@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_view"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/swipe_refresh_margin"
+        android:layout_height="match_parent" >
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/passenger_booking_list_margin"
+            android:id="@+id/vehicle_view" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="R.string.notice_no_gps"
+        style="@style/text_no_gps"
+        android:id="@+id/txt_no_result" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:layout_marginBottom="@dimen/passenger_booking_floating_button_margin"
+        android:layout_marginRight="@dimen/passenger_booking_floating_button_margin"
+        app:fabSize="normal"
+        android:scaleType="center"
+        app:backgroundTint="@color/colorPrimary"
+        android:layout_gravity="bottom|right"
+        app:srcCompat="@drawable/loc"
+        android:id="@+id/btn_filter" />
+
+</android.support.design.widget.CoordinatorLayout>

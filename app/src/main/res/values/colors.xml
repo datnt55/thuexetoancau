@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimaryTransparent">#ff3F51B5</color>
+    <color name="black">#000000</color>
+    <color name="red">#d81f06</color>
+    <color name="yellow">#ffe92b</color>
+    <color name="white">#ffffff</color>
+    <color name="blue">#438eff</color>
+    <color name="grey">#dedede</color>
+    <color name="grey_blur">#f3f3f3</color>
+    <color name="bg">#dddddd</color>
+    <color name="green">#61ad3f</color>
+    <color name="green_1">#53f40b</color>
+    <color name="green_2">#acff87</color>
+    <color name="blue_1">#aa5d5d5d</color>
+    <color name="blue_2">#aa414141</color>
+    <color name="md_red_600">#e53935</color>
+    <color name="md_red_400">#ef5350</color>
+    <color name="grey_1">#6d6d6d</color>
+    <color name="transparent">#00000000</color>
+    <color name="md_blue_800">#1565c0</color>
+    <color name="md_red_700">#d32f2f</color>
+    <color name="md_grey_400">#bdbdbd</color>
+    <color name="violet">#7f0184</color>2d587d
+    <color name="header">#2d587d</color>
+    <color name="color_text">#009245</color>
+    <color name="color_text_dark">#00612e</color>
+    <color name="orange">#f9a02b</color>
+    <color name="orange1">#ffddb1</color>
+    <color name="md_grey_800">#424242</color>
+</resources>

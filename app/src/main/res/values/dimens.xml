@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common -->
+    <dimen name="spacing_0">0dp</dimen>
+    <dimen name="spacing_5">3dp</dimen>
+    <!-- Splash activity -->
+    <dimen name="splash_spinner_size">50dp</dimen>
+    <dimen name="splash_notice_margin">15dp</dimen>
+    <dimen name="splash_spinner_margin">100dp</dimen>
+
+    <!-- passenger select action activity -->
+    <dimen name="select_action_layout_padding">10dp</dimen>
+    <dimen name="button_action_margin">20dp</dimen>
+
+    <!-- List passenger booking fragment-->
+     <dimen name="swipe_refresh_margin">5dp</dimen>
+    <dimen name="passenger_booking_list_margin">5dp</dimen>
+    <dimen name="passenger_booking_floating_button_margin">10dp</dimen>
+
+    <dimen name="menu_divider_margin">40dp</dimen>
+</resources>

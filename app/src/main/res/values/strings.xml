@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">Thuê xe toàn cầu</string>
+    <string name="title_activity_register_driver">RegisterDriverActivity</string>
+    <string-array name="move_array">
+        <item>Thành phố đi sân bay</item>
+        <item>Sân bay về thành phố</item>
+        <item>Khứ hồi</item>
+
+    </string-array>
+    <string name="splash_text">Đang load dữ liệu. Đảm bảo bạn đang kết nối mạng</string>
+    <string name="error_network">Bạn chưa kết nối mạng</string>
+    <string name="try_again">Thử lại</string>
+    <string name="exit">Thoát</string>
+    <string name="register_failure">Đăng ký thất bại</string>
+    <string name="haggle">Đặt giá</string>
+    <string name="text_price_notice">Giá bạn trả phải lớn hơn giá mua ngay</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Hủy</string>
+    <string name="telephone">Số điện thoại</string>
+    <string name="password">Mật khẩu</string>
+    <string name="notice_close_app">Bấm lần nữa để thoát</string>
+
+    <string name="select_action">Chọn hoạt động</string>
+
+    <!-- List passenger booking activity -->
+    <string name="information">Thông tin</string>
+    <string name="map">Bản đồ</string>
+    <string name="check_connection">Vui lòng kiểm tra lại kết nối</string>
+
+    <!-- GPS Dialog-->
+    <string name="notice">Thông báo</string>
+    <string name="gps_notice_content">Chức năng này cần lấy vị trí hiện tại của bạn.Bạn có muốn bật định vị</string>
+    <string name="gps_continue">Tiếp tục</string>
+    <string name="gps_no">Không</string>
+    <string name="getting_location">Đang lấy vị trí...</string>
+
+    <!-- Passdenger booking fragment-->
+    <string name="notice_no_gps"> Bạn phải bật chức năng định vị để dùng chức năng này</string>
+
+    <!-- Map Passdenger booking fragment-->
+    <string name="loading_data"> Đang tải dữ liệu</string>
+    <string name="distance_meter"> %1$d m</string>
+    <string name="distance_kilo_meter"> %1$d km</string>
+    <string name="distance_car"> Xe cách bạn %1$s</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="last_search">Các tìm kiếm trước</string>
+
+</resources>

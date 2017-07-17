@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "989692241948",
+    "firebase_url": "https://thuexetoancau-150306.firebaseio.com",
+    "project_id": "thuexetoancau-150306",
+    "storage_bucket": "thuexetoancau-150306.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:989692241948:android:519260169cc162a4",
+        "android_client_info": {
+          "package_name": "grab.com.thuexetoancau"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "989692241948-eve4a29im6dqq2gnudsopsk893trtklv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "grab.com.thuexetoancau",
+            "certificate_hash": "6B8D317B144A20040B5B3FD6764B918282F2FD9E"
+          }
+        },
+        {
+          "client_id": "989692241948-cd5dqu3ogi1nrdlu8oj3k7tp1nq9be0d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3yfD5Bd1n0JOTkJCrb4Jwv3NLREP8Jgg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "989692241948-cd5dqu3ogi1nrdlu8oj3k7tp1nq9be0d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
