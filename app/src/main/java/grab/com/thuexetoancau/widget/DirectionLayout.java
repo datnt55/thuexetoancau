@@ -13,6 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.utilities.Constants;
+import grab.com.thuexetoancau.utilities.Defines;
 
 /**
  * Created by DatNT on 7/18/2017.
@@ -26,7 +28,7 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     private TextView txtOneWay, txtRoundTrip;
     private TextView txtDirectionStart, txtDirectionEnd;
     private ImageView imgRoundTrip, imgOneWay, imgReverse;
-    private String endLocation;
+    private String endLocation , startLocation;
     public DirectionLayout(Context context, String endLocation) {
         super(context);
         this.mContext = context;
@@ -55,6 +57,8 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         layoutRoundTrip.setOnClickListener(this);
         txtDirectionStart = (TextView) view.findViewById(R.id.txt_direction_start);
         txtDirectionEnd = (TextView) view.findViewById(R.id.txt_direction_end);
+        txtDirectionStart.setOnClickListener(this);
+        txtDirectionEnd.setOnClickListener(this);
         txtDirectionEnd.setText(endLocation);
         imgReverse = (ImageView) view.findViewById(R.id.btn_reverse);
         imgReverse.setOnClickListener(this);
@@ -63,6 +67,17 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     public void setOnCallBackDirection(DirectionCallback callback){
         this.mCallback = callback;
     }
+
+    public void updateLocation(String location, int typeLocation){
+        if (typeLocation == Constants.DIRECTION_ENDPOINT) {
+            endLocation = location;
+            txtDirectionEnd.setText(endLocation);
+        }else{
+            startLocation = location;
+            txtDirectionStart.setText(startLocation);
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -92,11 +107,19 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
                 txtDirectionStart.setText(end);
                 txtDirectionEnd.setText(start);
                 break;
+            case R.id.txt_direction_end:
+                if (mCallback != null)
+                    mCallback.onDirectionClicked(Constants.DIRECTION_ENDPOINT);
+                break;
+            case R.id.txt_direction_start:
+                if (mCallback != null)
+                    mCallback.onDirectionClicked(Constants.DIRECTION_START_POINT);
+                break;
         }
     }
     public interface DirectionCallback {
         void onBackDirectionClicked();
-        void onMenuButtonClicked();
+        void onDirectionClicked(int type);
         void onSearchViewClicked();
         void onSearchViewSearching();
         void onChangeTextSearch(CharSequence s, AutoCompleteTextView edtSearch);

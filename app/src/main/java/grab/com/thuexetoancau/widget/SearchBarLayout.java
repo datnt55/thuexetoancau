@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.utilities.Constants;
+import grab.com.thuexetoancau.utilities.Defines;
 
 /**
  * Created by DatNT on 7/18/2017.
@@ -29,7 +31,6 @@ public class SearchBarLayout  extends LinearLayout implements View.OnClickListen
     private ImageView imgMenu;
     private Callback mCallback;
     private boolean showLastSearch =false;
-
     public SearchBarLayout(Context context) {
         super(context);
         mContext = context;
@@ -87,6 +88,16 @@ public class SearchBarLayout  extends LinearLayout implements View.OnClickListen
         mCallback.getLayoutSearchHeight(measureView(this));
     }
 
+    public void setShowLastSearch(boolean status){
+        if (!status)
+            imgMenu.setImageResource(R.drawable.ic_menu_black_24dp);
+        this.showLastSearch = status;
+    }
+
+    public void removeSearchText() {
+        edtSearch.setText("");
+    }
+
     private int measureView(final View view) {
         view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         return view.getMeasuredHeight();
@@ -109,7 +120,7 @@ public class SearchBarLayout  extends LinearLayout implements View.OnClickListen
                 if (!showLastSearch) {
                     showLastSearch = true;
                     if (mCallback != null)
-                        mCallback.onSearchViewClicked();
+                         mCallback.onSearchViewClicked();
                     imgMenu.setImageResource(R.drawable.ic_arrow_back_black_24dp);
                 }
                 break;

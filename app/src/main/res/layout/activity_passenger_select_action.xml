@@ -6,6 +6,12 @@
     android:fitsSystemWindows="true"
     android:layout_height="match_parent">
 
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.google.android.gms.maps.SupportMapFragment" />
+
    <grab.com.thuexetoancau.widget.SearchBarLayout
        android:id="@+id/layout_search"
        android:layout_width="match_parent"

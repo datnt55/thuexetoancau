@@ -20,19 +20,19 @@ import com.google.android.gms.location.places.Places;
 import java.util.ArrayList;
 
 import grab.com.thuexetoancau.R;
-import grab.com.thuexetoancau.activity.ListPassengerBookingActivity;
 import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
 import grab.com.thuexetoancau.adapter.LastSearchAdapter;
-import grab.com.thuexetoancau.model.Location;
+import grab.com.thuexetoancau.model.Position;
+import grab.com.thuexetoancau.utilities.Constants;
 import grab.com.thuexetoancau.widget.DividerItemDecoration;
 
 public class LastSearchFragment extends Fragment {
     private TextView txtLastSearch;
     private RecyclerView listLastSearch;
-    private ArrayList<Location> arrayLastSearch;
+    private ArrayList<Position> arrayLastSearch;
     private LastSearchAdapter adapter;
     private GoogleApiClient mGoogleApiClient;
-
+    private int directionType ;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +42,7 @@ public class LastSearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        directionType = getArguments().getInt(Constants.TYPE_POINT);
         View view = inflater.inflate(R.layout.fragment_last_search, container, false);
         initComponents(view);
         return view;
@@ -63,7 +64,7 @@ public class LastSearchFragment extends Fragment {
         listLastSearch.setAdapter(adapter);
         adapter.setOnClickListener(new LastSearchAdapter.onClickListener() {
             @Override
-            public void onItemClick(final Location location) {
+            public void onItemClick(final Position location) {
                 final String placeId = String.valueOf(location.getPlaceId());
                 PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
                 placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
@@ -72,7 +73,7 @@ public class LastSearchFragment extends Fragment {
                         if(places.getCount()==1){
                             Toast.makeText(getActivity(),String.valueOf(places.get(0).getLatLng()), Toast.LENGTH_SHORT).show();
                             PassengerSelectActionActivity activity = (PassengerSelectActionActivity) getActivity();
-                            activity.goToBookingCar(location);
+                            activity.goToBookingCar(location,directionType);
                         }
                     }
                 });
