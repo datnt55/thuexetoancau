@@ -40,7 +40,6 @@ public class ListPassengerBookingActivity extends AppCompatActivity implements L
     };
     private GoogleApiClient mGoogleApiClient;       // google place api
     private PlaceArrayAdapter mPlaceArrayFromAdapter , mPlaceToArrayAdapter; // Place adapter
-    private static final int GOOGLE_API_CLIENT_ID = 0;
     private OnConnected connected;
 
     @Override
@@ -87,7 +86,7 @@ public class ListPassengerBookingActivity extends AppCompatActivity implements L
     private void setupGoogleApi(){
         mGoogleApiClient = new GoogleApiClient.Builder(ListPassengerBookingActivity.this)
                 .addApi(Places.GEO_DATA_API)
-                .enableAutoManage(this, GOOGLE_API_CLIENT_ID, this)
+                .enableAutoManage(this, Constants.GOOGLE_API_CLIENT_ID, this)
                 .addConnectionCallbacks(this)
                 .build();
         mPlaceArrayFromAdapter = new PlaceArrayAdapter(this,Constants.BOUNDS_MOUNTAIN_VIEW, null);

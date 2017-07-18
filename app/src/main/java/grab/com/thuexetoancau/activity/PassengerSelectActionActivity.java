@@ -1,39 +1,55 @@
 package grab.com.thuexetoancau.activity;
 
 import android.animation.ValueAnimator;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.adapter.LastSearchAdapter;
 import grab.com.thuexetoancau.fragment.LastSearchFragment;
+import grab.com.thuexetoancau.model.Location;
+import grab.com.thuexetoancau.utilities.AnimUtils;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
+import grab.com.thuexetoancau.utilities.Constants;
 import grab.com.thuexetoancau.utilities.Defines;
+import grab.com.thuexetoancau.widget.DirectionLayout;
+import grab.com.thuexetoancau.widget.SearchBarLayout;
 
-public class PassengerSelectActionActivity extends AppCompatActivity {
+public class PassengerSelectActionActivity extends AppCompatActivity implements
+        SearchBarLayout.Callback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        DirectionLayout.DirectionCallback{
     private Button btnBooking, btnInfor;
-    private EditText edtSearch;
-    private FrameLayout layoutLastSearch, layoutMenu;
     private RelativeLayout layoutRoot;
-    private LinearLayout layoutSearch;
-    private ImageView imgMenu;
-    private boolean showLastSearch =false;
+    private SearchBarLayout layoutSearch;
+    private FrameLayout layoutLastSearch;
+    private int searchBarHeight;
+    private DirectionLayout layoutDirection;
+    private GoogleApiClient mGoogleApiClient;       // google place api
+    private LastSearchFragment lastSearchFragment;
+    private LastSearchAdapter mPlaceArrayAdapter; // Place adapter
+    private LinearLayout layoutFindCar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,35 +59,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity {
         btnBooking  = (Button)      findViewById(R.id.btn_booking);
         btnInfor    = (Button)      findViewById(R.id.btn_infor);
         layoutRoot  = (RelativeLayout) findViewById(R.id.root);
-
-        layoutLastSearch = (FrameLayout)  findViewById(R.id.fragment_last_search);
-        edtSearch   = (EditText)   findViewById(R.id.edt_search);
-        layoutSearch = (LinearLayout) findViewById(R.id.layout_search);
-        imgMenu = (ImageView) findViewById(R.id.img_menu);
-        layoutMenu = (FrameLayout) findViewById(R.id.layout_menu);
-        edtSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!showLastSearch) {
-                    showLastSearch = true;
-                    showLastSearchFragment();
-                }
-            }
-        });
-        edtSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                //here is your code
-
-            }
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
+        layoutSearch = (SearchBarLayout) findViewById(R.id.layout_search);
+        layoutSearch.setCallback(this);
+        layoutLastSearch = (FrameLayout) findViewById(R.id.fragment_last_search);
+        layoutFindCar = (LinearLayout) findViewById(R.id.layout_find_car);
         btnBooking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,51 +78,44 @@ public class PassengerSelectActionActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        setupGoogleApi();
     }
+
+
+    // Init google api
+    private void setupGoogleApi(){
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .enableAutoManage(this, Constants.GOOGLE_API_CLIENT_ID, this)
+                .addConnectionCallbacks(this)
+                .build();
+        mPlaceArrayAdapter = new LastSearchAdapter(this, Constants.BOUNDS_MOUNTAIN_VIEW, null);
+    }
+
 
     private void showLastSearchFragment() {
-        showLastSearch = true;
         layoutRoot.setBackgroundColor(ContextCompat.getColor(this, R.color.bg));
+        lastSearchFragment = new LastSearchFragment();
         FragmentTransaction fragmentManager =  getSupportFragmentManager().beginTransaction();
-        fragmentManager.replace(R.id.fragment_last_search, new LastSearchFragment()).commit();
-
-        int header = measureView(layoutSearch);
-        int height = Defines.APP_SCREEN_HEIGHT - header - (int)CommonUtilities.convertDpToPixel(20, this) - CommonUtilities.getStatusBarHeight(this);
-        ValueAnimator mAnimator = ValueAnimator.ofFloat(0, height);
-        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                Float a = (Float) animation.getAnimatedValue();
-                int x = a.intValue();
-                layoutLastSearch.getLayoutParams().height = x;
-                layoutLastSearch.requestLayout();
-            }
-        });
-        mAnimator.setDuration(400);
-        mAnimator.start();
-
-        imgMenu.setImageResource(R.drawable.ic_arrow_back_black_24dp);
-        layoutMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideLastSearhFragment();
-            }
-        });
+        fragmentManager.replace(R.id.fragment_last_search, lastSearchFragment).commit();
+        int height = Defines.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
+        animationTranslateView(0,height);
+        lastSearchFragment.setGoogleApiClient(mGoogleApiClient);
     }
 
-    private void hideLastSearhFragment() {
-        showLastSearch = false;
-        imgMenu.setImageResource(R.drawable.ic_menu_black_24dp);
-        layoutMenu.setOnClickListener(null);
+    private void hideLastSearchFragment() {
         layoutRoot.setBackgroundResource(R.drawable.bg_passenger_infor);
         View view = this.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-        int header = measureView(layoutSearch);
-        int height = Defines.APP_SCREEN_HEIGHT - header - (int)CommonUtilities.convertDpToPixel(20, this) - CommonUtilities.getStatusBarHeight(this);
-        ValueAnimator mAnimator = ValueAnimator.ofFloat(height,0);
+        int height = Defines.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
+        animationTranslateView(height,0);
+    }
+
+    private void animationTranslateView (int from , int to){
+        ValueAnimator mAnimator = ValueAnimator.ofFloat(from , to);
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -143,6 +127,33 @@ public class PassengerSelectActionActivity extends AppCompatActivity {
         });
         mAnimator.setDuration(400);
         mAnimator.start();
+    }
+
+    public void goToBookingCar(Location location){
+        layoutSearch.setTranslationY(-searchBarHeight);
+        layoutSearch.setTranslationY(-searchBarHeight);
+        hideLastSearchFragment();
+        //layoutSearch.animate().translationY(0).setDuration(300);
+        String destination = location.getPrimaryText() +", "+location.getSecondText();
+        layoutDirection = new DirectionLayout(this,destination);
+        layoutDirection.setOnCallBackDirection(this);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        layoutDirection.setLayoutParams(params);
+        layoutRoot.addView(layoutDirection);
+        int height = measureView(layoutDirection);
+        layoutDirection.setTranslationY(-height);
+        layoutDirection.animate()
+                .translationY(0)
+                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
+                .setDuration(400)
+                .start();
+        layoutDirection.setOnCallBackDirection(this);
+        layoutFindCar.animate()
+                .alpha(0)
+                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
+                .setDuration(1000)
+                .start();
     }
 
     private int measureView(final View view) {
@@ -151,11 +162,65 @@ public class PassengerSelectActionActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
+    public void onBackButtonClicked() {
+        hideLastSearchFragment();
     }
 
+    @Override
+    public void onBackDirectionClicked() {
+        int height = measureView(layoutDirection);
+        layoutDirection.animate()
+                .translationY(-height)
+                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
+                .setDuration(400)
+                .start();
+
+        layoutSearch.animate()
+                .translationY(0)
+                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
+                .setDuration(400)
+                .start();
+    }
+
+    @Override
+    public void onMenuButtonClicked() {
+
+    }
+
+    @Override
+    public void onSearchViewClicked() {
+        showLastSearchFragment();
+    }
+
+    @Override
+    public void onSearchViewSearching() {
+
+    }
+
+    @Override
+    public void onChangeTextSearch(CharSequence s,AutoCompleteTextView edtSearch) {
+        mPlaceArrayAdapter.getFilter().filter(s.toString());
+        lastSearchFragment.setAdapter(mPlaceArrayAdapter);
+        lastSearchFragment.setCharacter(s.toString());
+    }
+
+    @Override
+    public void getLayoutSearchHeight(int height) {
+        searchBarHeight = height;
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        mPlaceArrayAdapter.setGoogleApiClient(mGoogleApiClient);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mPlaceArrayAdapter.setGoogleApiClient(null);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, R.string.check_connection, Toast.LENGTH_LONG).show();
+    }
 }

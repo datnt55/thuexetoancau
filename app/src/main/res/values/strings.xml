@@ -43,7 +43,10 @@
     <string name="distance_kilo_meter"> %1$d km</string>
     <string name="distance_car"> Xe cách bạn %1$s</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="last_search">Các tìm kiếm trước</string>
+    <!-- layout search bar -->
+    <string name="last_search">CÁC TÌM KIẾM TRƯỚC</string>
+    <string name="recommend_search">ĐỊA ĐIỂM GỢI Ý</string>
 
+    <!-- layout direction -->
+    <string name="current_location">Vị trí của bạn</string>
 </resources>

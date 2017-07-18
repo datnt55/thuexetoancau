@@ -1,7 +1,5 @@
 package grab.com.thuexetoancau.fragment;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,17 +8,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.Places;
 
 import java.util.ArrayList;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.activity.ListPassengerBookingActivity;
+import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
 import grab.com.thuexetoancau.adapter.LastSearchAdapter;
 import grab.com.thuexetoancau.model.Location;
-import grab.com.thuexetoancau.utilities.DividerItemDecoration;
+import grab.com.thuexetoancau.widget.DividerItemDecoration;
 
 public class LastSearchFragment extends Fragment {
+    private TextView txtLastSearch;
     private RecyclerView listLastSearch;
     private ArrayList<Location> arrayLastSearch;
+    private LastSearchAdapter adapter;
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,14 +42,13 @@ public class LastSearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        dummyData();
         View view = inflater.inflate(R.layout.fragment_last_search, container, false);
         initComponents(view);
-
         return view;
     }
 
     private void initComponents(View view) {
+        txtLastSearch = (TextView) view.findViewById(R.id.txt_last_search);
         listLastSearch = (RecyclerView) view.findViewById(R.id.list_last_search);
         // set cardview
         listLastSearch.setHasFixedSize(true);
@@ -45,15 +56,39 @@ public class LastSearchFragment extends Fragment {
         listLastSearch.setLayoutManager(llm);
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(getActivity(), LinearLayout.VERTICAL);
         listLastSearch.addItemDecoration(mDividerItemDecoration);
-        LastSearchAdapter adapter = new LastSearchAdapter(getActivity(), arrayLastSearch);
-        listLastSearch.setAdapter(adapter);
     }
 
-    private void dummyData() {
-        arrayLastSearch = new ArrayList<>();
-        arrayLastSearch.add(new Location("Phạm Ngọc Thạch", "Đống Đa, Hà Nội"));
-        arrayLastSearch.add(new Location("Tôn Thất Thuyết", "Cầu Giấy, Hà Nội"));
-        arrayLastSearch.add(new Location("Bạch Mai", "Hai Bà Trưng, Hà Nội"));
+    public void setAdapter(LastSearchAdapter mAdapter){
+        this.adapter = mAdapter;
+        listLastSearch.setAdapter(adapter);
+        adapter.setOnClickListener(new LastSearchAdapter.onClickListener() {
+            @Override
+            public void onItemClick(final Location location) {
+                final String placeId = String.valueOf(location.getPlaceId());
+                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi.getPlaceById(mGoogleApiClient, placeId);
+                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(PlaceBuffer places) {
+                        if(places.getCount()==1){
+                            Toast.makeText(getActivity(),String.valueOf(places.get(0).getLatLng()), Toast.LENGTH_SHORT).show();
+                            PassengerSelectActionActivity activity = (PassengerSelectActionActivity) getActivity();
+                            activity.goToBookingCar(location);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public void setCharacter(String constraint){
+        if (constraint.equals(""))
+            txtLastSearch.setText(R.string.last_search);
+        else
+            txtLastSearch.setText(R.string.recommend_search);
+    }
+
+    public void setGoogleApiClient(GoogleApiClient mGoogleApiClient){
+        this.mGoogleApiClient = mGoogleApiClient;
     }
 
 }

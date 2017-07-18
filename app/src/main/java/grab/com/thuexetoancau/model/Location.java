@@ -7,27 +7,37 @@ import android.widget.TextView;
  */
 
 public class Location {
-    private String txtLocation;
-    private String txtAddress;
+    private String placeId;
+    private String primaryText;
+    private String secondText;
 
-    public Location(String txtLocation, String txtAddress) {
-        this.txtLocation = txtLocation;
-        this.txtAddress = txtAddress;
+    public Location(String placeId, String primaryText, String secondText) {
+        this.placeId = placeId;
+        this.primaryText = primaryText;
+        this.secondText = secondText;
     }
 
-    public String getTxtLocation() {
-        return txtLocation;
+    public String getPlaceId() {
+        return placeId;
     }
 
-    public void setTxtLocation(String txtLocation) {
-        this.txtLocation = txtLocation;
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
     }
 
-    public String getTxtAddress() {
-        return txtAddress;
+    public String getPrimaryText() {
+        return primaryText;
     }
 
-    public void setTxtAddress(String txtAddress) {
-        this.txtAddress = txtAddress;
+    public void setPrimaryText(String primaryText) {
+        this.primaryText = primaryText;
+    }
+
+    public String getSecondText() {
+        return secondText;
+    }
+
+    public void setSecondText(String secondText) {
+        this.secondText = secondText;
     }
 }
