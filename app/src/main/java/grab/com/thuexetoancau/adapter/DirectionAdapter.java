@@ -1,0 +1,189 @@
+package grab.com.thuexetoancau.adapter;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.InsetDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.listener.ItemTouchHelperAdapter;
+import grab.com.thuexetoancau.listener.ItemTouchHelperViewHolder;
+import grab.com.thuexetoancau.utilities.AnimUtils;
+import grab.com.thuexetoancau.utilities.CommonUtilities;
+import grab.com.thuexetoancau.utilities.PathInterpolatorCompat;
+import grab.com.thuexetoancau.utilities.SharePreference;
+import grab.com.thuexetoancau.widget.TextDrawable;
+
+/**
+ * Created by DatNT on 7/19/2017.
+ */
+
+public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.ViewHolder> implements ItemTouchHelperAdapter {
+
+
+    private static final String LOG_TAG = PassengerCarAdapter.class.getSimpleName();
+    private Context mContext;
+    private List<String> arrayDirection;
+    private ItemClickListener listener;
+    private boolean isDrapping = false;
+    public DirectionAdapter(Context context, ArrayList<String> vehicle) {
+        mContext = context;
+        this.arrayDirection = vehicle;
+    }
+
+
+    @Override
+    public DirectionAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        Log.d(LOG_TAG, "ON create view holder " + i);
+
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_direction, viewGroup, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(final DirectionAdapter.ViewHolder holder, final int position) {
+        holder.txtPlace.setText(arrayDirection.get(position));
+        if (position == 0) {
+            holder.imgRole.setVisibility(View.VISIBLE);
+            holder.imgRole.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
+            holder.imgRole.setImageResource(R.drawable.ic_radio_button_checked_black_24dp);
+            holder.layoutRouteDow.setVisibility(View.VISIBLE);
+            holder.layoutRouteUp.setVisibility(View.INVISIBLE);
+            holder.btnFunction.setImageResource(R.drawable.ic_autorenew_black_24dp);
+        }else if (position == arrayDirection.size()-1) {
+            holder.imgRole.setVisibility(View.VISIBLE);
+            holder.imgRole.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
+            holder.imgRole.setImageResource(R.drawable.ic_location_on_black_24dp);
+            holder.layoutRouteDow.setVisibility(View.INVISIBLE);
+            holder.layoutRouteUp.setVisibility(View.VISIBLE);
+            holder.btnFunction.setImageResource(R.drawable.ic_add_black_24dp);
+            holder.btnFunction.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(listener != null)
+                        listener.onNewStopPoint();
+                }
+            });
+        }else{
+            holder.imgRole.setVisibility(View.VISIBLE);
+            holder.layoutRouteDow.setVisibility(View.VISIBLE);
+            holder.layoutRouteUp.setVisibility(View.VISIBLE);
+            holder.btnFunction.setImageResource(R.drawable.ic_close_black_24dp);
+            holder.btnFunction.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(listener != null)
+                        listener.onRemoveStopPoint(position);
+                }
+            });
+            TextDrawable drawable = TextDrawable.builder()
+                    .beginConfig()
+                    .withBorder((int) CommonUtilities.convertDpToPixel(2,mContext))
+                    .textColor(0xffffffff)
+                    .width((int) CommonUtilities.convertDpToPixel(16,mContext))  // width in px
+                    .height((int) CommonUtilities.convertDpToPixel(16,mContext)) // height in px
+                    .fontSize(28)
+                    .endConfig()
+                    .buildRound(CommonUtilities.getCharacterDirection(position), 0xff4285f4);
+            holder.imgRole.setImageDrawable(drawable);
+        }
+        holder.txtPlace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(listener != null)
+                    listener.onChangeLocation(position);
+            }
+        });
+
+    }
+
+
+    public void setOnItemClickListener(ItemClickListener listener){
+        this.listener = listener;
+    }
+
+    @Override
+    public int getItemCount() {
+
+        if (arrayDirection == null) return 0;
+        else return arrayDirection.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
+    }
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        Collections.swap(arrayDirection, fromPosition, toPosition);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        arrayDirection.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
+        TextView txtPlace;
+        ImageView btnFunction;
+        ImageView imgRole;
+        LinearLayout layoutRouteUp;
+        LinearLayout layoutRouteDow;
+        FrameLayout layoutPlace;
+        LinearLayout layoutRoot;
+        public ViewHolder(View itemView) {
+            super(itemView);
+            txtPlace = (TextView) itemView.findViewById(R.id.txt_direction);
+            btnFunction = (ImageView) itemView.findViewById(R.id.btn_action);
+            imgRole = (ImageView) itemView.findViewById(R.id.img_role);
+            layoutRouteUp = (LinearLayout) itemView.findViewById(R.id.layout_route_up);
+            layoutRouteDow = (LinearLayout) itemView.findViewById(R.id.layout_route_down);
+            layoutPlace = (FrameLayout) itemView.findViewById(R.id.layout_place);
+            layoutRoot = (LinearLayout) itemView.findViewById(R.id.layout_root);
+        }
+        @Override
+        public void onItemSelected() {
+            itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shadow));
+            layoutPlace.animate().scaleX(1.02f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+            layoutPlace.animate().scaleY(1.2f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+            txtPlace.animate().scaleX(0.98f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+            txtPlace.animate().scaleY(0.8f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+        }
+
+        @Override
+        public void onItemClear() {
+            itemView.setBackgroundColor(0);
+            layoutPlace.animate().scaleX(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+            layoutPlace.animate().scaleY(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+            txtPlace.animate().scaleX(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+            txtPlace.animate().scaleY(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+            notifyDataSetChanged();
+        }
+    }
+
+    public interface ItemClickListener{
+        void onNewStopPoint();
+        void onRemoveStopPoint(int position);
+        void onChangeLocation(int postion);
+    }
+}

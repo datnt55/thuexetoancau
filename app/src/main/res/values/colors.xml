@@ -8,7 +8,7 @@
     <color name="red">#d81f06</color>
     <color name="yellow">#ffe92b</color>
     <color name="white">#ffffff</color>
-    <color name="blue">#438eff</color>
+    <color name="blue">#689df6</color>
     <color name="grey">#dedede</color>
     <color name="grey_blur">#f3f3f3</color>
     <color name="bg">#dddddd</color>
@@ -31,4 +31,5 @@
     <color name="orange">#f9a02b</color>
     <color name="orange1">#ffddb1</color>
     <color name="md_grey_800">#424242</color>
+    <color name="blue_light">#4285f4</color>
 </resources>

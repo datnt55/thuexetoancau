@@ -14,5 +14,7 @@ public class Constants {
     public static final int GOOGLE_API_CLIENT_ID = 0;
     public static final int DIRECTION_START_POINT = 1;
     public static final int DIRECTION_ENDPOINT = 2;
+    public static final int DIRECTION_NEW_STOP_POINT = 3;
     public static final String TYPE_POINT = "type direction point";
+    public static final String POSITION_POINT = "position direction point";
 }

@@ -1,5 +1,6 @@
 package grab.com.thuexetoancau.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,7 +33,8 @@ public class LastSearchFragment extends Fragment {
     private ArrayList<Position> arrayLastSearch;
     private LastSearchAdapter adapter;
     private GoogleApiClient mGoogleApiClient;
-    private int directionType ;
+    private int directionPosition = -1;
+    private OnAddNewDirection listener;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +44,8 @@ public class LastSearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        directionType = getArguments().getInt(Constants.TYPE_POINT);
+        if (getArguments().containsKey(Constants.POSITION_POINT))
+            directionPosition = getArguments().getInt(Constants.POSITION_POINT);
         View view = inflater.inflate(R.layout.fragment_last_search, container, false);
         initComponents(view);
         return view;
@@ -72,8 +75,14 @@ public class LastSearchFragment extends Fragment {
                     public void onResult(PlaceBuffer places) {
                         if(places.getCount()==1){
                             Toast.makeText(getActivity(),String.valueOf(places.get(0).getLatLng()), Toast.LENGTH_SHORT).show();
-                            PassengerSelectActionActivity activity = (PassengerSelectActionActivity) getActivity();
-                            activity.goToBookingCar(location,directionType);
+                          /*  PassengerSelectActionActivity activity = (PassengerSelectActionActivity) getActivity();
+                            activity.goToBookingCar(location,directionPosition);*/
+                          if (directionPosition == -1) {
+                              if (listener != null)
+                                  listener.onNewDirection(location);
+                          }else
+                          if (listener != null)
+                              listener.onChangeLocation(location, directionPosition);
                         }
                     }
                 });
@@ -92,4 +101,14 @@ public class LastSearchFragment extends Fragment {
         this.mGoogleApiClient = mGoogleApiClient;
     }
 
+    @Override
+    public void onAttach(Context activity) {
+        super.onAttach(activity);
+        listener = (PassengerSelectActionActivity) activity;
+    }
+
+    public interface OnAddNewDirection {
+        void onNewDirection(Position location);
+        void onChangeLocation(Position location,int directionType);
+    }
 }

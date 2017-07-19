@@ -3,16 +3,25 @@ package grab.com.thuexetoancau.widget;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.adapter.DirectionAdapter;
+import grab.com.thuexetoancau.listener.OnStartDragListener;
+import grab.com.thuexetoancau.listener.SimpleItemTouchHelperCallback;
 import grab.com.thuexetoancau.utilities.Constants;
 import grab.com.thuexetoancau.utilities.Defines;
 
@@ -20,25 +29,33 @@ import grab.com.thuexetoancau.utilities.Defines;
  * Created by DatNT on 7/18/2017.
  */
 
-public class DirectionLayout extends LinearLayout implements View.OnClickListener {
+public class DirectionLayout extends LinearLayout implements View.OnClickListener, DirectionAdapter.ItemClickListener, OnStartDragListener {
     private Context mContext;
     public ImageView imgBack;
     private DirectionCallback mCallback;
     private LinearLayout layoutOneWay, layoutRoundTrip;
     private TextView txtOneWay, txtRoundTrip;
-    private TextView txtDirectionStart, txtDirectionEnd;
-    private ImageView imgRoundTrip, imgOneWay, imgReverse;
-    private String endLocation , startLocation;
+    private ImageView imgRoundTrip, imgOneWay;
+    private RecyclerView listDirection;
+    private ArrayList<String> routes;
+    private DirectionAdapter adapter;
+    private int listHeight;
+    private ItemTouchHelper mItemTouchHelper;
+
     public DirectionLayout(Context context, String endLocation) {
         super(context);
         this.mContext = context;
-        this.endLocation = endLocation;
+        routes = new ArrayList<>();
+        routes.add("Vị trí của bạn");
+        routes.add(endLocation);
         initLayout();
     }
 
     public DirectionLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
+        routes = new ArrayList<>();
+        routes.add("Vị trí của bạn");
         initLayout();
     }
 
@@ -55,27 +72,51 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         imgRoundTrip = (ImageView) view.findViewById(R.id.img_round_trip);
         layoutOneWay.setOnClickListener(this);
         layoutRoundTrip.setOnClickListener(this);
-        txtDirectionStart = (TextView) view.findViewById(R.id.txt_direction_start);
-        txtDirectionEnd = (TextView) view.findViewById(R.id.txt_direction_end);
-        txtDirectionStart.setOnClickListener(this);
-        txtDirectionEnd.setOnClickListener(this);
-        txtDirectionEnd.setText(endLocation);
-        imgReverse = (ImageView) view.findViewById(R.id.btn_reverse);
-        imgReverse.setOnClickListener(this);
+        listDirection = (RecyclerView) view.findViewById(R.id.list_direction);
+        listDirection.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(mContext);
+        listDirection.setLayoutManager(llm);
+        adapter = new DirectionAdapter(mContext, routes);
+        listDirection.setAdapter(adapter);
+        adapter.setOnItemClickListener(this);
+        listHeight = measureView(listDirection)/2*3;
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(listDirection);
     }
 
     public void setOnCallBackDirection(DirectionCallback callback){
         this.mCallback = callback;
     }
 
-    public void updateLocation(String location, int typeLocation){
-        if (typeLocation == Constants.DIRECTION_ENDPOINT) {
-            endLocation = location;
-            txtDirectionEnd.setText(endLocation);
-        }else{
-            startLocation = location;
-            txtDirectionStart.setText(startLocation);
+    public void updateLocation(String location, int position){
+        if (position == -1) {
+            routes.add(routes.size() - 1, location);
+            adapter.notifyItemInserted(routes.size() - 1);
+            adapter.notifyItemRangeChanged(position,routes.size());
+            checkSizeOfRecyclerView(listDirection);
+        }else {
+            routes.set(position, location);
+            adapter.notifyItemChanged(position);
         }
+        listDirection.scrollToPosition(routes.size()-1);
+    }
+
+    private void checkSizeOfRecyclerView(RecyclerView list) {
+        int curHeight = measureView(list);
+        if (curHeight > listHeight){
+            LinearLayout.LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, listHeight);
+            list.setLayoutParams(params);
+        }
+        if (curHeight < listHeight){
+            LinearLayout.LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, curHeight);
+            list.setLayoutParams(params);
+        }
+    }
+
+    private int measureView(final View view) {
+        view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        return view.getMeasuredHeight();
     }
 
     @Override
@@ -101,26 +142,38 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
                 txtOneWay.setTextColor(ContextCompat.getColor(mContext,R.color.white));
                 imgOneWay.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
                 break;
-            case R.id.btn_reverse:
-                String start = txtDirectionStart.getText().toString();
-                String end = txtDirectionEnd.getText().toString();
-                txtDirectionStart.setText(end);
-                txtDirectionEnd.setText(start);
-                break;
-            case R.id.txt_direction_end:
-                if (mCallback != null)
-                    mCallback.onDirectionClicked(Constants.DIRECTION_ENDPOINT);
-                break;
-            case R.id.txt_direction_start:
-                if (mCallback != null)
-                    mCallback.onDirectionClicked(Constants.DIRECTION_START_POINT);
-                break;
         }
     }
+
+    @Override
+    public void onNewStopPoint() {
+        if (mCallback != null)
+            mCallback.onNewStopPoint();
+    }
+
+    @Override
+    public void onRemoveStopPoint(int position) {
+        routes.remove(position);
+        adapter.notifyItemRemoved(position);
+        adapter.notifyItemRangeChanged(position,routes.size());
+        checkSizeOfRecyclerView(listDirection);
+    }
+
+    @Override
+    public void onChangeLocation(int postion) {
+        if (mCallback != null)
+            mCallback.onDirectionClicked(postion);
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
+    }
+
     public interface DirectionCallback {
         void onBackDirectionClicked();
         void onDirectionClicked(int type);
-        void onSearchViewClicked();
+        void onNewStopPoint();
         void onSearchViewSearching();
         void onChangeTextSearch(CharSequence s, AutoCompleteTextView edtSearch);
         void getLayoutSearchHeight(int height);
