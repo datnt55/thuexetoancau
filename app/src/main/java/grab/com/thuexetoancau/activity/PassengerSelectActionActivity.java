@@ -251,7 +251,17 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onBackButtonClicked() {
         hideLastSearchFragment();
-
+        if (!layoutSearch.isFinishSearchBar()){
+            int height = measureView(layoutDirection);
+            layoutDirection.setTranslationY(-height);
+            layoutDirection.animate()
+                    .translationY(0)
+                    .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
+                    .setDuration(400)
+                    .start();
+            //layoutSearch.setShowLastSearch(true);
+        }
+        layoutSearch.setShowLastSearch(false);
     }
 
     @Override
@@ -269,10 +279,14 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 .setDuration(400)
                 .start();
         layoutSearch.setShowLastSearch(false);
+        layoutSearch.setFinishSearchBar(true);
+        layoutDirection = null;
+        layoutRoot.removeView(layoutDirection);
     }
 
     @Override
     public void onDirectionClicked(int position) {
+
         int height = measureView(layoutDirection);
         layoutDirection.animate()
                 .translationY(-height)
@@ -286,11 +300,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 .setDuration(400)
                 .start();
         layoutSearch.setShowLastSearch(true);
+        layoutSearch.requestForcus();
         showLastSearchFragment(true, position);
     }
 
     @Override
     public void onNewStopPoint() {
+        layoutSearch.setFinishSearchBar(false);
         int height = measureView(layoutDirection);
         layoutDirection.animate()
                 .translationY(-height)
@@ -304,6 +320,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 .setDuration(400)
                 .start();
         layoutSearch.setShowLastSearch(true);
+        layoutSearch.requestForcus();
         showLastSearchFragment(false,0);
     }
 

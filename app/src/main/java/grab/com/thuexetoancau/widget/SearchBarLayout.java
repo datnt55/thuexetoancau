@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -31,6 +32,7 @@ public class SearchBarLayout  extends LinearLayout implements View.OnClickListen
     private ImageView imgMenu;
     private Callback mCallback;
     private boolean showLastSearch =false;
+    private boolean isEndSearchBar = true;
     public SearchBarLayout(Context context) {
         super(context);
         mContext = context;
@@ -91,8 +93,24 @@ public class SearchBarLayout  extends LinearLayout implements View.OnClickListen
     public void setShowLastSearch(boolean status){
         if (!status)
             imgMenu.setImageResource(R.drawable.ic_menu_black_24dp);
+        else
+            imgMenu.setImageResource(R.drawable.ic_arrow_back_black_24dp);
         this.showLastSearch = status;
     }
+
+    public void requestForcus(){
+        edtSearch.requestFocus();
+        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(edtSearch, InputMethodManager.SHOW_IMPLICIT);
+    }
+    public void setFinishSearchBar(boolean finish){
+        this.isEndSearchBar = finish;
+    }
+
+    public boolean isFinishSearchBar(){
+        return isEndSearchBar;
+    }
+
 
     public void removeSearchText() {
         edtSearch.setText("");
@@ -108,7 +126,6 @@ public class SearchBarLayout  extends LinearLayout implements View.OnClickListen
         switch (v.getId()){
             case R.id.layout_menu:
                 if (showLastSearch) {
-                    showLastSearch = false;
                     imgMenu.setImageResource(R.drawable.ic_menu_black_24dp);
                     if (mCallback != null)
                         mCallback.onBackButtonClicked();

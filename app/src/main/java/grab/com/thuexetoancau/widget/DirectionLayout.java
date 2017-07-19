@@ -41,6 +41,7 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     private DirectionAdapter adapter;
     private int listHeight;
     private ItemTouchHelper mItemTouchHelper;
+    private SimpleItemTouchHelperCallback callback;
 
     public DirectionLayout(Context context, String endLocation) {
         super(context);
@@ -76,13 +77,20 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         listDirection.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(mContext);
         listDirection.setLayoutManager(llm);
-        adapter = new DirectionAdapter(mContext, routes);
+        adapter = new DirectionAdapter(mContext, routes, listDirection);
         listDirection.setAdapter(adapter);
         adapter.setOnItemClickListener(this);
         listHeight = measureView(listDirection)/2*3;
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+        adapter.setStandardHeight(listHeight);
+        callback = new SimpleItemTouchHelperCallback(adapter);
+        adapter.setItemTouchCallBack(callback);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(listDirection);
+        // If less or equal 2 direction, disable swipe
+        if (routes.size() > 2)
+            callback.setItemSwipe(true);
+        else
+            callback.setItemSwipe(false);
     }
 
     public void setOnCallBackDirection(DirectionCallback callback){
@@ -94,7 +102,10 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
             routes.add(routes.size() - 1, location);
             adapter.notifyItemInserted(routes.size() - 1);
             adapter.notifyItemRangeChanged(position,routes.size());
-            checkSizeOfRecyclerView(listDirection);
+            LinearLayout.LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, listHeight);
+            listDirection.setLayoutParams(params);
+            if (routes.size() > 2)
+                callback.setItemSwipe(true);
         }else {
             routes.set(position, location);
             adapter.notifyItemChanged(position);
@@ -154,9 +165,11 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     @Override
     public void onRemoveStopPoint(int position) {
         routes.remove(position);
-        adapter.notifyItemRemoved(position);
-        adapter.notifyItemRangeChanged(position,routes.size());
+        adapter.notifyDataSetChanged();
         checkSizeOfRecyclerView(listDirection);
+        if (routes.size()<= 2){
+            callback.setItemSwipe(false);
+        }
     }
 
     @Override

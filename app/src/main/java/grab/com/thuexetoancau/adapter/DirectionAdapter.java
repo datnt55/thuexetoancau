@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ import java.util.List;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.listener.ItemTouchHelperAdapter;
 import grab.com.thuexetoancau.listener.ItemTouchHelperViewHolder;
+import grab.com.thuexetoancau.listener.SimpleItemTouchHelperCallback;
 import grab.com.thuexetoancau.utilities.AnimUtils;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.PathInterpolatorCompat;
@@ -42,12 +44,43 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
     private Context mContext;
     private List<String> arrayDirection;
     private ItemClickListener listener;
-    private boolean isDrapping = false;
-    public DirectionAdapter(Context context, ArrayList<String> vehicle) {
+    private SimpleItemTouchHelperCallback callBack;
+    private RecyclerView listDirection;
+    private int listHeight;
+    public DirectionAdapter(Context context, ArrayList<String> vehicle,RecyclerView listDirection) {
         mContext = context;
         this.arrayDirection = vehicle;
+        this.listDirection = listDirection;
     }
 
+    public void setStandardHeight(int height){
+        this.listHeight = height;
+    }
+    private void checkSizeOfRecyclerView(RecyclerView list) {
+        int curHeight = measureView(list);
+        if (curHeight > listHeight){
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, listHeight);
+            list.setLayoutParams(params);
+        }
+        if (curHeight < listHeight){
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, curHeight);
+            list.setLayoutParams(params);
+        }
+    }
+
+    private int measureView(final View view) {
+        view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        return view.getMeasuredHeight();
+    }
+
+
+    public void setItemTouchCallBack(SimpleItemTouchHelperCallback callBack){
+        this.callBack = callBack;
+    }
+
+    public void setOnItemClickListener(ItemClickListener listener){
+        this.listener = listener;
+    }
 
     @Override
     public DirectionAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -114,14 +147,8 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
 
     }
 
-
-    public void setOnItemClickListener(ItemClickListener listener){
-        this.listener = listener;
-    }
-
     @Override
     public int getItemCount() {
-
         if (arrayDirection == null) return 0;
         else return arrayDirection.size();
     }
@@ -135,12 +162,24 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
     public void onItemMove(int fromPosition, int toPosition) {
         Collections.swap(arrayDirection, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
+        if (fromPosition == 0 || fromPosition == arrayDirection.size()-1 || toPosition == 0 || toPosition == arrayDirection.size()-1)
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    notifyDataSetChanged();
+                }
+            },500);
+
     }
 
     @Override
     public void onItemDismiss(int position) {
         arrayDirection.remove(position);
-        notifyItemRemoved(position);
+        notifyDataSetChanged();
+        checkSizeOfRecyclerView(listDirection);
+        if (arrayDirection.size()<= 2){
+            callBack.setItemSwipe(false);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
@@ -177,7 +216,7 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
             layoutPlace.animate().scaleY(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             txtPlace.animate().scaleX(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             txtPlace.animate().scaleY(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
-            notifyDataSetChanged();
+//            notifyDataSetChanged();
         }
     }
 
