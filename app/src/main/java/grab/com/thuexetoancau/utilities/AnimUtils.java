@@ -212,4 +212,35 @@ public class AnimUtils {
         });
         animator.start();
     }
+
+    public static void slideUp(View view, int height){
+        view.animate()
+                .translationY(-height)
+                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
+                .setDuration(400)
+                .start();
+    }
+
+    public static void slideDown(View view, int height){
+        view.animate()
+                .translationY(height)
+                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
+                .setDuration(400)
+                .start();
+    }
+
+    public static void translate (final View view, int from , int to){
+        ValueAnimator mAnimator = ValueAnimator.ofFloat(from , to);
+        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                Float a = (Float) animation.getAnimatedValue();
+                int x = a.intValue();
+                view.getLayoutParams().height = x;
+                view.requestLayout();
+            }
+        });
+        mAnimator.setDuration(400);
+        mAnimator.start();
+    }
 }

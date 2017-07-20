@@ -2,6 +2,8 @@ package grab.com.thuexetoancau.utilities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,6 +16,8 @@ import org.joda.time.DateTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
+
+import grab.com.thuexetoancau.R;
 
 /**
  * Created by DatNT on 11/9/2016.
@@ -188,5 +192,28 @@ public class CommonUtilities {
             default:
                 return "#";
         }
+    }
+
+    // Show dialog request turn on gps
+    public static void settingRequestTurnOnLocation(final Activity mActivity) {
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(mActivity);
+        alertDialogBuilder.setTitle(R.string.notice);  // GPS not found
+        alertDialogBuilder.setMessage(R.string.gps_notice_content)
+                .setCancelable(false)
+                .setPositiveButton(R.string.gps_continue,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                mActivity.startActivityForResult(callGPSSettingIntent,1000);
+                            }
+                        });
+        alertDialogBuilder.setNegativeButton(R.string.gps_no,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        android.app.AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
     }
 }

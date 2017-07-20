@@ -1,6 +1,5 @@
 package grab.com.thuexetoancau.activity;
 
-import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,10 +7,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -45,6 +49,7 @@ import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.GPSTracker;
 import grab.com.thuexetoancau.widget.DirectionLayout;
 import grab.com.thuexetoancau.widget.SearchBarLayout;
+import grab.com.thuexetoancau.widget.TransportationLayout;
 
 public class PassengerSelectActionActivity extends AppCompatActivity implements
         SearchBarLayout.Callback,
@@ -52,52 +57,58 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         DirectionLayout.DirectionCallback,
         OnMapReadyCallback,
-        LastSearchFragment.OnAddNewDirection {
+        LastSearchFragment.OnAddNewDirection,
+        View.OnClickListener {
+
     private Button btnBooking, btnInfor;
     private RelativeLayout layoutRoot;
     private SearchBarLayout layoutSearch;
-    private FrameLayout layoutLastSearch;
+    private FrameLayout layoutPredict;
     private int searchBarHeight;
     private DirectionLayout layoutDirection;
     private GoogleApiClient mGoogleApiClient;       // google place api
-    private LastSearchFragment lastSearchFragment;
+    private LastSearchFragment mPredictFragment;
     private LastSearchAdapter mPlaceArrayAdapter; // Place adapter
-    private LinearLayout layoutFindCar;
+    private LinearLayout layoutFindCar, layoutTransport;
     private GoogleMap mMap;
+    private Context mContext;
     private GPSTracker gpsTracker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_select_action);
+        initComponents();
+    }
 
-
+    private void initComponents(){
         btnBooking  = (Button)      findViewById(R.id.btn_booking);
         btnInfor    = (Button)      findViewById(R.id.btn_infor);
         layoutRoot  = (RelativeLayout) findViewById(R.id.root);
         layoutSearch = (SearchBarLayout) findViewById(R.id.layout_search);
-        layoutSearch.setCallback(this);
-        layoutLastSearch = (FrameLayout) findViewById(R.id.fragment_last_search);
+        layoutPredict = (FrameLayout) findViewById(R.id.fragment_last_search);
         layoutFindCar = (LinearLayout) findViewById(R.id.layout_find_car);
-        btnBooking.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(PassengerSelectActionActivity.this, FormPassengerBookingActivity.class);
-                startActivity(intent);
-            }
-        });
 
-        btnInfor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(PassengerSelectActionActivity.this, ListPassengerBookingActivity.class);
-                startActivity(intent);
-            }
-        });
+        layoutSearch.setCallback(this);
+        btnBooking.setOnClickListener(this);
+        btnInfor.setOnClickListener(this);
         setupGoogleApi();
         SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         map.getMapAsync(this);
+        mContext = this;
+        setupActionBarDrawerToogle();
     }
-
+    private void setupActionBarDrawerToogle() {
+        final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
+                menuItem.setChecked(true);
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
+    }
 
     // Init google api
     private void setupGoogleApi(){
@@ -109,72 +120,48 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         mPlaceArrayAdapter = new LastSearchAdapter(this, Constants.BOUNDS_MOUNTAIN_VIEW, null);
     }
 
+    /**
+     * Show layout predict location
+     * If change exist location, pass to position of it
+     */
     private void showLastSearchFragment(boolean addnew, int position) {
-        layoutRoot.setBackgroundColor(ContextCompat.getColor(this, R.color.bg));
-        lastSearchFragment = new LastSearchFragment();
+        mPredictFragment = new LastSearchFragment();
         Bundle bundle = new Bundle();
         if (addnew)
             bundle.putInt(Constants.POSITION_POINT,position );
-        lastSearchFragment.setArguments(bundle);
+        mPredictFragment.setArguments(bundle);
+
+        // Add predict fragment to layout
         FragmentTransaction fragmentManager =  getSupportFragmentManager().beginTransaction();
-        fragmentManager.replace(R.id.fragment_last_search, lastSearchFragment).commit();
+        fragmentManager.replace(R.id.fragment_last_search, mPredictFragment).commit();
         int height = Defines.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
-        animationTranslateView(0,height);
-        lastSearchFragment.setGoogleApiClient(mGoogleApiClient);
+
+        AnimUtils.translate(layoutPredict,0,height);
+        mPredictFragment.setGoogleApiClient(mGoogleApiClient);
     }
 
+    /**
+     *  Hide layout location predict
+     */
     private void hideLastSearchFragment() {
-        layoutRoot.setBackgroundResource(R.drawable.bg_passenger_infor);
+        // Remove focus and hide soft keyboard
         View view = this.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+        // Animation hide layout location predict
         int height = Defines.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
-        animationTranslateView(height,0);
+        AnimUtils.translate(layoutPredict,height,0);
     }
 
-    private void animationTranslateView (int from , int to){
-        ValueAnimator mAnimator = ValueAnimator.ofFloat(from , to);
-        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                Float a = (Float) animation.getAnimatedValue();
-                int x = a.intValue();
-                layoutLastSearch.getLayoutParams().height = x;
-                layoutLastSearch.requestLayout();
-            }
-        });
-        mAnimator.setDuration(400);
-        mAnimator.start();
-    }
+
     private int measureView(final View view) {
         view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         return view.getMeasuredHeight();
     }
 
-    // Show dialog request turn on gps
-    private void settingRequestTurnOnLocation() {
-        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle(R.string.notice);  // GPS not found
-        alertDialogBuilder.setMessage(R.string.gps_notice_content)
-                .setCancelable(false)
-                .setPositiveButton(R.string.gps_continue,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                startActivityForResult(callGPSSettingIntent,1000);
-                            }
-                        });
-        alertDialogBuilder.setNegativeButton(R.string.gps_no,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        android.app.AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
-    }
+
 
     private void showCurrentLocationToMap(double latitude, double longitude){
         LatLng curLatLng = new LatLng(latitude, longitude);
@@ -185,39 +172,37 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 .target(curLatLng)             // Sets the center of the map to current location
                 .zoom(16)                   // Sets the zoom
                 .tilt(45)                   // Sets the tilt of the camera to 0 degrees
-
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
 
     }
 
+    /**
+     * Update layout when click to item of list predict location
+     */
     private void changeUIWhenChangedDirecition(){
         layoutSearch.removeSearchText();
-        layoutSearch.setTranslationY(-searchBarHeight);
-        layoutSearch.setTranslationY(-searchBarHeight);
+        // Hide layout list propose location
         hideLastSearchFragment();
-        //layoutSearch.animate().translationY(0).setDuration(300);
-        int height = measureView(layoutDirection);
-        layoutDirection.setTranslationY(-height);
-        layoutDirection.animate()
-                .translationY(0)
-                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
-                .setDuration(400)
-                .start();
+        // Show layout direction
+        AnimUtils.slideDown(layoutDirection,0);
+        // Hide layout search
+        AnimUtils.slideUp(layoutSearch,searchBarHeight);
+        // Hide layout auction
+        AnimUtils.slideDown(layoutFindCar,measureView(layoutFindCar));
+        // Start event receive action from layout direction
         layoutDirection.setOnCallBackDirection(this);
-        layoutFindCar.animate()
-                .alpha(0)
-                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
-                .setDuration(1000)
-                .start();
-
-        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View transportationLayout = inflater.inflate(R.layout.layout_transportation, null);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        transportationLayout.setLayoutParams(params);
-        layoutRoot.addView(transportationLayout);
+        // Initial and show layout select and booking car
+        if (layoutTransport == null) {
+            layoutTransport = new TransportationLayout(this);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            layoutTransport.setLayoutParams(params);
+            layoutRoot.addView(layoutTransport);
+            layoutTransport.setTranslationY(-measureView(layoutTransport));
+        }
+        AnimUtils.slideUp(layoutTransport,0);
     }
 
     @Override
@@ -248,77 +233,63 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     *  Event back button of search bar clicked
+     */
     @Override
     public void onBackButtonClicked() {
         hideLastSearchFragment();
+        // Check layout search show from direction layout
         if (!layoutSearch.isFinishSearchBar()){
-            int height = measureView(layoutDirection);
-            layoutDirection.setTranslationY(-height);
-            layoutDirection.animate()
-                    .translationY(0)
-                    .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
-                    .setDuration(400)
-                    .start();
-            //layoutSearch.setShowLastSearch(true);
+            AnimUtils.slideDown(layoutDirection,0);
+            AnimUtils.slideUp(layoutSearch,measureView(layoutSearch));
         }
         layoutSearch.setShowLastSearch(false);
     }
 
+    /**
+     *  Event back button of direction layout clicked
+     */
     @Override
     public void onBackDirectionClicked() {
-        int height = measureView(layoutDirection);
-        layoutDirection.animate()
-                .translationY(-height)
-                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
-                .setDuration(400)
-                .start();
+        // Hide layout direction and show layout search
+        AnimUtils.slideUp(layoutDirection,measureView(layoutDirection));
+        AnimUtils.slideDown(layoutSearch,0);
 
-        layoutSearch.animate()
-                .translationY(0)
-                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
-                .setDuration(400)
-                .start();
+        // Hide layout transport and show layout auction car
+        AnimUtils.slideDown(layoutTransport,measureView(layoutTransport));
+        AnimUtils.slideUp(layoutFindCar,0);
+
         layoutSearch.setShowLastSearch(false);
         layoutSearch.setFinishSearchBar(true);
+
+        // Remove layout direction and layout transport from main layout
         layoutDirection = null;
         layoutRoot.removeView(layoutDirection);
+        layoutTransport = null;
+        layoutRoot.removeView(layoutTransport);
     }
 
+    /**
+     *  Event click to change location
+     */
     @Override
-    public void onDirectionClicked(int position) {
-
-        int height = measureView(layoutDirection);
-        layoutDirection.animate()
-                .translationY(-height)
-                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
-                .setDuration(400)
-                .start();
-
-        layoutSearch.animate()
-                .translationY(0)
-                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
-                .setDuration(400)
-                .start();
+    public void onDirectionTextClicked(int position) {
+        AnimUtils.slideUp(layoutDirection, measureView(layoutDirection));
+        AnimUtils.slideDown(layoutSearch,0);
+        AnimUtils.slideDown(layoutTransport,measureView(layoutTransport));
         layoutSearch.setShowLastSearch(true);
         layoutSearch.requestForcus();
         showLastSearchFragment(true, position);
     }
 
+    /**
+     *  Event click to new stop point
+     */
     @Override
     public void onNewStopPoint() {
-        layoutSearch.setFinishSearchBar(false);
-        int height = measureView(layoutDirection);
-        layoutDirection.animate()
-                .translationY(-height)
-                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
-                .setDuration(400)
-                .start();
-
-        layoutSearch.animate()
-                .translationY(0)
-                .setInterpolator(AnimUtils.EASE_OUT_EASE_IN)
-                .setDuration(400)
-                .start();
+        AnimUtils.slideUp(layoutDirection,measureView(layoutDirection));
+        AnimUtils.slideDown(layoutSearch,0);
         layoutSearch.setShowLastSearch(true);
         layoutSearch.requestForcus();
         showLastSearchFragment(false,0);
@@ -326,9 +297,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onMenuButtonClicked() {
-
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.openDrawer(GravityCompat.START);
     }
 
+    /**
+     *  Event click to search bar
+     */
     @Override
     public void onSearchViewClicked() {
         showLastSearchFragment(false,0);
@@ -337,13 +312,14 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onSearchViewSearching() {
 
+
     }
 
     @Override
     public void onChangeTextSearch(CharSequence s,AutoCompleteTextView edtSearch) {
         mPlaceArrayAdapter.getFilter().filter(s.toString());
-        lastSearchFragment.setAdapter(mPlaceArrayAdapter);
-        lastSearchFragment.setCharacter(s.toString());
+        mPredictFragment.setAdapter(mPlaceArrayAdapter);
+        mPredictFragment.setCharacter(s.toString());
     }
 
     @Override
@@ -372,7 +348,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         gpsTracker = new GPSTracker(this);
         if (gpsTracker.handlePermissionsAndGetLocation()) {
             if (!gpsTracker.canGetLocation()) {
-                settingRequestTurnOnLocation();
+                CommonUtilities.settingRequestTurnOnLocation(PassengerSelectActionActivity.this);
             } else
                 showCurrentLocationToMap(gpsTracker.getLatitude(), gpsTracker.getLongitude());
         }
@@ -380,6 +356,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onNewDirection(Position location) {
+        layoutSearch.setFinishSearchBar(false);
         String sLocation = location.getPrimaryText() +", "+location.getSecondText();
         if (layoutDirection == null) {
             layoutDirection = new DirectionLayout(this, sLocation);
@@ -388,6 +365,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
             layoutDirection.setLayoutParams(params);
             layoutRoot.addView(layoutDirection);
+            int height = measureView(layoutDirection);
+            layoutDirection.setTranslationY(-height);
         }else{
             layoutDirection.updateLocation(sLocation,-1);
         }
@@ -399,5 +378,20 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         changeUIWhenChangedDirecition();
         String sLocation = location.getPrimaryText() +", "+location.getSecondText();
         layoutDirection.updateLocation(sLocation,position);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_booking:
+                Intent intent = new Intent(PassengerSelectActionActivity.this, FormPassengerBookingActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.btn_infor:
+                Intent intentInfo = new Intent(PassengerSelectActionActivity.this, ListPassengerBookingActivity.class);
+                startActivity(intentInfo);
+                break;
+        }
+
     }
 }

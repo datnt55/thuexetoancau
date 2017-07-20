@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,8 +21,6 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.DirectionAdapter;
 import grab.com.thuexetoancau.listener.OnStartDragListener;
 import grab.com.thuexetoancau.listener.SimpleItemTouchHelperCallback;
-import grab.com.thuexetoancau.utilities.Constants;
-import grab.com.thuexetoancau.utilities.Defines;
 
 /**
  * Created by DatNT on 7/18/2017.
@@ -175,7 +172,7 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     @Override
     public void onChangeLocation(int postion) {
         if (mCallback != null)
-            mCallback.onDirectionClicked(postion);
+            mCallback.onDirectionTextClicked(postion);
     }
 
     @Override
@@ -185,7 +182,7 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
 
     public interface DirectionCallback {
         void onBackDirectionClicked();
-        void onDirectionClicked(int type);
+        void onDirectionTextClicked(int type);
         void onNewStopPoint();
         void onSearchViewSearching();
         void onChangeTextSearch(CharSequence s, AutoCompleteTextView edtSearch);
