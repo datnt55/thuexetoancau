@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/login_bg"
+    android:fitsSystemWindows="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/btn_login_facebook"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/view_size_16"
+            android:layout_marginRight="@dimen/view_size_16"
+            android:layout_marginBottom="@dimen/view_size_16"
+            android:background="@drawable/bg_facebook"
+            android:clickable="true"
+            android:padding="@dimen/view_size_10">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/facebook"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_weight="1"
+                style="@style/white_text_bold"
+                android:text="@string/login_google"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/view_size_16"
+            android:layout_marginRight="@dimen/view_size_16"
+            android:layout_marginBottom="@dimen/view_size_16"
+            android:background="@drawable/bg_google"
+            android:clickable="true"
+            android:padding="@dimen/view_size_10">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/google"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_weight="1"
+                style="@style/black_text_bold"
+                android:text="@string/login_google"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/view_size_16"
+            android:layout_marginRight="@dimen/view_size_16"
+            android:layout_marginBottom="@dimen/view_size_16"
+            android:background="@drawable/vehicle_shape"
+            android:clickable="true"
+            android:padding="@dimen/view_size_10">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/smartphone"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:layout_weight="1"
+                style="@style/white_text_bold"
+                android:text="@string/login_phone"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

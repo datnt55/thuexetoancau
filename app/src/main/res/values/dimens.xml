@@ -3,6 +3,9 @@
     <!-- Common -->
     <dimen name="spacing_0">0dp</dimen>
     <dimen name="spacing_5">3dp</dimen>
+    <dimen name="view_size_16">16dp</dimen>
+    <dimen name="view_size_10">10dp</dimen>
+
     <!-- Splash activity -->
     <dimen name="splash_spinner_size">50dp</dimen>
     <dimen name="splash_notice_margin">15dp</dimen>
@@ -24,4 +27,7 @@
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <color name="facebook_click">#23386e</color>
+    <color name="facebook">#324e97</color>
 </resources>

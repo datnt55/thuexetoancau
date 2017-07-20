@@ -1,11 +1,13 @@
 package grab.com.thuexetoancau.adapter;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -47,6 +50,11 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
     private SimpleItemTouchHelperCallback callBack;
     private RecyclerView listDirection;
     private int listHeight;
+    private int mTopMargin;
+    private int mBottomMargin;
+    private int mLeftMargin;
+    private int mRightMargin;
+
     public DirectionAdapter(Context context, ArrayList<String> vehicle,RecyclerView listDirection) {
         mContext = context;
         this.arrayDirection = vehicle;
@@ -202,11 +210,17 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
         }
         @Override
         public void onItemSelected() {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) txtPlace.getLayoutParams();
+            mTopMargin = params.topMargin;
+            mBottomMargin = params.bottomMargin;
+            mLeftMargin = params.leftMargin;
+            mRightMargin = params.rightMargin;
             itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shadow));
-            layoutPlace.animate().scaleX(1.02f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+            /*layoutPlace.animate().scaleX(1.02f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             layoutPlace.animate().scaleY(1.2f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             txtPlace.animate().scaleX(0.98f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
-            txtPlace.animate().scaleY(0.8f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
+            txtPlace.animate().scaleY(0.8f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);*/
+            increaseMargin(txtPlace);
         }
 
         @Override
@@ -217,7 +231,44 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
             txtPlace.animate().scaleX(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             txtPlace.animate().scaleY(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
 //            notifyDataSetChanged();
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) txtPlace.getLayoutParams();
+            decreaseMargin(txtPlace);
         }
+    }
+
+    public void increaseMargin(final View view){
+        ValueAnimator mAnimator = ValueAnimator.ofFloat(1f, 1.5f);
+        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                final Float fraction = (Float) animation.getAnimatedValue();
+                setMargins(fraction, view);
+            }
+        });
+        mAnimator.setDuration(400);
+        mAnimator.start();
+    }
+
+    public void decreaseMargin(final View view){
+        ValueAnimator mAnimator = ValueAnimator.ofFloat(1.5f, 1f);
+        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                final Float fraction = (Float) animation.getAnimatedValue();
+                setMargins(fraction, view);
+            }
+        });
+        mAnimator.setDuration(400);
+        mAnimator.start();
+    }
+
+    private void setMargins(float fraction, View view) {
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+        params.topMargin = (int) (mTopMargin * fraction);
+        params.bottomMargin = (int) (mBottomMargin * fraction);
+        params.leftMargin = (int) (mLeftMargin * fraction);
+        params.rightMargin = (int) (mRightMargin * fraction);
+        view.requestLayout();
     }
 
     public interface ItemClickListener{

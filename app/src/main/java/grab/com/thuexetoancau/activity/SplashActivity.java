@@ -78,7 +78,7 @@ public class SplashActivity extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Intent i = new Intent(SplashActivity.this, PassengerSelectActionActivity.class);
+                    Intent i = new Intent(SplashActivity.this, LoginActivity.class);
                     startActivity(i);
                     finish();
                 }
@@ -91,7 +91,7 @@ public class SplashActivity extends AppCompatActivity {
             String token = intent.getStringExtra("token");
             if(token != null)
             {
-                Intent i = new Intent(SplashActivity.this, PassengerSelectActionActivity.class);
+                Intent i = new Intent(SplashActivity.this, LoginActivity.class);
                 startActivity(i);
                 finish();
             }

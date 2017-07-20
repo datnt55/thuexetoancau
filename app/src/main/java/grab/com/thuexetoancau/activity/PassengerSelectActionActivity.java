@@ -243,6 +243,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         if (!layoutSearch.isFinishSearchBar()){
             AnimUtils.slideDown(layoutDirection,0);
             AnimUtils.slideUp(layoutSearch,measureView(layoutSearch));
+            AnimUtils.slideUp(layoutTransport,0);
         }
         layoutSearch.setShowLastSearch(false);
     }
@@ -290,6 +291,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     public void onNewStopPoint() {
         AnimUtils.slideUp(layoutDirection,measureView(layoutDirection));
         AnimUtils.slideDown(layoutSearch,0);
+        AnimUtils.slideDown(layoutTransport,measureView(layoutTransport));
         layoutSearch.setShowLastSearch(true);
         layoutSearch.requestForcus();
         showLastSearchFragment(false,0);

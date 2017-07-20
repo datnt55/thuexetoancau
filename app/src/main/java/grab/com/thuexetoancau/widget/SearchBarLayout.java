@@ -1,5 +1,6 @@
 package grab.com.thuexetoancau.widget;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -8,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
@@ -102,6 +104,8 @@ public class SearchBarLayout  extends LinearLayout implements View.OnClickListen
         edtSearch.requestFocus();
         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(edtSearch, InputMethodManager.SHOW_IMPLICIT);
+        Activity activity = (Activity) mContext;
+        activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
     }
     public void setFinishSearchBar(boolean finish){
         this.isEndSearchBar = finish;
