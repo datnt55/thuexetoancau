@@ -17,4 +17,5 @@ public class Constants {
     public static final int DIRECTION_NEW_STOP_POINT = 3;
     public static final String TYPE_POINT = "type direction point";
     public static final String POSITION_POINT = "position direction point";
+    public static final String BUNDLE_USER = "bundle user";
 }
