@@ -19,6 +19,10 @@ public class Position {
         this.secondText = secondText;
     }
 
+    public Position(LatLng latLng) {
+        this.latLng = latLng;
+    }
+
     public String getPlaceId() {
         return placeId;
     }

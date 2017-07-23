@@ -28,13 +28,14 @@ import grab.com.thuexetoancau.R;
 public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackManager ;
     private AccessTokenTracker accessTokenTracker ;
-    private LinearLayout btnFacebook;
+    private LinearLayout btnFacebook,btnLoginPhone;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         FacebookSdk.sdkInitialize(getApplicationContext());
         btnFacebook = (LinearLayout) findViewById(R.id.btn_login_facebook);
+        btnLoginPhone = (LinearLayout) findViewById(R.id.btn_login_phone);
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -60,6 +61,13 @@ public class LoginActivity extends AppCompatActivity {
 
                 LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile","email","user_friends"));
 
+            }
+        });
+        btnLoginPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, PassengerSelectActionActivity.class);
+                startActivity(intent);
             }
         });
     }

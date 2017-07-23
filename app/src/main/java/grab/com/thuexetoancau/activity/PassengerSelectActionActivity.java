@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,11 +34,21 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import grab.com.thuexetoancau.DirectionFinder.DirectionFinder;
+import grab.com.thuexetoancau.DirectionFinder.DirectionFinderListener;
+import grab.com.thuexetoancau.DirectionFinder.Route;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.LastSearchAdapter;
 import grab.com.thuexetoancau.fragment.LastSearchFragment;
@@ -58,7 +69,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         DirectionLayout.DirectionCallback,
         OnMapReadyCallback,
         LastSearchFragment.OnAddNewDirection,
-        View.OnClickListener {
+        View.OnClickListener,DirectionFinderListener {
 
     private Button btnBooking, btnInfor;
     private RelativeLayout layoutRoot;
@@ -73,7 +84,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private GoogleMap mMap;
     private Context mContext;
     private GPSTracker gpsTracker;
-
+    private ArrayList<Position> listStopPoint = new ArrayList<>();
+    private List<Polyline> polylinePaths = new ArrayList<>();
+    private Position mFrom, mEnd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -164,12 +177,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
 
     private void showCurrentLocationToMap(double latitude, double longitude){
-        LatLng curLatLng = new LatLng(latitude, longitude);
-        Marker markerTo = mMap.addMarker(new MarkerOptions().position(curLatLng).title("Vị trí của bạn"));
+        Position lFrom = new Position(new LatLng(latitude,longitude));
+        listStopPoint.add(lFrom);
+        Marker markerTo = mMap.addMarker(new MarkerOptions().position(lFrom.getLatLng()).title("Vị trí của bạn"));
      /*   mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curLatLng, 16));*/
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(curLatLng)             // Sets the center of the map to current location
+                .target(lFrom.getLatLng())             // Sets the center of the map to current location
                 .zoom(16)                   // Sets the zoom
                 .tilt(45)                   // Sets the tilt of the camera to 0 degrees
                 .build();                   // Creates a CameraPosition from the builder
@@ -203,6 +217,20 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             layoutTransport.setTranslationY(-measureView(layoutTransport));
         }
         AnimUtils.slideUp(layoutTransport,0);
+    }
+
+    private void sendRequestFindDirection() {
+        try {
+            for (int i= 0; i< listStopPoint.size()-1; i++) {
+                mFrom = listStopPoint.get(i);
+                Position mTo = listStopPoint.get(i+1);
+                if (i == listStopPoint.size()-2)
+                    mEnd = listStopPoint.get(i+1);
+                new DirectionFinder(this, mFrom.getLatLng(), mTo.getLatLng()).execute();
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -369,10 +397,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             layoutRoot.addView(layoutDirection);
             int height = measureView(layoutDirection);
             layoutDirection.setTranslationY(-height);
+            listStopPoint.add(location);
         }else{
             layoutDirection.updateLocation(sLocation,-1);
+            listStopPoint.add(listStopPoint.size()-1,location);
         }
         changeUIWhenChangedDirecition();
+        sendRequestFindDirection();
     }
 
     @Override
@@ -395,5 +426,42 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 break;
         }
 
+    }
+
+    @Override
+    public void onDirectionFinderStart() {
+        if (polylinePaths != null) {
+            for (Polyline polyline : polylinePaths) {
+                polyline.remove();
+            }
+        }
+    }
+
+    @Override
+    public void onDirectionFinderSuccess(List<Route> routes) {
+        for (Route route : routes) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
+            //((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
+            //((TextView) findViewById(R.id.tvDistance)).setText(route.distance.text);
+            PolylineOptions polylineOptions = new PolylineOptions().
+                    geodesic(true).
+                    color(Color.BLUE).
+                    width(10);
+
+            for (int i = 0; i < route.points.size(); i++)
+                polylineOptions.add(route.points.get(i));
+
+            polylinePaths.add(mMap.addPolyline(polylineOptions));
+        }
+        mMap.addMarker(new MarkerOptions()
+                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                .title(mFrom.getPrimaryText())
+                .position(mFrom.getLatLng()));
+        if (mEnd != null){
+            mMap.addMarker(new MarkerOptions()
+                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                    .title(mEnd.getPrimaryText())
+                    .position(mEnd.getLatLng()));
+        }
     }
 }
