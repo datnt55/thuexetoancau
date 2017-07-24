@@ -95,6 +95,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+        btnLoginPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, PassengerSelectActionActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void signIn() {
@@ -112,15 +119,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             intent.putExtra(Constants.BUNDLE_USER, user);
             startActivity(intent);
         }
-
-        btnLoginPhone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, PassengerSelectActionActivity.class);
-                startActivity(intent);
-            }
-        });
-
     }
 
     public void graphRequest(AccessToken token){

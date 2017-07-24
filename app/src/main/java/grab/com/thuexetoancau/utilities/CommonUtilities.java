@@ -194,6 +194,16 @@ public class CommonUtilities {
         }
     }
 
+    public static String getTripType(int type){
+        switch (type){
+            case 1:
+                return "Một chiều";
+            case 2:
+                return "Khứ hồi";
+        }
+        return null;
+    }
+
     // Show dialog request turn on gps
     public static void settingRequestTurnOnLocation(final Activity mActivity) {
         android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(mActivity);

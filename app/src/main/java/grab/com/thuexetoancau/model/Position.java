@@ -13,10 +13,12 @@ public class Position {
     private String primaryText;
     private String secondText;
     private LatLng latLng;
+    private String fullPlace;
     public Position(String placeId, String primaryText, String secondText) {
         this.placeId = placeId;
         this.primaryText = primaryText;
         this.secondText = secondText;
+        this.fullPlace = primaryText +", "+secondText;
     }
 
     public Position(LatLng latLng) {
@@ -53,5 +55,13 @@ public class Position {
 
     public void setLatLng(LatLng latLng) {
         this.latLng = latLng;
+    }
+
+    public String getFullPlace() {
+        return fullPlace;
+    }
+
+    public void setFullPlace(String fullPlace) {
+        this.fullPlace = fullPlace;
     }
 }

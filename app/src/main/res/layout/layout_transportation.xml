@@ -18,19 +18,19 @@
             android:id="@+id/list_transport"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/car_icon"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp"
+            app:srcCompat="@drawable/car_icon"/>
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btn_booking"
+            style="@style/text_direction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="@color/blue"
-            android:textAllCaps="false"
             android:gravity="center"
-            style="@style/text_direction"
-            android:text="Đặt chuyến" />
+            android:text="Đặt chuyến"
+            android:textAllCaps="false"/>
 
     </LinearLayout>
 

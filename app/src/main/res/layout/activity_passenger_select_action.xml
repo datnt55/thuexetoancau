@@ -28,7 +28,14 @@
                 class="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
+            <FrameLayout
+                android:id="@+id/layout_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/grey"
+                android:visibility="gone">
 
+            </FrameLayout>
             <grab.com.thuexetoancau.widget.SearchBarLayout
                 android:id="@+id/layout_search"
                 android:layout_width="match_parent"
@@ -59,13 +66,6 @@
                     android:layout_height="wrap_content"
                     android:text="Tìm xe chiều về/Đi chung"/>
             </LinearLayout>
-
-            <FrameLayout
-                android:id="@+id/fragment_last_search"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentBottom="true">
-            </FrameLayout>
             <FrameLayout
                 android:id="@+id/layout_fix_gps"
                 android:layout_width="wrap_content"
@@ -73,7 +73,10 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="5dp"
                 android:layout_alignParentRight="true"
-                android:background="@drawable/circle">
+                android:elevation="5dp"
+                android:clickable="true"
+                android:background="@drawable/fix_gps"
+                >
 
                 <ImageView
                     android:id="@+id/imageView2"
@@ -82,7 +85,12 @@
                     android:layout_gravity="center"
                     app:srcCompat="@drawable/ic_gps_fixed_black_24dp" />
             </FrameLayout>
-
+            <FrameLayout
+                android:id="@+id/fragment_last_search"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true">
+            </FrameLayout>
         </RelativeLayout>
     </android.support.design.widget.CoordinatorLayout>
 

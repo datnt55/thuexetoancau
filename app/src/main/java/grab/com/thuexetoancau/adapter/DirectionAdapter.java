@@ -205,11 +205,14 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
             mBottomMargin = params.bottomMargin;
             mLeftMargin = params.leftMargin;
             mRightMargin = params.rightMargin;
-            itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bg_fix_gps));
+            itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shadow));
             /*layoutPlace.animate().scaleX(1.02f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             layoutPlace.animate().scaleY(1.2f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             txtPlace.animate().scaleX(0.98f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             txtPlace.animate().scaleY(0.8f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);*/
+            imgRole.setVisibility(View.INVISIBLE);
+            layoutRouteUp.setVisibility(View.INVISIBLE);
+            layoutRouteDow.setVisibility(View.INVISIBLE);
             increaseMargin(txtPlace);
         }
 
@@ -222,6 +225,9 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
             txtPlace.animate().scaleY(1f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
 //            notifyDataSetChanged();
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) txtPlace.getLayoutParams();
+            imgRole.setVisibility(View.VISIBLE);
+            layoutRouteUp.setVisibility(View.VISIBLE);
+            layoutRouteDow.setVisibility(View.VISIBLE);
             decreaseMargin(txtPlace);
         }
     }

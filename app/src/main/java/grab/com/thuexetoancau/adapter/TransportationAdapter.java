@@ -34,6 +34,7 @@ public class TransportationAdapter extends RecyclerView.Adapter<TransportationAd
     private Context mContext;
     private List<Car> arrayVehicle;
     private DisplayImageOptions options;
+    private OnItemClickListener listener;
 
     public TransportationAdapter(Context context, ArrayList<Car> vehicle) {
         mContext = context;
@@ -52,6 +53,10 @@ public class TransportationAdapter extends RecyclerView.Adapter<TransportationAd
     private void clearSelectAllCar(){
         for (Car car : arrayVehicle)
             car.setSelected(false);
+    }
+
+    public void setOnClickListener(OnItemClickListener listener){
+        this.listener = listener;
     }
 
     @Override
@@ -89,13 +94,13 @@ public class TransportationAdapter extends RecyclerView.Adapter<TransportationAd
                     holder.txtCarName.setTextColor(ContextCompat.getColor(mContext, R.color.blue_light));
                     holder.txtPrice.setTextColor(ContextCompat.getColor(mContext, R.color.blue_light));
                 }
+                if (listener != null)
+                    listener.onClicked(arrayVehicle.get(position));
                 notifyDataSetChanged();
             }
         });
 
     }
-
-
 
     @Override
     public int getItemCount() {
@@ -124,4 +129,7 @@ public class TransportationAdapter extends RecyclerView.Adapter<TransportationAd
         }
     }
 
+    public interface OnItemClickListener{
+        void onClicked(Car car);
+    }
 }

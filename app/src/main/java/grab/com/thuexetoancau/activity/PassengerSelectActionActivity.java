@@ -1,5 +1,6 @@
 package grab.com.thuexetoancau.activity;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -16,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -53,6 +57,7 @@ import grab.com.thuexetoancau.DirectionFinder.Route;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.LastSearchAdapter;
 import grab.com.thuexetoancau.fragment.LastSearchFragment;
+import grab.com.thuexetoancau.model.Car;
 import grab.com.thuexetoancau.model.Position;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.AnimUtils;
@@ -71,7 +76,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         DirectionLayout.DirectionCallback,
         OnMapReadyCallback,
         LastSearchFragment.OnAddNewDirection,
-        View.OnClickListener,DirectionFinderListener {
+        View.OnClickListener,
+        DirectionFinderListener,
+        TransportationLayout.OnTransportationListener {
 
     private Button btnBooking, btnInfor;
     private RelativeLayout layoutRoot;
@@ -90,7 +97,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private ArrayList<Position> listStopPoint = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private Position mFrom, mEnd;
-
+    private FrameLayout layoutOverLay;
+    private int typeTrip = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +113,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         layoutSearch = (SearchBarLayout) findViewById(R.id.layout_search);
         layoutPredict = (FrameLayout) findViewById(R.id.fragment_last_search);
         layoutFindCar = (LinearLayout) findViewById(R.id.layout_find_car);
-
+        layoutOverLay = (FrameLayout) findViewById(R.id.layout_overlay);
         layoutSearch.setCallback(this);
         btnBooking.setOnClickListener(this);
         btnInfor.setOnClickListener(this);
@@ -125,24 +133,26 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 return true;
             }
         });
-        //receive
-        user = (User) getIntent().getSerializableExtra(Constants.BUNDLE_USER);
-        TextView txtName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_name);
-        TextView txtEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_email);
-        ImageView imgAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar);
+        if (getIntent().hasExtra(Constants.BUNDLE_USER)) {
+            //receive
+            user = (User) getIntent().getSerializableExtra(Constants.BUNDLE_USER);
+            TextView txtName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_name);
+            TextView txtEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_email);
+            ImageView imgAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar);
 
-        txtEmail.setText(user.getEmail());
-        txtName.setText(user.getName());
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.loading)
-                .showImageForEmptyUri(R.drawable.loading)
-                .showImageOnFail(R.drawable.loading)
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .considerExifParams(true)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .build();
-        ImageLoader.getInstance().displayImage(user.getUrl(),imgAvatar, options, new SimpleImageLoadingListener());
+            txtEmail.setText(user.getEmail());
+            txtName.setText(user.getName());
+            DisplayImageOptions options = new DisplayImageOptions.Builder()
+                    .showImageOnLoading(R.drawable.loading)
+                    .showImageForEmptyUri(R.drawable.loading)
+                    .showImageOnFail(R.drawable.loading)
+                    .cacheInMemory(true)
+                    .cacheOnDisk(true)
+                    .considerExifParams(true)
+                    .bitmapConfig(Bitmap.Config.RGB_565)
+                    .build();
+            ImageLoader.getInstance().displayImage(user.getUrl(), imgAvatar, options, new SimpleImageLoadingListener());
+        }
     }
 
     // Init google api
@@ -173,6 +183,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
         AnimUtils.translate(layoutPredict,0,height);
         mPredictFragment.setGoogleApiClient(mGoogleApiClient);
+        AnimUtils.fadeIn(layoutOverLay,300);
     }
 
     /**
@@ -188,6 +199,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         // Animation hide layout location predict
         int height = Defines.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
         AnimUtils.translate(layoutPredict,height,0);
+        AnimUtils.fadeOut(layoutOverLay,300);
     }
 
 
@@ -253,6 +265,28 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
+
+    private void showDialogBooking() {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_booking);
+
+        TextView txtSource = (TextView) dialog.findViewById(R.id.txt_source);
+        txtSource.setText(listStopPoint.get(0).getFullPlace());
+        TextView txtDestination = (TextView) dialog.findViewById(R.id.txt_destination);
+        txtDestination.setText(listStopPoint.get(listStopPoint.size()-1).getFullPlace());
+        TextView txtTypeTrip = (TextView) dialog.findViewById(R.id.trip_type);
+        txtTypeTrip.setText(CommonUtilities.getTripType(typeTrip));
+
+
+        dialog.show();
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        Window window = dialog.getWindow();
+        lp.copyFrom(window.getAttributes());
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        window.setAttributes(lp);
     }
 
     @Override
@@ -485,5 +519,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     .title(mEnd.getPrimaryText())
                     .position(mEnd.getLatLng()));
         }
+    }
+
+    @Override
+    public void onBookingClicked() {
+        showDialogBooking();
+    }
+
+    @Override
+    public void onSelectVehicle(Car car) {
+
     }
 }

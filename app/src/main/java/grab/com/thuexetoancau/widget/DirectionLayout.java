@@ -1,12 +1,15 @@
 package grab.com.thuexetoancau.widget;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +18,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.DirectionAdapter;
 import grab.com.thuexetoancau.listener.OnStartDragListener;
 import grab.com.thuexetoancau.listener.SimpleItemTouchHelperCallback;
+import grab.com.thuexetoancau.utilities.GPSTracker;
 
 /**
  * Created by DatNT on 7/18/2017.
@@ -44,9 +51,27 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         super(context);
         this.mContext = context;
         routes = new ArrayList<>();
-        routes.add("Vị trí của bạn");
+        GPSTracker gpsTracker = new GPSTracker(mContext);
+        routes.add(getAddress(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
         routes.add(endLocation);
         initLayout();
+    }
+
+    private String getAddress(double latitude, double longitude) {
+        StringBuilder result = new StringBuilder();
+        try {
+            Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses.size() > 0) {
+                Address address = addresses.get(0);
+                result.append(address.getLocality()).append("\n");
+                result.append(address.getCountryName());
+            }
+        } catch (IOException e) {
+            Log.e("tag", e.getMessage());
+        }
+
+        return result.toString();
     }
 
     public DirectionLayout(Context context, @Nullable AttributeSet attrs) {

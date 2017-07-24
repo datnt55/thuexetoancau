@@ -5,8 +5,7 @@
     android:id="@+id/layout_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_weight="6"
-    android:padding="5dp"
+    android:padding="2dp"
     android:orientation="vertical">
     <LinearLayout
         android:id="@+id/layout_route_up"
