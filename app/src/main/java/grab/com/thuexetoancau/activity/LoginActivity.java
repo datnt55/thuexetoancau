@@ -40,11 +40,12 @@ import grab.com.thuexetoancau.utilities.Constants;
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private CallbackManager callbackManager ;
     private AccessTokenTracker accessTokenTracker ;
-    private LinearLayout btnFacebook, btnGoogle;
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
     private User user;
+    private LinearLayout btnGoogle, btnFacebook, btnLoginPhone;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +53,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         FacebookSdk.sdkInitialize(getApplicationContext());
         btnFacebook = (LinearLayout) findViewById(R.id.btn_login_facebook);
         btnGoogle = (LinearLayout) findViewById(R.id.btn_login_google);
+        btnLoginPhone = (LinearLayout) findViewById(R.id.btn_login_phone);
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -110,6 +112,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             intent.putExtra(Constants.BUNDLE_USER, user);
             startActivity(intent);
         }
+
+        btnLoginPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, PassengerSelectActionActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     public void graphRequest(AccessToken token){

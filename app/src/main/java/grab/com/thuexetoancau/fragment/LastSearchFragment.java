@@ -17,6 +17,7 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -77,6 +78,7 @@ public class LastSearchFragment extends Fragment {
                             Toast.makeText(getActivity(),String.valueOf(places.get(0).getLatLng()), Toast.LENGTH_SHORT).show();
                           /*  PassengerSelectActionActivity activity = (PassengerSelectActionActivity) getActivity();
                             activity.goToBookingCar(location,directionPosition);*/
+                          location.setLatLng(places.get(0).getLatLng());
                           if (directionPosition == -1) {
                               if (listener != null)
                                   listener.onNewDirection(location);

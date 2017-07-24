@@ -2,21 +2,13 @@ package grab.com.thuexetoancau.adapter;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.InsetDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,8 +24,6 @@ import grab.com.thuexetoancau.listener.ItemTouchHelperViewHolder;
 import grab.com.thuexetoancau.listener.SimpleItemTouchHelperCallback;
 import grab.com.thuexetoancau.utilities.AnimUtils;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
-import grab.com.thuexetoancau.utilities.PathInterpolatorCompat;
-import grab.com.thuexetoancau.utilities.SharePreference;
 import grab.com.thuexetoancau.widget.TextDrawable;
 
 /**
@@ -215,7 +205,7 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
             mBottomMargin = params.bottomMargin;
             mLeftMargin = params.leftMargin;
             mRightMargin = params.rightMargin;
-            itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shadow));
+            itemView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.bg_fix_gps));
             /*layoutPlace.animate().scaleX(1.02f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             layoutPlace.animate().scaleY(1.2f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
             txtPlace.animate().scaleX(0.98f).setInterpolator(AnimUtils.EASE_OUT_EASE_IN).setDuration(100);
