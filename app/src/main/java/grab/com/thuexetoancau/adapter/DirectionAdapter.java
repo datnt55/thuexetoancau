@@ -168,16 +168,15 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
                 }
             },500);
 
+        if(listener != null)
+            listener.onSwapLocation(fromPosition,toPosition);
     }
 
     @Override
     public void onItemDismiss(int position) {
-        arrayDirection.remove(position);
-        notifyDataSetChanged();
-        checkSizeOfRecyclerView(listDirection);
-        if (arrayDirection.size()<= 2){
-            callBack.setItemSwipe(false);
-        }
+        if(listener != null)
+            listener.onRemoveStopPoint(position);
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
@@ -271,5 +270,6 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
         void onNewStopPoint();
         void onRemoveStopPoint(int position);
         void onChangeLocation(int postion);
+        void onSwapLocation(int fromPosition, int postion);
     }
 }

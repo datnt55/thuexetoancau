@@ -52,26 +52,9 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         this.mContext = context;
         routes = new ArrayList<>();
         GPSTracker gpsTracker = new GPSTracker(mContext);
-        routes.add(getAddress(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
+        routes.add("Vị trí của bạn");
         routes.add(endLocation);
         initLayout();
-    }
-
-    private String getAddress(double latitude, double longitude) {
-        StringBuilder result = new StringBuilder();
-        try {
-            Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
-            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            if (addresses.size() > 0) {
-                Address address = addresses.get(0);
-                result.append(address.getLocality()).append("\n");
-                result.append(address.getCountryName());
-            }
-        } catch (IOException e) {
-            Log.e("tag", e.getMessage());
-        }
-
-        return result.toString();
     }
 
     public DirectionLayout(Context context, @Nullable AttributeSet attrs) {
@@ -121,8 +104,8 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
 
     public void updateLocation(String location, int position){
         if (position == -1) {
-            routes.add(routes.size() - 1, location);
-            adapter.notifyItemInserted(routes.size() - 1);
+            routes.add(routes.size(), location);
+            adapter.notifyItemInserted(routes.size());
             adapter.notifyItemRangeChanged(position,routes.size());
             LinearLayout.LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, listHeight);
             listDirection.setLayoutParams(params);
@@ -192,6 +175,8 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         if (routes.size()<= 2){
             callback.setItemSwipe(false);
         }
+        if (mCallback != null)
+            mCallback.onRemoveStopPoint(position);
     }
 
     @Override
@@ -201,16 +186,22 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     }
 
     @Override
+    public void onSwapLocation(int fromPosition, int position) {
+        if (mCallback != null)
+            mCallback.onSwapLocation(fromPosition,position);
+    }
+
+    @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
     }
 
     public interface DirectionCallback {
         void onBackDirectionClicked();
-        void onDirectionTextClicked(int type);
+        void onDirectionTextClicked(int position);
         void onNewStopPoint();
-        void onSearchViewSearching();
-        void onChangeTextSearch(CharSequence s, AutoCompleteTextView edtSearch);
+        void onRemoveStopPoint(int position);
+        void onSwapLocation(int fromPosition, int position);
         void getLayoutSearchHeight(int height);
     }
 }

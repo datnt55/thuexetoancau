@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +17,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,9 +50,13 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 
 import grab.com.thuexetoancau.DirectionFinder.DirectionFinder;
 import grab.com.thuexetoancau.DirectionFinder.DirectionFinderListener;
@@ -95,10 +102,12 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private GPSTracker gpsTracker;
     private User user;
     private ArrayList<Position> listStopPoint = new ArrayList<>();
+    private ArrayList<Marker> markerList = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private Position mFrom, mEnd;
     private FrameLayout layoutOverLay;
     private int typeTrip = 1;
+    private int totalDistance = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,10 +178,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
      * Show layout predict location
      * If change exist location, pass to position of it
      */
-    private void showLastSearchFragment(boolean addnew, int position) {
+    private void showLastSearchFragment(boolean changeLocation, int position) {
         mPredictFragment = new LastSearchFragment();
         Bundle bundle = new Bundle();
-        if (addnew)
+        if (changeLocation)
             bundle.putInt(Constants.POSITION_POINT,position );
         mPredictFragment.setArguments(bundle);
 
@@ -211,9 +220,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
 
     private void showCurrentLocationToMap(double latitude, double longitude){
-        Position lFrom = new Position(new LatLng(latitude,longitude));
+        Position lFrom = new Position(getAddress(latitude, longitude),new LatLng(latitude,longitude));
         listStopPoint.add(lFrom);
-        Marker markerTo = mMap.addMarker(new MarkerOptions().position(lFrom.getLatLng()).title("Vị trí của bạn"));
+        markerList.add(mMap.addMarker(new MarkerOptions().position(lFrom.getLatLng()).title("Vị trí của bạn")));
      /*   mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curLatLng, 16));*/
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -224,6 +233,28 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
 
+    }
+
+    private String getAddress(double latitude, double longitude) {
+        StringBuilder result = new StringBuilder();
+        try {
+            Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses.size() > 0) {
+                Address address = addresses.get(0);
+                int index = addresses.get(0).getMaxAddressLineIndex();
+                for (int i = 0 ; i < index ; i++)
+                    if (address.getAddressLine(i) != null) {
+                        result.append(address.getAddressLine(i));
+                        if (i < index-1)
+                            result.append(", ");
+                    }
+            }
+        } catch (IOException e) {
+            Log.e("tag", e.getMessage());
+        }
+
+        return result.toString();
     }
 
     /**
@@ -254,17 +285,39 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     private void sendRequestFindDirection() {
+        removeAllMarker();
         try {
             for (int i= 0; i< listStopPoint.size()-1; i++) {
                 mFrom = listStopPoint.get(i);
                 Position mTo = listStopPoint.get(i+1);
-                if (i == listStopPoint.size()-2)
-                    mEnd = listStopPoint.get(i+1);
+                markerList.add(mMap.addMarker(new MarkerOptions()
+                        //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                        .title(mFrom.getPrimaryText())
+                        .position(mFrom.getLatLng())));
+                if (i == listStopPoint.size()-2) {
+                    mEnd = listStopPoint.get(i + 1);
+                    markerList.add(mMap.addMarker(new MarkerOptions()
+                            //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                            .title(mEnd.getPrimaryText())
+                            .position(mEnd.getLatLng())));
+                }
                 new DirectionFinder(this, mFrom.getLatLng(), mTo.getLatLng()).execute();
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+    }
+
+    private void removeAllMarker(){
+        totalDistance = 0;
+        if (polylinePaths != null) {
+            for (Polyline polyline : polylinePaths) {
+                polyline.remove();
+            }
+        }
+
+        for (Marker marker : markerList)
+            marker.remove();
     }
 
     private void showDialogBooking() {
@@ -277,7 +330,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         txtDestination.setText(listStopPoint.get(listStopPoint.size()-1).getFullPlace());
         TextView txtTypeTrip = (TextView) dialog.findViewById(R.id.trip_type);
         txtTypeTrip.setText(CommonUtilities.getTripType(typeTrip));
-
+        TextView txtDistance = (TextView) dialog.findViewById(R.id.distance);
+        txtDistance.setText(CommonUtilities.convertToKilometer(totalDistance));
 
         dialog.show();
 
@@ -382,6 +436,18 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onRemoveStopPoint(int position) {
+        listStopPoint.remove(position);
+        sendRequestFindDirection();
+    }
+
+    @Override
+    public void onSwapLocation(int fromPosition, int toPosition) {
+        Collections.swap(listStopPoint, fromPosition, toPosition);
+        sendRequestFindDirection();
+    }
+
+    @Override
     public void onMenuButtonClicked() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.openDrawer(GravityCompat.START);
@@ -456,7 +522,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             listStopPoint.add(location);
         }else{
             layoutDirection.updateLocation(sLocation,-1);
-            listStopPoint.add(listStopPoint.size()-1,location);
+            listStopPoint.add(listStopPoint.size(),location);
         }
         changeUIWhenChangedDirecition();
         sendRequestFindDirection();
@@ -467,6 +533,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         changeUIWhenChangedDirecition();
         String sLocation = location.getPrimaryText() +", "+location.getSecondText();
         layoutDirection.updateLocation(sLocation,position);
+        listStopPoint.set(position, location);
+        sendRequestFindDirection();
     }
 
     @Override
@@ -486,11 +554,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onDirectionFinderStart() {
-        if (polylinePaths != null) {
-            for (Polyline polyline : polylinePaths) {
-                polyline.remove();
-            }
-        }
+
     }
 
     @Override
@@ -499,6 +563,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
             //((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
             //((TextView) findViewById(R.id.tvDistance)).setText(route.distance.text);
+            Random rand = new Random();
+
+            int  n = rand.nextInt(255) + 1;
+
             PolylineOptions polylineOptions = new PolylineOptions().
                     geodesic(true).
                     color(Color.BLUE).
@@ -508,16 +576,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 polylineOptions.add(route.points.get(i));
 
             polylinePaths.add(mMap.addPolyline(polylineOptions));
-        }
-        mMap.addMarker(new MarkerOptions()
-                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
-                .title(mFrom.getPrimaryText())
-                .position(mFrom.getLatLng()));
-        if (mEnd != null){
-            mMap.addMarker(new MarkerOptions()
-                    //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
-                    .title(mEnd.getPrimaryText())
-                    .position(mEnd.getLatLng()));
+            totalDistance+= route.distance.value;
         }
     }
 

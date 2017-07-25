@@ -3,88 +3,161 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/textView12"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         style="@style/title_form_booking"
-        android:text="Xác nhận thông tin đặt xe"
-        android:layout_marginBottom="10dp"/>
-
-    <TextView
-        android:id="@+id/txt_source"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        style="@style/content_form_booking"
-        android:text="TextView"/>
+        android:layout_marginBottom="10dp"
+        android:text="Xác nhận thông tin đặt xe"/>
 
-    <TextView
-        android:id="@+id/txt_destination"
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        style="@style/content_form_booking"
-        android:text="TextView"/>
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/booking_shape"
+        android:padding="5dp">
 
-    <LinearLayout
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Điểm đi :"/>
+
+            <TextView
+                android:id="@+id/txt_source"
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:text="TextView"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Điểm đến :"/>
+
+            <TextView
+                android:id="@+id/txt_destination"
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"/>
+        </TableRow>
+    </TableLayout>
+
+
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:orientation="horizontal">
+        android:layout_marginBottom="10dp"
+        android:padding="5dp">
 
-        <TextView
-            android:id="@+id/trip_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/content_form_booking"
-            android:layout_weight="1"
-            android:text="TextView"/>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/distance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/content_form_booking"
-            android:layout_weight="1"
-            android:text="10 km"/>
+            <TextView
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/booking_shape"
+                android:padding="5dp"
+                android:text="Chuyến đi"/>
 
-        <TextView
-            android:id="@+id/price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            style="@style/content_form_booking"
-            android:text="50K"/>
-    </LinearLayout>
+            <TextView
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/booking_shape"
+                android:padding="5dp"
+                android:text="Quãng đường"/>
+
+            <TextView
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/booking_shape"
+                android:padding="5dp"
+                android:text="Chi phí (ước tính)"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/trip_type"
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/booking_shape"
+                android:padding="5dp"
+                android:text="TextView"/>
+
+            <TextView
+                android:id="@+id/distance"
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/booking_shape"
+                android:padding="5dp"
+                android:text="10 km"/>
+
+            <TextView
+                android:id="@+id/price"
+                style="@style/content_form_booking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/booking_shape"
+                android:padding="5dp"
+                android:text="50K"/>
+        </TableRow>
+    </TableLayout>
 
     <TextView
         android:id="@+id/start_time"
+        style="@style/content_form_booking"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/booking_shape"
-        style="@style/content_form_booking"
-        android:padding="5dp"
+        android:padding="10dp"
         android:text="TextView"/>
 
     <TextView
         android:id="@+id/back_time"
+        style="@style/content_form_booking"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="10dp"
         android:background="@drawable/booking_shape"
-        style="@style/content_form_booking"
-        android:padding="5dp"
+        android:padding="10dp"
         android:text="TextView"/>
 
     <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal">
 
         <RadioButton
@@ -102,21 +175,23 @@
             android:text="Đặt hộ"/>
     </RadioGroup>
 
-    <TextView
+    <EditText
         android:id="@+id/txt_note"
+        style="@style/content_form_booking"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:lines="6"
         android:layout_marginBottom="10dp"
-        style="@style/content_form_booking"
         android:background="@drawable/booking_shape"
-        android:text="TextView"/>
+        android:gravity="top"
+        android:hint="Ghi chú"
+        android:lines="6"
+        android:padding="5dp"/>
 
     <Button
         android:id="@+id/btn_confirm"
+        style="@style/button_white_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/button_white_title"
         android:text="Xác nhận"/>
 
 </LinearLayout>

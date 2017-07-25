@@ -21,8 +21,9 @@ public class Position {
         this.fullPlace = primaryText +", "+secondText;
     }
 
-    public Position(LatLng latLng) {
+    public Position(String fullPath, LatLng latLng) {
         this.latLng = latLng;
+        this.fullPlace = fullPath;
     }
 
     public String getPlaceId() {

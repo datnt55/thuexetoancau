@@ -204,6 +204,12 @@ public class CommonUtilities {
         return null;
     }
 
+    public static String convertToKilometer(int meter){
+        float kilometer = (float)meter/1000;
+        return kilometer + " km";
+
+    }
+
     // Show dialog request turn on gps
     public static void settingRequestTurnOnLocation(final Activity mActivity) {
         android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(mActivity);
