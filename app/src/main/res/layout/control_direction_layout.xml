@@ -4,7 +4,7 @@
               android:id="@+id/layout_direction"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:padding="5dp"
+              android:padding="4dp"
               android:fitsSystemWindows="true"
               android:visibility="visible"
               android:background="@color/blue_light"
@@ -54,9 +54,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:background="@drawable/direction_type_shape"
+                    android:background="@drawable/direction_type_select_shape"
                     android:clickable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -93,7 +92,6 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:clickable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
                     android:orientation="horizontal">
 
                     <ImageView

@@ -361,10 +361,17 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                             @Override
                             public void onLocate(double mlongitude, double mlatitude) {
                                 showCurrentLocationToMap(mlatitude,mlongitude);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dialog.dismiss();
+                                    }
+                                });
                             }
                         });
                     } else {
                         showCurrentLocationToMap(gpsTracker.getLatitude(),gpsTracker.getLongitude());
+                        dialog.dismiss();
                     }
                 }
                 break;
@@ -563,9 +570,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
             //((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
             //((TextView) findViewById(R.id.tvDistance)).setText(route.distance.text);
-            Random rand = new Random();
-
-            int  n = rand.nextInt(255) + 1;
 
             PolylineOptions polylineOptions = new PolylineOptions().
                     geodesic(true).

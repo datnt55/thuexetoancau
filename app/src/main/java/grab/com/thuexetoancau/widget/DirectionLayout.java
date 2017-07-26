@@ -1,27 +1,20 @@
 package grab.com.thuexetoancau.widget;
 
 import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.DirectionAdapter;
@@ -143,18 +136,18 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
                     mCallback.onBackDirectionClicked();
                 break;
             case R.id.layout_one_way:
-                layoutOneWay.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_shape));
+                layoutOneWay.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_select_shape));
                 txtOneWay.setTextColor(ContextCompat.getColor(mContext,R.color.blue));
                 imgOneWay.setColorFilter(ContextCompat.getColor(mContext,R.color.blue));
-                layoutRoundTrip.setBackground(null);
+                layoutRoundTrip.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_no_select_shape));
                 txtRoundTrip.setTextColor(ContextCompat.getColor(mContext,R.color.white));
                 imgRoundTrip.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
                 break;
             case R.id.layout_round_trip:
-                layoutRoundTrip.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_shape));
+                layoutRoundTrip.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_select_shape));
                 txtRoundTrip.setTextColor(ContextCompat.getColor(mContext,R.color.blue));
                 imgRoundTrip.setColorFilter(ContextCompat.getColor(mContext,R.color.blue));
-                layoutOneWay.setBackground(null);
+                layoutOneWay.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_no_select_shape));
                 txtOneWay.setTextColor(ContextCompat.getColor(mContext,R.color.white));
                 imgOneWay.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
                 break;
