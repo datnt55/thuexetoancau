@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class Defines {
     public static  final String HOSTNAME                        = "http://thuexetoancau.vn/";
-    public static  final String URL_GET_CAR_HIRE_TYPE       = HOSTNAME + "api/getCarHireType";
+    public static  final String URL_REGISTER                    = HOSTNAME + "api/customRegister";
     public static  final String URL_GET_CAR_SIZE            = HOSTNAME + "api/getCarSize";
     public static  final String URL_GET_CAR_TYPE            = HOSTNAME + "api/getListCarType";
     public static  final String URL_GET_CAR_MADE            = HOSTNAME + "api/getCarMadeList";
