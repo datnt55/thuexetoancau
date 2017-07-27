@@ -36,12 +36,14 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -300,6 +302,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                             //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
                             .title(mEnd.getPrimaryText())
                             .position(mEnd.getLatLng())));
+                    updateMapCamera();
                 }
                 new DirectionFinder(this, mFrom.getLatLng(), mTo.getLatLng()).execute();
             }
@@ -318,6 +321,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
         for (Marker marker : markerList)
             marker.remove();
+        markerList.clear();
     }
 
     private void showDialogBooking() {
@@ -341,6 +345,18 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         lp.width = WindowManager.LayoutParams.MATCH_PARENT;
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
         window.setAttributes(lp);
+    }
+
+    private void updateMapCamera(){
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (Marker marker : markerList) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+        int padding = (int)CommonUtilities.convertDpToPixel(20,mContext); // offset from edges of the map in pixels
+        mMap.setPadding(padding,measureView(layoutDirection)+(int)CommonUtilities.convertDpToPixel(50,mContext),padding, measureView(layoutTransport));
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 0);
+        mMap.animateCamera(cu);
     }
 
     @Override
@@ -567,10 +583,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onDirectionFinderSuccess(List<Route> routes) {
         for (Route route : routes) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
-            //((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
-            //((TextView) findViewById(R.id.tvDistance)).setText(route.distance.text);
-
             PolylineOptions polylineOptions = new PolylineOptions().
                     geodesic(true).
                     color(Color.BLUE).
