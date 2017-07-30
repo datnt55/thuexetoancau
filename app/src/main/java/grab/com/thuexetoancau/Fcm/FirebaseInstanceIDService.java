@@ -17,7 +17,7 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService {
         token = FirebaseInstanceId.getInstance().getToken();
         preference = new SharePreference(this);
 
-        preference.saveToken(token);
+        preference.saveRegId(token);
         final Intent intent = new Intent("tokenReceiver");
         // You can also include some extra data.
         final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);

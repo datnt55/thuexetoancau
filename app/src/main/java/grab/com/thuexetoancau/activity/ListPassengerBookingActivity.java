@@ -42,6 +42,7 @@ public class ListPassengerBookingActivity extends AppCompatActivity implements L
     private PlaceArrayAdapter mPlaceArrayFromAdapter , mPlaceToArrayAdapter; // Place adapter
     private OnConnected connected;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

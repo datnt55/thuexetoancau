@@ -8,8 +8,8 @@ import android.preference.PreferenceManager;
 public class SharePreference {
 
     private Context activity;
-    private String NAME         = "name";
-    private String PHONE        = "phone";
+    private String REGID        = "reg_id";
+    private String CUSTOMER_ID  = "customer_id";
     private String THE_FIRST    = "the_first";
     private String TOKEN        = "token";
     private String DRIVER_ID    = "driver id";
@@ -21,26 +21,26 @@ public class SharePreference {
     public SharePreference(Context activity) {
         this.activity = activity;
     }
-    public void saveName(String token) {
+    public void saveRegId(String token) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(NAME, token);
+        editor.putString(REGID, token);
         editor.apply();
     }
-    public String getName() {
+    public String getRegId() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
-        return sp.getString(NAME, "");
+        return sp.getString(REGID, "");
     }
 
-    public void savePhone(String phone) {
+    public void saveCustomerId(String phone) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(PHONE, phone);
+        editor.putString(CUSTOMER_ID, phone);
         editor.apply();
     }
-    public String getPhone() {
+    public String getCustomerId() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
-        return sp.getString(PHONE, "");
+        return sp.getString(CUSTOMER_ID, "");
     }
 
     public void saveFirst() {

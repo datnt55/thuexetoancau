@@ -85,8 +85,8 @@ public class PassengerCarAdapter extends RecyclerView.Adapter<PassengerCarAdapte
     private void bookingTrip(int position) {
         RequestParams params;
         params = new RequestParams();
-        params.put("name", preference.getName());
-        params.put("phone", preference.getPhone());
+       // params.put("name", preference.getName());
+       // params.put("phone", preference.getPhone());
         params.put("id_booking", mVehicle.get(position).getId());
         final ProgressDialog dialog = new ProgressDialog(mContext);
         dialog.setIndeterminate(true);

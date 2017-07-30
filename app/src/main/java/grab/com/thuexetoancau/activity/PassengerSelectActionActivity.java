@@ -1,5 +1,7 @@
 package grab.com.thuexetoancau.activity;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -8,14 +10,17 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -26,11 +31,13 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -41,6 +48,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -54,8 +62,12 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -92,7 +104,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private Button btnBooking, btnInfor;
     private RelativeLayout layoutRoot;
     private SearchBarLayout layoutSearch;
-    private FrameLayout layoutPredict;
+    private FrameLayout layoutPredict, layoutFixGPS,layoutOverLay;
     private int searchBarHeight;
     private DirectionLayout layoutDirection;
     private GoogleApiClient mGoogleApiClient;       // google place api
@@ -105,13 +117,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private User user;
     private ArrayList<Position> listStopPoint = new ArrayList<>();
     private ArrayList<Marker> markerList = new ArrayList<>();
+    private Marker currentLocation;
     private List<Polyline> polylinePaths = new ArrayList<>();
     private Position mFrom, mEnd;
-    private FrameLayout layoutOverLay;
     private int typeTrip = 1;
     private int totalDistance = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_select_action);
         initComponents();
@@ -125,8 +139,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         layoutPredict = (FrameLayout) findViewById(R.id.fragment_last_search);
         layoutFindCar = (LinearLayout) findViewById(R.id.layout_find_car);
         layoutOverLay = (FrameLayout) findViewById(R.id.layout_overlay);
+        layoutFixGPS = (FrameLayout) findViewById(R.id.layout_fix_gps);
         layoutSearch.setCallback(this);
         btnBooking.setOnClickListener(this);
+        layoutFixGPS.setOnClickListener(this);
         btnInfor.setOnClickListener(this);
         setupGoogleApi();
         SupportMapFragment map = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -150,7 +166,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             TextView txtName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_name);
             TextView txtEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_email);
             ImageView imgAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar);
-
+            ImageView imgEdit= (ImageView) navigationView.getHeaderView(0).findViewById(R.id.img_edit);
+            imgEdit.setOnClickListener(this);
             txtEmail.setText(user.getEmail());
             txtName.setText(user.getName());
             DisplayImageOptions options = new DisplayImageOptions.Builder()
@@ -195,6 +212,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         AnimUtils.translate(layoutPredict,0,height);
         mPredictFragment.setGoogleApiClient(mGoogleApiClient);
         AnimUtils.fadeIn(layoutOverLay,300);
+        AnimUtils.fadeOut(layoutFixGPS,300);
     }
 
     /**
@@ -211,6 +229,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         int height = Defines.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
         AnimUtils.translate(layoutPredict,height,0);
         AnimUtils.fadeOut(layoutOverLay,300);
+        AnimUtils.fadeIn(layoutFixGPS,300);
     }
 
 
@@ -222,19 +241,18 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
 
     private void showCurrentLocationToMap(double latitude, double longitude){
+        if (currentLocation != null)
+            currentLocation.remove();
         Position lFrom = new Position(getAddress(latitude, longitude),new LatLng(latitude,longitude));
         listStopPoint.add(lFrom);
-        markerList.add(mMap.addMarker(new MarkerOptions().position(lFrom.getLatLng()).title("Vị trí của bạn")));
-     /*   mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curLatLng, 16));*/
-
+        currentLocation = mMap.addMarker(new MarkerOptions().position(lFrom.getLatLng()).title("Vị trí của bạn").icon(BitmapDescriptorFactory.fromResource(R.drawable.current)));
+        markerList.add(currentLocation);
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(lFrom.getLatLng())             // Sets the center of the map to current location
+                .target(currentLocation.getPosition())             // Sets the center of the map to current location
                 .zoom(16)                   // Sets the zoom
                 .tilt(45)                   // Sets the tilt of the camera to 0 degrees
                 .build();                   // Creates a CameraPosition from the builder
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-
     }
 
     private String getAddress(double latitude, double longitude) {
@@ -292,16 +310,32 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             for (int i= 0; i< listStopPoint.size()-1; i++) {
                 mFrom = listStopPoint.get(i);
                 Position mTo = listStopPoint.get(i+1);
-                markerList.add(mMap.addMarker(new MarkerOptions()
-                        //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
-                        .title(mFrom.getPrimaryText())
-                        .position(mFrom.getLatLng())));
-                if (i == listStopPoint.size()-2) {
-                    mEnd = listStopPoint.get(i + 1);
+                if (CommonUtilities.distanceInMeter(mFrom.getLatLng(), currentLocation.getPosition()) < Defines.MIN_CURRENT_DISTANCE ){
                     markerList.add(mMap.addMarker(new MarkerOptions()
                             //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
-                            .title(mEnd.getPrimaryText())
-                            .position(mEnd.getLatLng())));
+                            .title(currentLocation.getTitle())
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.current))
+                            .position(currentLocation.getPosition())));
+                }else {
+                    markerList.add(mMap.addMarker(new MarkerOptions()
+                            //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                            .title(mFrom.getPrimaryText())
+                            .position(mFrom.getLatLng())));
+                }
+                if (i == listStopPoint.size()-2) {
+                    mEnd = listStopPoint.get(i + 1);
+                    if (CommonUtilities.distanceInMeter(mEnd.getLatLng(), currentLocation.getPosition()) < Defines.MIN_CURRENT_DISTANCE ){
+                        markerList.add(mMap.addMarker(new MarkerOptions()
+                                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                                .title(currentLocation.getTitle())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.current))
+                                .position(currentLocation.getPosition())));
+                    }else {
+                        markerList.add(mMap.addMarker(new MarkerOptions()
+                                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                                .title(mEnd.getPrimaryText())
+                                .position(mEnd.getLatLng())));
+                    }
                     updateMapCamera();
                 }
                 new DirectionFinder(this, mFrom.getLatLng(), mTo.getLatLng()).execute();
@@ -318,7 +352,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 polyline.remove();
             }
         }
-
+        polylinePaths.clear();
         for (Marker marker : markerList)
             marker.remove();
         markerList.clear();
@@ -337,6 +371,29 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         TextView txtDistance = (TextView) dialog.findViewById(R.id.distance);
         txtDistance.setText(CommonUtilities.convertToKilometer(totalDistance));
 
+        final TextView txtStartTime = (TextView) dialog.findViewById(R.id.start_time);
+        TextView txtBackTime = (TextView) dialog.findViewById(R.id.back_time);
+
+        if (totalDistance < Defines.MAX_DISTANCE) {
+            txtStartTime.setVisibility(View.GONE);
+            txtBackTime.setVisibility(View.GONE);
+        }else if (typeTrip == 1){
+            txtBackTime.setVisibility(View.GONE);
+        }
+
+        txtStartTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateTimeDialog(txtStartTime);
+            }
+        });
+
+        txtBackTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDateTimeDialog(txtStartTime);
+            }
+        });
         dialog.show();
 
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
@@ -353,10 +410,133 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             builder.include(marker.getPosition());
         }
         LatLngBounds bounds = builder.build();
-        int padding = (int)CommonUtilities.convertDpToPixel(20,mContext); // offset from edges of the map in pixels
+        int padding = (int)CommonUtilities.convertDpToPixel(30,mContext); // offset from edges of the map in pixels
         mMap.setPadding(padding,measureView(layoutDirection)+(int)CommonUtilities.convertDpToPixel(50,mContext),padding, measureView(layoutTransport));
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 0);
         mMap.animateCamera(cu);
+    }
+
+    private void showDateTimeDialog(final TextView txtDate){
+        final View dialogView = View.inflate(mContext, R.layout.date_time_picker, null);
+        final AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
+        final DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.datepicker);
+        datePicker.setMinDate(System.currentTimeMillis() - 1000);
+        final TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.timepicker);
+
+        timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker timePicker, int mHour, int mMinute) {
+                Calendar now = Calendar.getInstance();
+                int year = now.get(Calendar.YEAR);
+                int month = now.get(Calendar.MONTH); // Note: zero based!
+                int day = now.get(Calendar.DAY_OF_MONTH);
+                int hour = now.get(Calendar.HOUR_OF_DAY);
+                int minutes = now.get(Calendar.MINUTE);
+                if (datePicker.getYear() == year && datePicker.getMonth() == month && datePicker.getDayOfMonth() == day ){
+                    if (mHour <= hour) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                            if (hour > 22)
+                                timePicker.setHour(hour);
+                            else
+                                timePicker.setHour(hour+1);
+                            timePicker.setMinute(minutes);
+                        }else {
+                            if (hour > 22)
+                                timePicker.setCurrentHour(hour);
+                            else
+                                timePicker.setCurrentHour(hour+1);
+
+                            timePicker.setCurrentMinute(minutes);
+                        }
+                    }
+                }
+            }
+        });
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (calendar.get(Calendar.HOUR_OF_DAY) > 22){
+                timePicker.setHour(calendar.get(Calendar.HOUR_OF_DAY));
+            }else
+                timePicker.setHour(calendar.get(Calendar.HOUR_OF_DAY)+1);
+        }else {
+            if (calendar.get(Calendar.HOUR_OF_DAY) > 22)
+                timePicker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY));
+            else
+                timePicker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY)+1);
+        }
+        datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
+
+            @Override
+            public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
+                Calendar now = Calendar.getInstance();
+                int cYear = now.get(Calendar.YEAR);
+                int cMonth = now.get(Calendar.MONTH);
+                int cDay = now.get(Calendar.DAY_OF_MONTH);
+                int hour = now.get(Calendar.HOUR_OF_DAY);
+                int minutes = now.get(Calendar.MINUTE);
+                if (cYear == year && cMonth == month && cDay == dayOfMonth ) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (hour > 22)
+                            timePicker.setHour(hour);
+                        else
+                            timePicker.setHour(hour+1);
+                        timePicker.setMinute(minutes);
+                    }else {
+                        if (hour > 22)
+                            timePicker.setCurrentHour(hour);
+                        else
+                            timePicker.setCurrentHour(hour+1);
+
+                        timePicker.setCurrentMinute(minutes);
+                    }
+                }
+
+            }
+        });
+        dialogView.findViewById(R.id.datetimeset).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                        datePicker.getMonth(),
+                        datePicker.getDayOfMonth(),
+                        timePicker.getCurrentHour(),
+                        timePicker.getCurrentMinute());
+                SimpleDateFormat mSDF = new SimpleDateFormat("HH:mm:ss");
+                String time = mSDF.format(calendar.getTime());
+                int day = datePicker.getDayOfMonth();
+                int month = datePicker.getMonth();
+                int year = datePicker.getYear();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                String formatedDate = sdf.format(new Date(year-1900, month, day));
+                txtDate.setText(formatedDate + ' ' + time);
+                alertDialog.dismiss();
+
+            }
+        });
+
+        alertDialog.setView(dialogView);
+        alertDialog.show();
+    }
+
+    private void getCurrentPosition(){
+        gpsTracker = new GPSTracker(this);
+        if (gpsTracker.handlePermissionsAndGetLocation()) {
+            if (!gpsTracker.canGetLocation()) {
+                CommonUtilities.settingRequestTurnOnLocation(PassengerSelectActionActivity.this);
+            } else
+                showCurrentLocationToMap(gpsTracker.getLatitude(), gpsTracker.getLongitude());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == Constants.REQUEST_CODE_LOCATION_PERMISSIONS) {
+            getCurrentPosition();
+        }
     }
 
     @Override
@@ -430,6 +610,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         layoutRoot.removeView(layoutDirection);
         layoutTransport = null;
         layoutRoot.removeView(layoutTransport);
+        listStopPoint.clear();
+        removeAllMarker();
+        getCurrentPosition();
     }
 
     /**
@@ -468,6 +651,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     public void onSwapLocation(int fromPosition, int toPosition) {
         Collections.swap(listStopPoint, fromPosition, toPosition);
         sendRequestFindDirection();
+    }
+
+    @Override
+    public void onSetTripType(int type) {
+        typeTrip = type;
     }
 
     @Override
@@ -520,13 +708,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        gpsTracker = new GPSTracker(this);
-        if (gpsTracker.handlePermissionsAndGetLocation()) {
-            if (!gpsTracker.canGetLocation()) {
-                CommonUtilities.settingRequestTurnOnLocation(PassengerSelectActionActivity.this);
-            } else
-                showCurrentLocationToMap(gpsTracker.getLatitude(), gpsTracker.getLongitude());
-        }
+       getCurrentPosition();
     }
 
     @Override
@@ -570,6 +752,31 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             case R.id.btn_infor:
                 Intent intentInfo = new Intent(PassengerSelectActionActivity.this, ListPassengerBookingActivity.class);
                 startActivity(intentInfo);
+                break;
+            case R.id.img_edit:
+                Intent intentEdit= new Intent(PassengerSelectActionActivity.this, ConfigureAccountActivity.class);
+                intentEdit.putExtra(Constants.BUNDLE_USER, user);
+                startActivity(intentEdit);
+                break;
+            case R.id.layout_fix_gps:
+                gpsTracker = new GPSTracker(this);
+                if (gpsTracker.handlePermissionsAndGetLocation()) {
+                    if (!gpsTracker.canGetLocation()) {
+                        CommonUtilities.settingRequestTurnOnLocation(PassengerSelectActionActivity.this);
+                    } else{
+                        currentLocation.remove();
+                        currentLocation = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()))
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.current))
+                                .title("Vị trí của bạn"));
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(currentLocation.getPosition())// Sets the center of the map to current location
+                                .zoom(16)                   // Sets the zoom
+                                .tilt(45)                   // Sets the tilt of the camera to 0 degrees
+                                .build();                   // Creates a CameraPosition from the builder
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    }
+                }
                 break;
         }
 

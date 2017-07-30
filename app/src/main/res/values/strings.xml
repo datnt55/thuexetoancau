@@ -60,7 +60,15 @@
     <string name="login_google">Đăng nhập qua Google</string>
     <string name="login_phone">Sử dụng số điện thoại</string>
 
+    <string name="ACCOUNT_KIT_CLIENT_TOKEN">fb067cb472213a2d5a7ac68d9fefea8d</string>
     <string name="facebook_app_id">154472745109695</string>
     <string name="fb_login_protocol_scheme">fb154472745109695</string>
+
+    <string name="title_register">Vui lòng điền thông tin, Chỉ có tài xế đón bạn thấy thông tin của bạn</string>
+    <string name="register_policy">Bằng việc đăng ký, tôi đã đọc và đồng ý với Điều khoản Sử dụng và Chính sách bảo mật</string>
+    <string name="register_message">Đang tạo tài khoản. Vui lòng đợi</string>
+    <string name="register_error">Đăng ký thất bại, Vui lòng kiểm tra kết nối mạng</string>
+    <string name="edit_customer_message">Đang cập nhật thông tin. Vui lòng đợi</string>
+    <string name="edit_customer_error">Sửa thông tin thất bại, Vui lòng kiểm tra kết nối mạng</string>
 
 </resources>

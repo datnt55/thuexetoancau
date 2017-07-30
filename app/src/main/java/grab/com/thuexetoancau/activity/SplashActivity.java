@@ -7,11 +7,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.AnimationDrawable;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -29,6 +32,11 @@ public class SplashActivity extends AppCompatActivity {
     private LinearLayout layoutLoading;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow();
+            w.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            // w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         preference = new SharePreference(this);
@@ -38,6 +46,7 @@ public class SplashActivity extends AppCompatActivity {
         FirebaseInstanceId.getInstance().getToken();
         FirebaseMessaging.getInstance().subscribeToTopic("test");
         CommonUtilities.dimensionScreen(this);
+        CommonUtilities.getListPhone(this);
     }
 
     @Override
@@ -72,7 +81,7 @@ public class SplashActivity extends AppCompatActivity {
             dialog.dismiss();
         }
         layoutLoading.setVisibility(View.VISIBLE);
-        if (preference.getToken().equals("")) {
+        if (preference.getRegId().equals("")) {
             LocalBroadcastManager.getInstance(this).registerReceiver(tokenReceiver, new IntentFilter("tokenReceiver"));
         }else {
             new Handler().postDelayed(new Runnable() {

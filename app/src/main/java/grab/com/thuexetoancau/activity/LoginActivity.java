@@ -3,11 +3,14 @@ package grab.com.thuexetoancau.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -48,6 +51,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow();
+            w.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            // w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -98,7 +106,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         btnLoginPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, PassengerSelectActionActivity.class);
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
             }
         });
@@ -113,9 +121,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            Toast.makeText(getApplicationContext(),acct.getEmail(),Toast.LENGTH_LONG).show();
+          //  Toast.makeText(getApplicationContext(),acct.getEmail(),Toast.LENGTH_LONG).show();
             user = new User(acct.getDisplayName(),"", acct.getEmail(), String.valueOf(acct.getPhotoUrl()));
-            Intent intent = new Intent(LoginActivity.this, PassengerSelectActionActivity.class);
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             intent.putExtra(Constants.BUNDLE_USER, user);
             startActivity(intent);
         }
@@ -127,9 +135,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
                 Log.e("JSON",object.toString());
-                Toast.makeText(getApplicationContext(),object.toString(),Toast.LENGTH_LONG).show();
+               // Toast.makeText(getApplicationContext(),object.toString(),Toast.LENGTH_LONG).show();
                 parseFacebookProfile(object);
-                Intent intent = new Intent(LoginActivity.this, PassengerSelectActionActivity.class);
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 intent.putExtra(Constants.BUNDLE_USER, user);
                 startActivity(intent);
             }

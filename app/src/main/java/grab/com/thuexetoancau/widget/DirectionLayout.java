@@ -142,6 +142,8 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
                 layoutRoundTrip.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_no_select_shape));
                 txtRoundTrip.setTextColor(ContextCompat.getColor(mContext,R.color.white));
                 imgRoundTrip.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
+                if (mCallback != null)
+                    mCallback.onSetTripType(1);
                 break;
             case R.id.layout_round_trip:
                 layoutRoundTrip.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_select_shape));
@@ -150,6 +152,8 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
                 layoutOneWay.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_no_select_shape));
                 txtOneWay.setTextColor(ContextCompat.getColor(mContext,R.color.white));
                 imgOneWay.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
+                if (mCallback != null)
+                    mCallback.onSetTripType(2);
                 break;
         }
     }
@@ -195,6 +199,6 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         void onNewStopPoint();
         void onRemoveStopPoint(int position);
         void onSwapLocation(int fromPosition, int position);
-        void getLayoutSearchHeight(int height);
+        void onSetTripType(int type);
     }
 }
