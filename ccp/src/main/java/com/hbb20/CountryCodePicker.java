@@ -76,8 +76,8 @@ public class CountryCodePicker extends RelativeLayout {
     List<Country> customMasterCountriesList;
     //this will be "AU,IN,US"
     String customMasterCountries;
-    Language customDefaultLanguage = Language.VIETNAMESE;
-    Language languageToApply = Language.VIETNAMESE;
+    Language customDefaultLanguage = Language.ENGLISH;
+    Language languageToApply = Language.ENGLISH;
 
     boolean dialogKeyboardAutoPopup = true;
     boolean ccpClickable = true;
@@ -89,7 +89,7 @@ public class CountryCodePicker extends RelativeLayout {
     private OnCountryChangeListener onCountryChangeListener;
     private PhoneNumberValidityChangeListener phoneNumberValidityChangeListener;
     private int fastScrollerHandleColor;
-    private int dialogBackgroundColor, dialogTextColor, dialogSearchEditTextTintColor, textColor, colorDivider;
+    private int dialogBackgroundColor, dialogTextColor, dialogSearchEditTextTintColor;
     private int fastScrollerBubbleTextAppearance;
     View.OnClickListener countryCodeHolderClickListener = new View.OnClickListener() {
         @Override
@@ -204,7 +204,7 @@ public class CountryCodePicker extends RelativeLayout {
             setDialogKeyboardAutoPopup(a.getBoolean(R.styleable.CountryCodePicker_ccpDialog_keyboardAutoPopup, true));
 
             //if custom default language is specified, then set it as custom
-            int attrLanguage = 0; //for english
+            int attrLanguage = 3; //for english
             if (a.hasValue(R.styleable.CountryCodePicker_ccp_defaultLanguage)) {
                 attrLanguage = a.getInt(R.styleable.CountryCodePicker_ccp_defaultLanguage, 1);
             }
@@ -279,14 +279,7 @@ public class CountryCodePicker extends RelativeLayout {
             //dialog colors
             setDialogBackgroundColor(a.getColor(R.styleable.CountryCodePicker_ccpDialog_backgroundColor, 0));
             setDialogTextColor(a.getColor(R.styleable.CountryCodePicker_ccpDialog_textColor, 0));
-            setTextColor(a.getColor(R.styleable.CountryCodePicker_ccp_textColor, 0));
-            setDividerColor(a.getColor(R.styleable.CountryCodePicker_ccp_divider_color, 0));
             setDialogSearchEditTextTintColor(a.getColor(R.styleable.CountryCodePicker_ccpDialog_searchEditTextTint, 0));
-
-            //Text color
-            textView_selectedCountry.setTextColor(textColor);
-            imageViewArrow.setColorFilter(textColor);
-            findViewById(R.id.view_divider).setBackgroundColor(colorDivider);
 
             //text size
             int textSize = a.getDimensionPixelSize(R.styleable.CountryCodePicker_ccp_textSize, 0);
@@ -730,9 +723,6 @@ public class CountryCodePicker extends RelativeLayout {
         return dialogTextColor;
     }
 
-    int getTextColor() {
-        return textColor;
-    }
     /**
      * This color will be applied to
      * Title of dialog
@@ -747,13 +737,6 @@ public class CountryCodePicker extends RelativeLayout {
         this.dialogTextColor = dialogTextColor;
     }
 
-    public void setTextColor(int textColor) {
-        this.textColor = textColor;
-    }
-
-    public void setDividerColor(int color) {
-        this.colorDivider = color;
-    }
     /**
      * Publicly available functions from library
      */
@@ -1457,7 +1440,7 @@ public class CountryCodePicker extends RelativeLayout {
     //add an entry for your language in attrs.xml's <attr name="language" format="enum"> enum.
     //add here so that language can be set programmatically
     public enum Language {
-        VIETNAMESE("vn"),ARABIC("ar"), BENGALI("bn"), CHINESE_SIMPLIFIED("zh"), ENGLISH("en"), FRENCH("fr"), GERMAN("de"), GUJARATI("gu"), HINDI("hi"), JAPANESE("ja"), INDONESIA("in"), PORTUGUESE("pt"), RUSSIAN("ru"), SPANISH("es"), HEBREW("iw"), CHINESE_TRADITIONAL("zh"), KOREAN("ko");
+        ARABIC("ar"), BENGALI("bn"), CHINESE_SIMPLIFIED("zh"), ENGLISH("en"), FRENCH("fr"), GERMAN("de"), GUJARATI("gu"), HINDI("hi"), JAPANESE("ja"), INDONESIA("in"), PORTUGUESE("pt"), RUSSIAN("ru"), SPANISH("es"), HEBREW("iw"), CHINESE_TRADITIONAL("zh"), KOREAN("ko");
 
         String code;
 

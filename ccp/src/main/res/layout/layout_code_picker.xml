@@ -67,12 +67,5 @@
             android:alpha="0.6"
             android:src="@drawable/ic_arrow_drop_down_black_24dp"
             android:tint="@android:color/black" />
-        <View
-            android:id="@+id/view_divider"
-            android:layout_below="@+id/linear_flag_holder"
-            android:layout_width="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_height="1dp"
-            android:background="#898989" />
     </RelativeLayout>
 </RelativeLayout>
