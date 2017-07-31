@@ -36,6 +36,8 @@
         <attr name="ccpDialog_fastScroller_bubbleTextAppearance" format="reference"/>
         <attr name="ccpDialog_backgroundColor" format="color"/>
         <attr name="ccpDialog_textColor" format="color"/>
+        <attr name="ccp_textColor" format="color"/>
+        <attr name="ccp_divider_color" format="color"/>
         <attr name="ccpDialog_searchEditTextTint" format="color"/>
 
         <!--list of languages-->

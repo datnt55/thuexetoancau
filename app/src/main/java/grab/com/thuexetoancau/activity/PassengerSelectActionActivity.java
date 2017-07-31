@@ -88,6 +88,7 @@ import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.GPSTracker;
 import grab.com.thuexetoancau.widget.DirectionLayout;
 import grab.com.thuexetoancau.widget.SearchBarLayout;
+import grab.com.thuexetoancau.widget.SearchingCarLayout;
 import grab.com.thuexetoancau.widget.TransportationLayout;
 
 public class PassengerSelectActionActivity extends AppCompatActivity implements
@@ -125,7 +126,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow();
+            w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            w.addFlags(WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_select_action);
         initComponents();
@@ -805,7 +810,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onBookingClicked() {
-        showDialogBooking();
+        //showDialogBooking();
+        SearchingCarLayout layout = new SearchingCarLayout(this);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        layout.setLayoutParams(params);
+        layoutRoot.addView(layout);
     }
 
     @Override

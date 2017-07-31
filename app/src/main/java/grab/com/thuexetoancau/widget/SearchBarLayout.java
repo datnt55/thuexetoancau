@@ -27,7 +27,7 @@ import grab.com.thuexetoancau.utilities.Defines;
  * Created by DatNT on 7/18/2017.
  */
 
-public class SearchBarLayout  extends LinearLayout implements View.OnClickListener{
+public class SearchBarLayout extends LinearLayout implements View.OnClickListener{
     private Context mContext;
     private FrameLayout layoutMenu;
     private AutoCompleteTextView edtSearch;

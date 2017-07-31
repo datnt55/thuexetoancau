@@ -736,7 +736,7 @@ class Country implements Comparable<Country> {
                 return R.drawable.flag_british_virgin_islands;
             case "vi": //us virgin islands
                 return R.drawable.flag_us_virgin_islands;
-            case "vn": //vietnam
+            case "vn": //vietnamese
                 return R.drawable.flag_vietnam;
             case "vu": //vanuatu
                 return R.drawable.flag_vanuatu;

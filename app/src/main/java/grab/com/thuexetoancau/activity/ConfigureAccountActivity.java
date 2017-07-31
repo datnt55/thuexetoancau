@@ -49,13 +49,12 @@ public class ConfigureAccountActivity extends AppCompatActivity implements View.
     private Context mContext;
     private FrameLayout layoutChangeAvatar;
     private CountryCodePicker countryCodePicker;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Window w = getWindow();
-            w.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-           // w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            w.addFlags(WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION);
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configure_account);

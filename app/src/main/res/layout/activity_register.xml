@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/bg_register"
-    android:orientation="vertical"
-    android:padding="10dp"
-    tools:context="grab.com.thuexetoancau.activity.RegisterActivity">
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/bg_register"
+              android:orientation="vertical"
+              android:padding="10dp"
+              tools:context="grab.com.thuexetoancau.activity.RegisterActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -18,58 +18,80 @@
             android:id="@+id/btn_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:tint="@color/white"
-            android:clickable="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:srcCompat="@drawable/ic_arrow_back_black_24dp" />
+            android:clickable="true"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_arrow_back_black_24dp"/>
 
         <TextView
             android:id="@+id/txt_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:clickable="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_alignParentRight="true"
-            android:text="Tiếp theo" />
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:text="Tiếp theo"
+            android:textColor="@color/white"
+            android:textSize="18sp"/>
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/txt_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
-        android:textColor="@color/white"
-        android:textSize="18sp"
         android:gravity="center"
-        android:text="@string/title_register" />
+        android:text="@string/login_message"
+        android:textColor="@color/white"
+        android:textSize="18sp"/>
 
-    <EditText
-        android:id="@+id/edt_customer_name"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/text_input_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
+        android:textColorHint="@color/grey_blur"
         android:layout_marginLeft="10dp"
-        android:ems="10"
-        android:backgroundTint="@color/green"
-        android:textColor="@color/white"
-        android:inputType="textPersonName"
-        android:text="Name" />
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        app:hintEnabled="false">
 
-    <EditText
-        android:id="@+id/edt_customer_email"
+        <EditText
+            android:id="@+id/edt_customer_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/green"
+            android:ems="10"
+            android:hint="Tên hành khách"
+            android:inputType="textPersonName"
+            android:paddingLeft="15dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grey"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/text_input_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
-        android:ems="10"
-        android:textColor="@color/white"
-        android:inputType="textEmailAddress"
-        android:backgroundTint="@color/green"
-        android:text="Name" />
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:textColorHint="@color/grey_blur"
+        app:hintEnabled="false">
+
+        <EditText
+            android:id="@+id/edt_customer_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/green"
+            android:ems="10"
+            android:hint="Email"
+            android:paddingLeft="15dp"
+            android:inputType="textEmailAddress"
+            android:textColor="@color/white"
+            android:textColorHint="@color/grey"/>
+    </android.support.design.widget.TextInputLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -91,25 +113,46 @@
                 app:ccp_textColor="@color/white"/>
         </FrameLayout>
 
-        <EditText
-            android:id="@+id/edt_customer_phone"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/text_input_phone"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
             android:layout_weight="5"
-            android:ems="10"
-            android:backgroundTint="@color/green"
-            android:textColor="@color/white"
-            android:inputType="phone"
-            android:text="" />
+            android:layout_height="wrap_content"
+            android:textColorHint="@color/grey_blur"
+            app:hintEnabled="false">
+
+            <EditText
+                android:id="@+id/edt_customer_phone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/green"
+                android:ems="10"
+                android:paddingLeft="15dp"
+                android:inputType="phone"
+                android:hint="Số điện thoại "
+                android:textColorHint="@color/grey"
+                android:textColor="@color/white"/>
+        </android.support.design.widget.TextInputLayout>
     </LinearLayout>
 
     <TextView
-        android:id="@+id/text_policy"
+        android:id="@+id/text_register"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:gravity="center"
+        android:text="@string/not_have_account"
         android:textColor="@color/white"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/text_policy"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
         android:text="@string/register_policy"
-        android:textSize="16sp" />
+        android:textColor="@color/white"
+        android:textSize="16sp"/>
 </LinearLayout>

@@ -11,7 +11,7 @@ import grab.com.thuexetoancau.model.Phone;
 public class Defines {
     public static  final String HOSTNAME                        = "http://thuexetoancau.vn/";
     public static  final String URL_REGISTER                    = HOSTNAME + "api2/customRegister";
-    public static  final String URL_GET_CAR_SIZE            = HOSTNAME + "api/getCarSize";
+    public static  final String URL_LOGIN                       = HOSTNAME + "api2/customerLogin";
     public static  final String URL_GET_CAR_TYPE            = HOSTNAME + "api/getListCarType";
     public static  final String URL_GET_CAR_MADE            = HOSTNAME + "api/getCarMadeList";
     public static  final String URL_GET_CAR_MODEL           = HOSTNAME + "api/getCarModelListFromMade";
@@ -22,7 +22,6 @@ public class Defines {
     public static  final String URL_REGISTER_DRIVER         = HOSTNAME + "api/driverRegister";
     public static  final String URL_GET_AIRPORT             = HOSTNAME + "api/getAirportName";
     public static  final String URL_GET_LONLAT_AIRPORT      = HOSTNAME + "api/getLonLatAirport";
-    public static  final String URL_LOGIN                   = HOSTNAME + "api/login";
     public static  final String URL_NOTICE                  = HOSTNAME + "api/getNotice";
     public static  final String URL_BOOKING_LOG             = HOSTNAME + "api/bookingLog";
     public static  final String URL_GET_BOOKING_LOG         = HOSTNAME + "api/getBookingLog";
