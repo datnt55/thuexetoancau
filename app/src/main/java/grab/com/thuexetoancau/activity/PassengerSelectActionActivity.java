@@ -18,6 +18,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
@@ -87,6 +88,7 @@ import grab.com.thuexetoancau.utilities.Constants;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.GPSTracker;
 import grab.com.thuexetoancau.widget.DirectionLayout;
+import grab.com.thuexetoancau.widget.DriverInformationLayout;
 import grab.com.thuexetoancau.widget.SearchBarLayout;
 import grab.com.thuexetoancau.widget.SearchingCarLayout;
 import grab.com.thuexetoancau.widget.TransportationLayout;
@@ -100,6 +102,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         LastSearchFragment.OnAddNewDirection,
         View.OnClickListener,
         DirectionFinderListener,
+        SearchingCarLayout.SearchingCallBack,
         TransportationLayout.OnTransportationListener {
 
     private Button btnBooking, btnInfor;
@@ -126,11 +129,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow();
-            w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            w.addFlags(WindowManager.LayoutParams.SOFT_INPUT_IS_FORWARD_NAVIGATION);
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_select_action);
         initComponents();
@@ -769,6 +767,16 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     if (!gpsTracker.canGetLocation()) {
                         CommonUtilities.settingRequestTurnOnLocation(PassengerSelectActionActivity.this);
                     } else{
+                        for (Marker marker : markerList)
+                            if (marker.getTitle().equals("Vị trí của bạn")){
+                                CameraPosition cameraPosition = new CameraPosition.Builder()
+                                        .target(currentLocation.getPosition())// Sets the center of the map to current location
+                                        .zoom(16)                   // Sets the zoom
+                                        .tilt(45)                   // Sets the tilt of the camera to 0 degrees
+                                        .build();                   // Creates a CameraPosition from the builder
+                                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                return;
+                            }
                         currentLocation.remove();
                         currentLocation = mMap.addMarker(new MarkerOptions()
                                 .position(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()))
@@ -811,14 +819,40 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onBookingClicked() {
         //showDialogBooking();
-        SearchingCarLayout layout = new SearchingCarLayout(this);
+        AnimUtils.fadeOut(layoutFixGPS,300);
+        SearchingCarLayout layout = new SearchingCarLayout(this,this);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         layout.setLayoutParams(params);
         layoutRoot.addView(layout);
+        layout.setTranslationY(Defines.APP_SCREEN_HEIGHT);
+        AnimUtils.slideUp(layout,0);
     }
 
     @Override
     public void onSelectVehicle(Car car) {
+
+    }
+
+    @Override
+    public void onSearchCarSuccess() {
+        AnimUtils.slideUp(layoutDirection,measureView(layoutDirection));
+        // Hide layout transport and show layout auction car
+        AnimUtils.slideDown(layoutTransport,measureView(layoutTransport));
+        DriverInformationLayout layoutInfo = new DriverInformationLayout(this);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        layoutInfo.setLayoutParams(params);
+        layoutRoot.addView(layoutInfo);
+        AnimUtils.fadeIn(layoutFixGPS,300);
+    }
+
+    @Override
+    public void onSearchCarError() {
+
+    }
+
+    @Override
+    public void onSearchCarBack() {
 
     }
 }

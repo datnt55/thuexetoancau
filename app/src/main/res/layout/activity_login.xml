@@ -92,9 +92,4 @@
         </LinearLayout>
 
     </LinearLayout>
-    <grab.com.thuexetoancau.widget.SearchingCarLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </grab.com.thuexetoancau.widget.SearchingCarLayout>
 </RelativeLayout>

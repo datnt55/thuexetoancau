@@ -12,7 +12,7 @@ public class Defines {
     public static  final String HOSTNAME                        = "http://thuexetoancau.vn/";
     public static  final String URL_REGISTER                    = HOSTNAME + "api2/customRegister";
     public static  final String URL_LOGIN                       = HOSTNAME + "api2/customerLogin";
-    public static  final String URL_GET_CAR_TYPE            = HOSTNAME + "api/getListCarType";
+    public static  final String URL_CHECK_TOKEN                 = HOSTNAME + "api2/customerCheckToken";
     public static  final String URL_GET_CAR_MADE            = HOSTNAME + "api/getCarMadeList";
     public static  final String URL_GET_CAR_MODEL           = HOSTNAME + "api/getCarModelListFromMade";
     public static  final String URL_GET_WHO_HIRE            = HOSTNAME + "api/getCarWhoHire ";

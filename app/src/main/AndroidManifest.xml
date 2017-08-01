@@ -54,6 +54,7 @@
         </activity>
         <activity
             android:name=".activity.PassengerSelectActionActivity"
+            android:theme="@style/TranslucentTheme"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activity.FormPassengerBookingActivity" />
         <activity android:name=".activity.ListPassengerBookingActivity" />
