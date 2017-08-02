@@ -26,6 +26,7 @@ import com.dd.CircularProgressButton;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.utilities.AnimUtils;
 import grab.com.thuexetoancau.utilities.Defines;
+import grab.com.thuexetoancau.utilities.Global;
 
 import static grab.com.thuexetoancau.utilities.AnimUtils.EASE_IN;
 
@@ -76,7 +77,7 @@ public class SearchingCarLayout extends LinearLayout {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        AnimUtils.slideDown(SearchingCarLayout.this, Defines.APP_SCREEN_HEIGHT);
+                        AnimUtils.slideDown(SearchingCarLayout.this, Global.APP_SCREEN_HEIGHT);
                         if (callBack!= null)
                             callBack.onSearchCarSuccess();
                     }

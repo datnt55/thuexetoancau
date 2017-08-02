@@ -61,7 +61,7 @@ public class GPSTracker extends Service implements LocationListener {
 			return true;
 		int hasWriteContactsPermission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
 		if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-			//ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_LOCATION_PERMISSIONS);
+			//ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Global.REQUEST_CODE_LOCATION_PERMISSIONS);
 			return false;
 		}
 		return true;
@@ -71,7 +71,7 @@ public class GPSTracker extends Service implements LocationListener {
 		try {
 			int hasWriteContactsPermission = ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
 			if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
-				ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_LOCATION_PERMISSIONS);
+				ActivityCompat.requestPermissions((Activity) mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Defines.REQUEST_CODE_LOCATION_PERMISSIONS);
 				return null;
 			}
 			locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);

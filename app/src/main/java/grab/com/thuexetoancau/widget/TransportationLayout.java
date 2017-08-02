@@ -1,6 +1,5 @@
 package grab.com.thuexetoancau.widget;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +16,7 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
 import grab.com.thuexetoancau.adapter.TransportationAdapter;
 import grab.com.thuexetoancau.model.Car;
+import grab.com.thuexetoancau.utilities.Defines;
 
 /**
  * Created by DatNT on 7/20/2017.
@@ -24,16 +24,21 @@ import grab.com.thuexetoancau.model.Car;
 
 public class TransportationLayout extends LinearLayout implements View.OnClickListener{
     private  Context mContext;
-    private ArrayList<Car> transports;
     private RecyclerView listTrans;
     private TransportationAdapter adapter;
     private Button btnBook;
     private OnTransportationListener listener;
+    private ArrayList<Car> transports;
+    private int totalDistance;
+    private int tripType;
 
-    public TransportationLayout(PassengerSelectActionActivity activity) {
+    public TransportationLayout(PassengerSelectActionActivity activity, ArrayList<Car> carPrice, int totalDistance, int tripType ) {
         super(activity);
         this.mContext = activity;
         this.listener = activity;
+        this.transports = carPrice;
+        this.tripType = tripType;
+        this.totalDistance = totalDistance;
         initLayout();
     }
 
@@ -44,7 +49,6 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     }
 
     private void initLayout() {
-        dummyData();
         LayoutInflater mInflater = LayoutInflater.from(mContext);
         View view = mInflater.inflate(R.layout.layout_transportation, this, true);
         listTrans = (RecyclerView) view.findViewById(R.id.list_transport);
@@ -53,6 +57,7 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         listTrans.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         listTrans.setLayoutManager(layoutManager);
+        setCarPrice();
         adapter = new TransportationAdapter(mContext, transports);
         listTrans.setAdapter(adapter);
         adapter.setOnClickListener(new TransportationAdapter.OnItemClickListener() {
@@ -64,15 +69,14 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         });
     }
 
-    public void setOnCallBackListener(OnTransportationListener listener){
-        this.listener = listener;
-    }
-
-    private void dummyData() {
-        transports = new ArrayList<>();
-        transports.add(new Car(4,"Taxi 4 chỗ",R.drawable.car_4_size,41000));
-        transports.add(new Car(5,"Taxi 5 chỗ",R.drawable.car_5_size,43000));
-        transports.add(new Car(8,"Taxi 8 chỗ",R.drawable.car_8_size,64000));
+    private void setCarPrice() {
+        for (Car car : transports)
+            if (totalDistance < Defines.MAX_DISTANCE)
+                car.setTotalPrice(car.getPrice11way()*totalDistance);
+            else if (tripType == 1)
+                car.setTotalPrice(car.getPrice01way()*totalDistance);
+            else
+                car.setTotalPrice(car.getPrice02way()*totalDistance);
     }
 
     @Override

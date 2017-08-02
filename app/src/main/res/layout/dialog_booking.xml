@@ -49,14 +49,15 @@
                 android:gravity="center_vertical"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
+                android:ellipsize="end"
                 android:text="TextView" />
         </LinearLayout>
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.75dp"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="3dp"
-            android:background="@color/grey" />
+            android:background="@color/grey_blur" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,15 +79,16 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:layout_marginRight="10dp"
+                android:ellipsize="end"
                 android:layout_weight="1"
                 android:text="TextView" />
         </LinearLayout>
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.75dp"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="3dp"
-            android:background="@color/grey" />
+            android:background="@color/grey_blur" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -113,10 +115,10 @@
         </LinearLayout>
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.75dp"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="3dp"
-            android:background="@color/grey" />
+            android:background="@color/grey_blur" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -143,10 +145,10 @@
         </LinearLayout>
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.75dp"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="3dp"
-            android:background="@color/grey" />
+            android:background="@color/grey_blur" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -172,14 +174,16 @@
                 android:text="TextView" />
         </LinearLayout>
         <View
+            android:id="@+id/divider_start_time"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.75dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginBottom="3dp"
-            android:background="@color/grey" />
+            android:background="@color/grey_blur" />
         <LinearLayout
+            android:id="@+id/layout_start"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="3dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -199,18 +203,21 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:layout_marginRight="10dp"
+                android:background="?attr/selectableItemBackground"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="@string/error_time_start" />
         </LinearLayout>
         <View
+            android:id="@+id/divider_back_time"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.75dp"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="3dp"
-            android:background="@color/grey" />
+            android:background="@color/grey_blur" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/layout_back"
             android:orientation="horizontal">
 
             <ImageView
@@ -229,9 +236,10 @@
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
+                android:background="?attr/selectableItemBackground"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:text="TextView" />
+                android:text="@string/error_time_back" />
         </LinearLayout>
     </LinearLayout>
     <View
@@ -256,6 +264,7 @@
             android:textStyle="bold" />
 
         <RadioGroup
+            android:id="@+id/radio_select_customer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -277,35 +286,40 @@
                 android:text="Đặt hộ" />
         </RadioGroup>
         <View
+            android:id="@+id/divider_friend"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="0.75dp"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="3dp"
+            android:visibility="gone"
             android:background="@color/grey" />
         <EditText
-            android:id="@+id/txt_friend_name"
+            android:id="@+id/edt_friend_name"
             style="@style/content_form_booking"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/name_of_customer"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="5dp" />
+            android:layout_marginBottom="5dp"
+            android:visibility="gone"/>
         <EditText
-            android:id="@+id/txt_friend_phone"
+            android:id="@+id/edt_friend_phone"
             style="@style/content_form_booking"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="7dp"
-            android:hint="@string/phone_of_customer"/>
+            android:visibility="gone"
+            android:hint="@string/phone_of_customer" />
 
         <EditText
             android:id="@+id/txt_note"
             style="@style/content_form_booking"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
@@ -321,6 +335,9 @@
         style="@style/button_white_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="10dp"
         android:text="Xác nhận" />
 
 </LinearLayout>

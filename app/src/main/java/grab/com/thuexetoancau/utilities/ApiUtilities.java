@@ -2,12 +2,10 @@ package grab.com.thuexetoancau.utilities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,8 +14,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import grab.com.thuexetoancau.R;
-import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
-import grab.com.thuexetoancau.model.User;
+import grab.com.thuexetoancau.model.Car;
 
 /**
  * Created by DatNT on 8/2/2017.
@@ -30,19 +27,18 @@ public class ApiUtilities {
         this.mContext = mContext;
     }
 
-    private ArrayList<Integer> getPostage(final int carSize, final int carType){
-        final ArrayList<Integer> arrayPrice = new ArrayList<>();
+    public ArrayList<Car> getPostage(){
+        if (!CommonUtilities.isOnline(mContext)) {
+            CommonUtilities.showDialogNetworkError(mContext, null);
+            return null;
+        }
+        final ArrayList<Car> arrayPrice = new ArrayList<>();
         final ProgressDialog dialog = new ProgressDialog(mContext);
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage(mContext.getString(R.string.prepare_cost_of_trip));
+        dialog.setMessage(mContext.getString(R.string.prepare_data));
         dialog.show();
-        RequestParams params;
-        params = new RequestParams();
-        params.put("car_size", carSize);
-        params.put("car_type", carType);
-        Log.e("TAG",params.toString());
-        BaseService.getHttpClient().post(Defines.URL_GET_POSTAGE, params, new AsyncHttpResponseHandler() {
+        BaseService.getHttpClient().get(Defines.URL_GET_POSTAGE, new AsyncHttpResponseHandler() {
 
             @Override
             public void onStart() {
@@ -58,14 +54,14 @@ public class ApiUtilities {
                     if (json.getString("status").equals("success")){
                         JSONArray array = json.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
-                        if (carType == 0){
-                            int price2Way = data.getInt("price2Way");
-                            int price1Way = data.getInt("price1Way");
-                            arrayPrice.add(price2Way);
-                            arrayPrice.add(price1Way);
-                        }else if (carType == 1){
-                            int price = data.getInt("price");
-                            arrayPrice.add(price);
+                        JSONArray listPrice = data.getJSONArray("listprice");
+                        for (int i = 0 ; i < listPrice.length(); i++){
+                            JSONObject car = listPrice.getJSONObject(i);
+                            int carSize = car.getInt("car_size");
+                            int price01way = car.getInt("price01way");
+                            int price02way = car.getInt("price02way");
+                            int price11way = car.getInt("price11way");
+                            arrayPrice.add(new Car(carSize,CommonUtilities.getCarName(carSize), CommonUtilities.getCarImage(carSize), price01way, price02way, price11way));
                         }
 
                     }

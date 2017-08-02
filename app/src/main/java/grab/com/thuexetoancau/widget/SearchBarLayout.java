@@ -13,15 +13,12 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import grab.com.thuexetoancau.R;
-import grab.com.thuexetoancau.utilities.Constants;
-import grab.com.thuexetoancau.utilities.Defines;
 
 /**
  * Created by DatNT on 7/18/2017.

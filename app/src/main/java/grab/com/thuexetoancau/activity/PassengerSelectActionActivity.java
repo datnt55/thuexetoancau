@@ -1,8 +1,5 @@
 package grab.com.thuexetoancau.activity;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -10,37 +7,28 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -65,15 +53,10 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 import grab.com.thuexetoancau.DirectionFinder.DirectionFinder;
 import grab.com.thuexetoancau.DirectionFinder.DirectionFinderListener;
@@ -83,10 +66,12 @@ import grab.com.thuexetoancau.adapter.LastSearchAdapter;
 import grab.com.thuexetoancau.fragment.LastSearchFragment;
 import grab.com.thuexetoancau.model.Car;
 import grab.com.thuexetoancau.model.Position;
+import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.AnimUtils;
+import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
-import grab.com.thuexetoancau.utilities.Constants;
+import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.GPSTracker;
 import grab.com.thuexetoancau.widget.ConfirmDialogFragment;
@@ -105,6 +90,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         LastSearchFragment.OnAddNewDirection,
         View.OnClickListener,
         DirectionFinderListener,
+        ConfirmDialogFragment.ConfirmDialogListener,
         SearchingCarLayout.SearchingCallBack,
         TransportationLayout.OnTransportationListener {
 
@@ -126,6 +112,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private ArrayList<Marker> markerList = new ArrayList<>();
     private Marker currentLocation;
     private List<Polyline> polylinePaths = new ArrayList<>();
+    private ArrayList<Car> carPrice = new ArrayList<>();
     private Position mFrom, mEnd;
     private int typeTrip = 1;
     private int totalDistance = 0;
@@ -135,6 +122,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_select_action);
         initComponents();
+        ApiUtilities mApi = new ApiUtilities(this);
+        carPrice = mApi.getPostage();
     }
 
     private void initComponents(){
@@ -166,9 +155,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 return true;
             }
         });
-        if (getIntent().hasExtra(Constants.BUNDLE_USER)) {
+        if (getIntent().hasExtra(Defines.BUNDLE_USER)) {
             //receive
-            user = (User) getIntent().getSerializableExtra(Constants.BUNDLE_USER);
+            user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
             TextView txtName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_name);
             TextView txtEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_email);
             ImageView imgAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar);
@@ -193,10 +182,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private void setupGoogleApi(){
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Places.GEO_DATA_API)
-                .enableAutoManage(this, Constants.GOOGLE_API_CLIENT_ID, this)
+                .enableAutoManage(this, Defines.GOOGLE_API_CLIENT_ID, this)
                 .addConnectionCallbacks(this)
                 .build();
-        mPlaceArrayAdapter = new LastSearchAdapter(this, Constants.BOUNDS_MOUNTAIN_VIEW, null);
+        mPlaceArrayAdapter = new LastSearchAdapter(this, Defines.BOUNDS_MOUNTAIN_VIEW, null);
     }
 
     /**
@@ -207,13 +196,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         mPredictFragment = new LastSearchFragment();
         Bundle bundle = new Bundle();
         if (changeLocation)
-            bundle.putInt(Constants.POSITION_POINT,position );
+            bundle.putInt(Defines.POSITION_POINT,position );
         mPredictFragment.setArguments(bundle);
 
         // Add predict fragment to layout
         FragmentTransaction fragmentManager =  getSupportFragmentManager().beginTransaction();
         fragmentManager.replace(R.id.fragment_last_search, mPredictFragment).commit();
-        int height = Defines.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
+        int height = Global.APP_SCREEN_HEIGHT - searchBarHeight;
 
         AnimUtils.translate(layoutPredict,0,height);
         mPredictFragment.setGoogleApiClient(mGoogleApiClient);
@@ -232,7 +221,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
         // Animation hide layout location predict
-        int height = Defines.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
+        int height = Global.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
         AnimUtils.translate(layoutPredict,height,0);
         AnimUtils.fadeOut(layoutOverLay,300);
         AnimUtils.fadeIn(layoutFixGPS,300);
@@ -300,7 +289,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         layoutDirection.setOnCallBackDirection(this);
         // Initial and show layout select and booking car
         if (layoutTransport == null) {
-            layoutTransport = new TransportationLayout(this);
+            layoutTransport = new TransportationLayout(this, carPrice, totalDistance,typeTrip);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             layoutTransport.setLayoutParams(params);
@@ -364,52 +353,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         markerList.clear();
     }
 
-    private void showDialogBooking() {
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_booking);
-
-        TextView txtSource = (TextView) dialog.findViewById(R.id.txt_source);
-        txtSource.setText(listStopPoint.get(0).getFullPlace());
-        TextView txtDestination = (TextView) dialog.findViewById(R.id.txt_destination);
-        txtDestination.setText(listStopPoint.get(listStopPoint.size()-1).getFullPlace());
-        TextView txtTypeTrip = (TextView) dialog.findViewById(R.id.trip_type);
-        txtTypeTrip.setText(CommonUtilities.getTripType(typeTrip));
-        TextView txtDistance = (TextView) dialog.findViewById(R.id.distance);
-        txtDistance.setText(CommonUtilities.convertToKilometer(totalDistance));
-
-        final TextView txtStartTime = (TextView) dialog.findViewById(R.id.start_time);
-        TextView txtBackTime = (TextView) dialog.findViewById(R.id.back_time);
-
-        if (totalDistance < Defines.MAX_DISTANCE) {
-            txtStartTime.setVisibility(View.GONE);
-            txtBackTime.setVisibility(View.GONE);
-        }else if (typeTrip == 1){
-            txtBackTime.setVisibility(View.GONE);
-        }
-
-        txtStartTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDateTimeDialog(txtStartTime);
-            }
-        });
-
-        txtBackTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDateTimeDialog(txtStartTime);
-            }
-        });
-        dialog.show();
-
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        Window window = dialog.getWindow();
-        lp.copyFrom(window.getAttributes());
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        window.setAttributes(lp);
-    }
-
     private void updateMapCamera(){
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (Marker marker : markerList) {
@@ -420,111 +363,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         mMap.setPadding(padding,measureView(layoutDirection)+(int)CommonUtilities.convertDpToPixel(50,mContext),padding, measureView(layoutTransport));
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 0);
         mMap.animateCamera(cu);
-    }
-
-    private void showDateTimeDialog(final TextView txtDate){
-        final View dialogView = View.inflate(mContext, R.layout.date_time_picker, null);
-        final AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
-        final DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.datepicker);
-        datePicker.setMinDate(System.currentTimeMillis() - 1000);
-        final TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.timepicker);
-
-        timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-            @Override
-            public void onTimeChanged(TimePicker timePicker, int mHour, int mMinute) {
-                Calendar now = Calendar.getInstance();
-                int year = now.get(Calendar.YEAR);
-                int month = now.get(Calendar.MONTH); // Note: zero based!
-                int day = now.get(Calendar.DAY_OF_MONTH);
-                int hour = now.get(Calendar.HOUR_OF_DAY);
-                int minutes = now.get(Calendar.MINUTE);
-                if (datePicker.getYear() == year && datePicker.getMonth() == month && datePicker.getDayOfMonth() == day ){
-                    if (mHour <= hour) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-                            if (hour > 22)
-                                timePicker.setHour(hour);
-                            else
-                                timePicker.setHour(hour+1);
-                            timePicker.setMinute(minutes);
-                        }else {
-                            if (hour > 22)
-                                timePicker.setCurrentHour(hour);
-                            else
-                                timePicker.setCurrentHour(hour+1);
-
-                            timePicker.setCurrentMinute(minutes);
-                        }
-                    }
-                }
-            }
-        });
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (calendar.get(Calendar.HOUR_OF_DAY) > 22){
-                timePicker.setHour(calendar.get(Calendar.HOUR_OF_DAY));
-            }else
-                timePicker.setHour(calendar.get(Calendar.HOUR_OF_DAY)+1);
-        }else {
-            if (calendar.get(Calendar.HOUR_OF_DAY) > 22)
-                timePicker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY));
-            else
-                timePicker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY)+1);
-        }
-        datePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
-
-            @Override
-            public void onDateChanged(DatePicker datePicker, int year, int month, int dayOfMonth) {
-                Calendar now = Calendar.getInstance();
-                int cYear = now.get(Calendar.YEAR);
-                int cMonth = now.get(Calendar.MONTH);
-                int cDay = now.get(Calendar.DAY_OF_MONTH);
-                int hour = now.get(Calendar.HOUR_OF_DAY);
-                int minutes = now.get(Calendar.MINUTE);
-                if (cYear == year && cMonth == month && cDay == dayOfMonth ) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (hour > 22)
-                            timePicker.setHour(hour);
-                        else
-                            timePicker.setHour(hour+1);
-                        timePicker.setMinute(minutes);
-                    }else {
-                        if (hour > 22)
-                            timePicker.setCurrentHour(hour);
-                        else
-                            timePicker.setCurrentHour(hour+1);
-
-                        timePicker.setCurrentMinute(minutes);
-                    }
-                }
-
-            }
-        });
-        dialogView.findViewById(R.id.datetimeset).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Calendar calendar = new GregorianCalendar(datePicker.getYear(),
-                        datePicker.getMonth(),
-                        datePicker.getDayOfMonth(),
-                        timePicker.getCurrentHour(),
-                        timePicker.getCurrentMinute());
-                SimpleDateFormat mSDF = new SimpleDateFormat("HH:mm:ss");
-                String time = mSDF.format(calendar.getTime());
-                int day = datePicker.getDayOfMonth();
-                int month = datePicker.getMonth();
-                int year = datePicker.getYear();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-                String formatedDate = sdf.format(new Date(year-1900, month, day));
-                txtDate.setText(formatedDate + ' ' + time);
-                alertDialog.dismiss();
-
-            }
-        });
-
-        alertDialog.setView(dialogView);
-        alertDialog.show();
     }
 
     private void getCurrentPosition(){
@@ -540,7 +378,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == Constants.REQUEST_CODE_LOCATION_PERMISSIONS) {
+        if (requestCode == Defines.REQUEST_CODE_LOCATION_PERMISSIONS) {
             getCurrentPosition();
         }
     }
@@ -594,7 +432,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 break;
             case R.id.img_edit:
                 Intent intentEdit= new Intent(PassengerSelectActionActivity.this, ConfigureAccountActivity.class);
-                intentEdit.putExtra(Constants.BUNDLE_USER, user);
+                intentEdit.putExtra(Defines.BUNDLE_USER, user);
                 startActivity(intentEdit);
                 break;
             case R.id.layout_fix_gps:
@@ -832,20 +670,19 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onBookingClicked() {
+        Position startPoint = listStopPoint.get(0);
+        Position stopPoint = listStopPoint.get(listStopPoint.size()-1);
+        Trip trip = new Trip(startPoint.getFullPlace(), stopPoint.getFullPlace(), typeTrip, totalDistance, 50000);
         FragmentManager fragmentManager = getSupportFragmentManager();
-        ConfirmDialogFragment inputNameDialog = new ConfirmDialogFragment();
-        inputNameDialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog);
-        inputNameDialog.setCancelable(false);
-        inputNameDialog.setDialogTitle("Xác nhận thông tin");
-        inputNameDialog.show(fragmentManager, "Input Dialog");
-        //showDialogBooking();
-       /* AnimUtils.fadeOut(layoutFixGPS,300);
-        SearchingCarLayout layout = new SearchingCarLayout(this,this);
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        layout.setLayoutParams(params);
-        layoutRoot.addView(layout);
-        layout.setTranslationY(Defines.APP_SCREEN_HEIGHT);
-        AnimUtils.slideUp(layout,0);*/
+        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment();
+        dialogFragment.setOnCallBack(this);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(Defines.DIALOG_CONFIRM_TRIP,trip);
+        dialogFragment.setArguments(bundle);
+        dialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog);
+        dialogFragment.setCancelable(false);
+        dialogFragment.setDialogTitle("Xác nhận thông tin");
+        dialogFragment.show(fragmentManager, "Input Dialog");
     }
 
     @Override
@@ -876,5 +713,16 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onSearchCarBack() {
 
+    }
+
+    @Override
+    public void onConfirmed(Trip mTrip) {
+        AnimUtils.fadeOut(layoutFixGPS,300);
+        SearchingCarLayout layout = new SearchingCarLayout(this,this);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        layout.setLayoutParams(params);
+        layoutRoot.addView(layout);
+        layout.setTranslationY(Global.APP_SCREEN_HEIGHT);
+        AnimUtils.slideUp(layout,0);
     }
 }

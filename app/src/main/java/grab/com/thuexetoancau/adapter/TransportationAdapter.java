@@ -71,7 +71,7 @@ public class TransportationAdapter extends RecyclerView.Adapter<TransportationAd
     public void onBindViewHolder(final TransportationAdapter.ViewHolder holder, final int position) {
        holder.imgTransport.setImageResource(arrayVehicle.get(position).getImage());
         holder.txtCarName.setText(arrayVehicle.get(position).getName());
-        holder.txtPrice.setText(CommonUtilities.convertCurrency(arrayVehicle.get(position).getPrice())+" vnđ");
+        holder.txtPrice.setText(CommonUtilities.convertCurrency(arrayVehicle.get(position).getTotalPrice())+" vnđ");
         if (arrayVehicle.get(position).isSelected()) {
             holder.layoutRoot.setBackground(ContextCompat.getDrawable(mContext, R.drawable.vehicle_shape_selected));
             holder.txtCarName.setTextColor(ContextCompat.getColor(mContext, R.color.white));

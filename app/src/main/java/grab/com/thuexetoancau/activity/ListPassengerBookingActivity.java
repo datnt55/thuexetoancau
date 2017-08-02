@@ -22,7 +22,8 @@ import grab.com.thuexetoancau.adapter.ViewPagerAdapter;
 import grab.com.thuexetoancau.fragment.ListPassengerBookingFragment;
 import grab.com.thuexetoancau.fragment.MapPassengerBookingFragment;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
-import grab.com.thuexetoancau.utilities.Constants;
+import grab.com.thuexetoancau.utilities.Defines;
+import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.GPSTracker;
 
 import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
@@ -87,11 +88,11 @@ public class ListPassengerBookingActivity extends AppCompatActivity implements L
     private void setupGoogleApi(){
         mGoogleApiClient = new GoogleApiClient.Builder(ListPassengerBookingActivity.this)
                 .addApi(Places.GEO_DATA_API)
-                .enableAutoManage(this, Constants.GOOGLE_API_CLIENT_ID, this)
+                .enableAutoManage(this, Defines.GOOGLE_API_CLIENT_ID, this)
                 .addConnectionCallbacks(this)
                 .build();
-        mPlaceArrayFromAdapter = new PlaceArrayAdapter(this,Constants.BOUNDS_MOUNTAIN_VIEW, null);
-        mPlaceToArrayAdapter = new PlaceArrayAdapter(this,Constants.BOUNDS_MOUNTAIN_VIEW, null);
+        mPlaceArrayFromAdapter = new PlaceArrayAdapter(this, Defines.BOUNDS_MOUNTAIN_VIEW, null);
+        mPlaceToArrayAdapter = new PlaceArrayAdapter(this, Defines.BOUNDS_MOUNTAIN_VIEW, null);
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -163,7 +164,7 @@ public class ListPassengerBookingActivity extends AppCompatActivity implements L
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == Constants.REQUEST_CODE_LOCATION_PERMISSIONS && grantResults[0] == PERMISSION_GRANTED) {
+        if (requestCode == Defines.REQUEST_CODE_LOCATION_PERMISSIONS && grantResults[0] == PERMISSION_GRANTED) {
             requestPermission();
         }
     }

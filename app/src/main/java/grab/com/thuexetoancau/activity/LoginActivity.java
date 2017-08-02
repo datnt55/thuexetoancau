@@ -2,7 +2,6 @@ package grab.com.thuexetoancau.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +11,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
@@ -38,7 +36,8 @@ import java.util.Arrays;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
-import grab.com.thuexetoancau.utilities.Constants;
+import grab.com.thuexetoancau.utilities.Defines;
+import grab.com.thuexetoancau.utilities.Global;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private CallbackManager callbackManager ;
@@ -124,7 +123,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
           //  Toast.makeText(getApplicationContext(),acct.getEmail(),Toast.LENGTH_LONG).show();
             user = new User(acct.getDisplayName(),"", acct.getEmail(), String.valueOf(acct.getPhotoUrl()));
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            intent.putExtra(Constants.BUNDLE_USER, user);
+            intent.putExtra(Defines.BUNDLE_USER, user);
             startActivity(intent);
         }
     }
@@ -138,7 +137,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                // Toast.makeText(getApplicationContext(),object.toString(),Toast.LENGTH_LONG).show();
                 parseFacebookProfile(object);
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                intent.putExtra(Constants.BUNDLE_USER, user);
+                intent.putExtra(Defines.BUNDLE_USER, user);
                 startActivity(intent);
             }
         });

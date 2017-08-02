@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.BaseService;
-import grab.com.thuexetoancau.utilities.Constants;
+import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.SharePreference;
 
@@ -85,9 +85,9 @@ public class ConfigureAccountActivity extends AppCompatActivity implements View.
                         .start(Defines.REQUEST_CODE_PICKER); // start image picker activity with request code
             }
         });
-        if (getIntent().hasExtra(Constants.BUNDLE_USER)) {
+        if (getIntent().hasExtra(Defines.BUNDLE_USER)) {
             //receive
-            user = (User) getIntent().getSerializableExtra(Constants.BUNDLE_USER);
+            user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
             mProfileName.setText(user.getName());
             mName.setText(user.getName());
             mEmail.setText(user.getEmail());

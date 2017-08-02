@@ -1,6 +1,9 @@
 package grab.com.thuexetoancau.utilities;
 
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+
 import java.util.ArrayList;
 
 import grab.com.thuexetoancau.model.Phone;
@@ -40,36 +43,24 @@ public class Defines {
     public static  final String URL_SALARY                  = HOSTNAME + "api/searchTranSalary";
     public static  final String URL_PHONE                     = "http://country.io/phone.json";
 
-    public static  final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 123;
-    public static  final int REQUEST_CODE_LOCATION_PERMISSIONS = 234;
-    public static  final int REQUEST_CODE_COARSE_LOCATION_PERMISSIONS = 345;
-    public static  final int REQUEST_CODE_TELEPHONE_PERMISSIONS = 124;
 
-    public static  final String VEHICLE_PASS_ACTION         = "1";
-    public static  final String CAR_TYPE_FROM_ACTION        = "2";
-    public static  final String CAR_MADE_TO_ACTION          = "3";
-    public static  final String CAR_MODEL_ACTION            = "4";
-    public static  final String CAR_SIZE_ACTION             = "7";
-    public static  final String VEHICLE_ID_ACTION           = "5";
-    public static  final String OWNER_ID_ACTION             = "6";
-    public static  final String CAR_NAME_ACTION             = "8";
-    public static String token                 = "";
+    public static  final String DIALOG_CONFIRM_TRIP              = "trip";
 
+    public static int MAX_DISTANCE                              = 50000;
+    public static int MIN_CURRENT_DISTANCE                      = 20;
+    public static final int REQUEST_CODE_PICKER                 = 100;
 
-    public static  final int        LOOP_TIME                   = 5*1000;
-
-    public static ArrayList<Phone> listPhone;
-    public static ArrayList<String> provinceFrom;
-
-    public static int MAX_DISTANCE                 = 50;
-    public static int MIN_CURRENT_DISTANCE                 = 20;
-    public static int TIME_BEFORE_AUCTION_LONG                 = 5*60*60*1000;
-    public static int TIME_BEFORE_AUCTION_SHORT                 = 1*60*60*1000;
-
-    public static boolean startThread = false;
-    public static final int REQUEST_CODE_PICKER = 100;
+    public static final int REQUEST_CODE_LOCATION_PERMISSIONS = 234;
+    public static final int REQUEST_CODE_CONTACT_PERMISSIONS = 235;
+    public static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(new LatLng(8.412730, 102.144410), new LatLng(23.393395, 109.468975));
+    public static final int GOOGLE_API_CLIENT_ID = 0;
+    public static final int DIRECTION_START_POINT = 1;
+    public static final int DIRECTION_ENDPOINT = 2;
+    public static final int DIRECTION_NEW_STOP_POINT = 3;
+    public static final String TYPE_POINT = "type direction point";
+    public static final String POSITION_POINT = "position direction point";
+    public static final String BUNDLE_USER = "bundle user";
     // Main Screen Dimension, will be set when app startup
-    public static int APP_SCREEN_HEIGHT = 0;
-    public static int APP_SCREEN_WIDTH = 0;
+
 
 }

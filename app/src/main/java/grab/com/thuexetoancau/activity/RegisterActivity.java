@@ -1,17 +1,12 @@
 package grab.com.thuexetoancau.activity;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.preference.Preference;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
@@ -27,9 +22,6 @@ import android.widget.Toast;
 import com.hbb20.CountryCodePicker;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +31,7 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.BaseService;
-import grab.com.thuexetoancau.utilities.Constants;
+import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.SharePreference;
 
@@ -90,9 +82,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         contentRegister.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.blue_light)),  23, contentRegister.length(), 0);
         txtRegister.setText(contentRegister);
         txtRegister.setOnClickListener(this);
-        if (getIntent().hasExtra(Constants.BUNDLE_USER)) {
+        if (getIntent().hasExtra(Defines.BUNDLE_USER)) {
             //receive
-            user = (User) getIntent().getSerializableExtra(Constants.BUNDLE_USER);
+            user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
             edtCustomerName.setText(user.getName());
             edtCustomerEmail.setText(user.getEmail());
         }
@@ -220,7 +212,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         }else
                             user.setPhone(customerPhone);
                         Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                        intent.putExtra(Constants.BUNDLE_USER, user);
+                        intent.putExtra(Defines.BUNDLE_USER, user);
                         startActivity(intent);
                         finish();
                     }
@@ -292,7 +284,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         }else
                             user.setPhone(customerPhone);
                         Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                        intent.putExtra(Constants.BUNDLE_USER, user);
+                        intent.putExtra(Defines.BUNDLE_USER, user);
                         startActivity(intent);
                         finish();
                     }

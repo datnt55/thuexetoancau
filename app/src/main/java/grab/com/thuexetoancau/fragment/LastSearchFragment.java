@@ -17,7 +17,6 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
@@ -25,7 +24,8 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
 import grab.com.thuexetoancau.adapter.LastSearchAdapter;
 import grab.com.thuexetoancau.model.Position;
-import grab.com.thuexetoancau.utilities.Constants;
+import grab.com.thuexetoancau.utilities.Defines;
+import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.widget.DividerItemDecoration;
 
 public class LastSearchFragment extends Fragment {
@@ -45,8 +45,8 @@ public class LastSearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        if (getArguments().containsKey(Constants.POSITION_POINT))
-            directionPosition = getArguments().getInt(Constants.POSITION_POINT);
+        if (getArguments().containsKey(Defines.POSITION_POINT))
+            directionPosition = getArguments().getInt(Defines.POSITION_POINT);
         View view = inflater.inflate(R.layout.fragment_last_search, container, false);
         initComponents(view);
         return view;

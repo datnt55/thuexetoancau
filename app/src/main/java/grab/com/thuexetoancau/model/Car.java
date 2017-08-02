@@ -5,42 +5,63 @@ package grab.com.thuexetoancau.model;
  */
 
 public class Car {
-    private int id;
-    private String name;
+    private int size;
+    private String  name;
     private int image;
-    private int price;
+    private int price01way;
+    private int price02way;
+    private int price11way;
+    private int totalPrice;
     private boolean selected;
 
-    public Car(int id, String name, int image, int price) {
-        this.id = id;
+    public Car(int size,String name, int image, int price01way, int price02way, int price11way) {
+        this.size = size;
         this.name = name;
         this.image = image;
-        this.price = price;
         this.selected = false;
+        this.price01way = price01way;
+        this.price02way = price02way;
+        this.price11way = price11way;
     }
 
-    public int getId() {
-        return id;
+    public int getSize() {
+        return size;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setSize(int size) {
+        this.size = size;
     }
 
-    public String getName() {
-        return name;
+    public int getImage() {
+        return image;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setImage(int image) {
+        this.image = image;
     }
 
-    public int getPrice() {
-        return price;
+    public int getPrice01way() {
+        return price01way;
     }
 
-    public void setPrice(int price) {
-        this.price = price;
+    public void setPrice01way(int price01way) {
+        this.price01way = price01way;
+    }
+
+    public int getPrice02way() {
+        return price02way;
+    }
+
+    public void setPrice02way(int price02way) {
+        this.price02way = price02way;
+    }
+
+    public int getPrice11way() {
+        return price11way;
+    }
+
+    public void setPrice11way(int price11way) {
+        this.price11way = price11way;
     }
 
     public boolean isSelected() {
@@ -51,11 +72,19 @@ public class Car {
         this.selected = selected;
     }
 
-    public int getImage() {
-        return image;
+    public int getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setImage(int image) {
-        this.image = image;
+    public void setTotalPrice(int totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

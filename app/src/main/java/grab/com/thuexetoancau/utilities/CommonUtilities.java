@@ -1,6 +1,7 @@
 package grab.com.thuexetoancau.utilities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -65,6 +66,24 @@ public class CommonUtilities {
             result = activity.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    public interface TryAgain{
+        void onTryAgain();
+    }
+
+    public static void showDialogNetworkError(Context mContext, final TryAgain again){
+        AlertDialog dialog = new AlertDialog.Builder(mContext)
+                .setTitle(mContext.getString(R.string.app_name))
+                .setMessage(mContext.getString(R.string.error_network))
+                .setPositiveButton(mContext.getString(R.string.try_again), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (again != null)
+                            again.onTryAgain();
+                    }
+                })
+                .setCancelable(false)
+                .show();
     }
     public static void systemUiVisibility(Activity activity) {
 //         This work only for android 4.4+
@@ -165,8 +184,8 @@ public class CommonUtilities {
     public static void dimensionScreen(Activity activity){
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        Defines.APP_SCREEN_HEIGHT = displayMetrics.heightPixels;
-        Defines.APP_SCREEN_WIDTH = displayMetrics.widthPixels;
+        Global.APP_SCREEN_HEIGHT = displayMetrics.heightPixels;
+        Global.APP_SCREEN_WIDTH = displayMetrics.widthPixels;
     }
 
     public int getStatusBarHeight(Context context) {
@@ -245,7 +264,7 @@ public class CommonUtilities {
     }
 
     public static void getListPhone (Context mContext){
-        Defines.listPhone = new ArrayList<>();
+        Global.listPhone = new ArrayList<>();
         String countries = null;
         try {
             InputStream is = mContext.getAssets().open("CountryCodes.json");
@@ -267,7 +286,7 @@ public class CommonUtilities {
                 String code = object.getString("code");
                 String fileName = String.format("f%03d", i);
                 int mResId = mContext.getApplicationContext().getResources().getIdentifier(fileName, "drawable", mContext.getApplicationContext().getPackageName());
-                Defines.listPhone.add(new Phone(code, name,dialCode,mResId));
+                Global.listPhone.add(new Phone(code, name,dialCode,mResId));
             }
 
         } catch (JSONException e) {
@@ -286,4 +305,39 @@ public class CommonUtilities {
         return d;
     }
 
+    public static int getCarImage(int size){
+        switch (size){
+            case 4:
+                return R.drawable.car_4_size;
+            case 5:
+                return R.drawable.car_5_size;
+            case 8:
+                return R.drawable.car_8_size;
+            case 16:
+                return R.drawable.car_8_size;
+            case 30:
+                return R.drawable.car_8_size;
+            case 45:
+                return R.drawable.car_8_size;
+        }
+        return 0;
+    }
+
+    public static String getCarName(int size){
+        switch (size){
+            case 4:
+                return "Taxi 4 chỗ";
+            case 5:
+                return "Taxi 5 chỗ";
+            case 8:
+                return "Taxi 8 chỗ";
+            case 16:
+                return "Xe 16 chỗ";
+            case 30:
+                return "Xe 30 chỗ";
+            case 45:
+                return "Xe 45 chỗ";
+        }
+        return "";
+    }
 }

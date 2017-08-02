@@ -1,7 +1,6 @@
 package grab.com.thuexetoancau.activity;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -34,13 +33,12 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.BaseService;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
-import grab.com.thuexetoancau.utilities.Constants;
+import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.SharePreference;
 
 public class SplashActivity extends AppCompatActivity {
     private SharePreference preference;
-    private AlertDialog dialog;
     private ImageView imgLoading;
     private LinearLayout layoutLoading;
     private User user;
@@ -75,27 +73,15 @@ public class SplashActivity extends AppCompatActivity {
 
     private void checkOnline() {
         if (!CommonUtilities.isOnline(this)){
-            dialog = new AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.app_name))
-                    .setMessage(getString(R.string.error_network))
-                    .setPositiveButton(getString(R.string.try_again), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            checkOnline();
-                        }
-                    })
-                    .setNegativeButton(getString(R.string.exit), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
-                    .setCancelable(false)
-                    .show();
+            CommonUtilities.showDialogNetworkError(this, new CommonUtilities.TryAgain() {
+                @Override
+                public void onTryAgain() {
+                    checkOnline();
+                }
+            });
             return;
         }
-        if(dialog != null && dialog.isShowing()){
-            dialog.dismiss();
-        }
+
         layoutLoading.setVisibility(View.VISIBLE);
         if (preference.getRegId().equals("")) {
             LocalBroadcastManager.getInstance(this).registerReceiver(tokenReceiver, new IntentFilter("tokenReceiver"));
@@ -172,7 +158,7 @@ public class SplashActivity extends AppCompatActivity {
 
                         user = new User(name,phone,email,"");
                         Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                        intent.putExtra(Constants.BUNDLE_USER, user);
+                        intent.putExtra(Defines.BUNDLE_USER, user);
                         startActivity(intent);
                         finish();
                     }
