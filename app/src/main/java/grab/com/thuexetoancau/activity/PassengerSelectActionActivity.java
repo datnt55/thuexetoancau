@@ -16,7 +16,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -87,6 +89,7 @@ import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.Constants;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.GPSTracker;
+import grab.com.thuexetoancau.widget.ConfirmDialogFragment;
 import grab.com.thuexetoancau.widget.DirectionLayout;
 import grab.com.thuexetoancau.widget.DriverInformationLayout;
 import grab.com.thuexetoancau.widget.SearchBarLayout;
@@ -577,6 +580,82 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
     }
 
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_booking:
+                Intent intent = new Intent(PassengerSelectActionActivity.this, FormPassengerBookingActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.btn_infor:
+                Intent intentInfo = new Intent(PassengerSelectActionActivity.this, ListPassengerBookingActivity.class);
+                startActivity(intentInfo);
+                break;
+            case R.id.img_edit:
+                Intent intentEdit= new Intent(PassengerSelectActionActivity.this, ConfigureAccountActivity.class);
+                intentEdit.putExtra(Constants.BUNDLE_USER, user);
+                startActivity(intentEdit);
+                break;
+            case R.id.layout_fix_gps:
+                gpsTracker = new GPSTracker(this);
+                if (gpsTracker.handlePermissionsAndGetLocation()) {
+                    if (!gpsTracker.canGetLocation()) {
+                        CommonUtilities.settingRequestTurnOnLocation(PassengerSelectActionActivity.this);
+                    } else{
+                        for (Marker marker : markerList)
+                            if (marker.getTitle().equals("Vị trí của bạn")){
+                                CameraPosition cameraPosition = new CameraPosition.Builder()
+                                        .target(currentLocation.getPosition())// Sets the center of the map to current location
+                                        .zoom(16)                   // Sets the zoom
+                                        .tilt(45)                   // Sets the tilt of the camera to 0 degrees
+                                        .build();                   // Creates a CameraPosition from the builder
+                                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                return;
+                            }
+                        currentLocation.remove();
+                        currentLocation = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()))
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.current))
+                                .title("Vị trí của bạn"));
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(currentLocation.getPosition())// Sets the center of the map to current location
+                                .zoom(16)                   // Sets the zoom
+                                .tilt(45)                   // Sets the tilt of the camera to 0 degrees
+                                .build();                   // Creates a CameraPosition from the builder
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    }
+                }
+                break;
+        }
+
+    }
+
+    //======================================== Google API implement ================================
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        mPlaceArrayAdapter.setGoogleApiClient(mGoogleApiClient);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mPlaceArrayAdapter.setGoogleApiClient(null);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, R.string.check_connection, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        getCurrentPosition();
+    }
+
+    //======================================== Search bar implement ================================
+
     /**
      *  Event back button of search bar clicked
      */
@@ -591,6 +670,39 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
         layoutSearch.setShowLastSearch(false);
     }
+
+    @Override
+    public void onMenuButtonClicked() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.openDrawer(GravityCompat.START);
+    }
+
+    /**
+     *  Event click to search bar
+     */
+    @Override
+    public void onSearchViewClicked() {
+        showLastSearchFragment(false,0);
+    }
+
+    @Override
+    public void onSearchViewSearching() {
+
+    }
+
+    @Override
+    public void onChangeTextSearch(CharSequence s,AutoCompleteTextView edtSearch) {
+        mPlaceArrayAdapter.getFilter().filter(s.toString());
+        mPredictFragment.setAdapter(mPlaceArrayAdapter);
+        mPredictFragment.setCharacter(s.toString());
+    }
+
+    @Override
+    public void getLayoutSearchHeight(int height) {
+        searchBarHeight = height;
+    }
+
+    //======================================== Direction implement =================================
 
     /**
      *  Event back button of direction layout clicked
@@ -661,58 +773,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         typeTrip = type;
     }
 
-    @Override
-    public void onMenuButtonClicked() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.openDrawer(GravityCompat.START);
-    }
-
-    /**
-     *  Event click to search bar
-     */
-    @Override
-    public void onSearchViewClicked() {
-        showLastSearchFragment(false,0);
-    }
-
-    @Override
-    public void onSearchViewSearching() {
-
-
-    }
-
-    @Override
-    public void onChangeTextSearch(CharSequence s,AutoCompleteTextView edtSearch) {
-        mPlaceArrayAdapter.getFilter().filter(s.toString());
-        mPredictFragment.setAdapter(mPlaceArrayAdapter);
-        mPredictFragment.setCharacter(s.toString());
-    }
-
-    @Override
-    public void getLayoutSearchHeight(int height) {
-        searchBarHeight = height;
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        mPlaceArrayAdapter.setGoogleApiClient(mGoogleApiClient);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        mPlaceArrayAdapter.setGoogleApiClient(null);
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(this, R.string.check_connection, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-       getCurrentPosition();
-    }
+    //======================================== Predict location implement ==========================
 
     @Override
     public void onNewDirection(Position location) {
@@ -745,56 +806,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         sendRequestFindDirection();
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btn_booking:
-                Intent intent = new Intent(PassengerSelectActionActivity.this, FormPassengerBookingActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.btn_infor:
-                Intent intentInfo = new Intent(PassengerSelectActionActivity.this, ListPassengerBookingActivity.class);
-                startActivity(intentInfo);
-                break;
-            case R.id.img_edit:
-                Intent intentEdit= new Intent(PassengerSelectActionActivity.this, ConfigureAccountActivity.class);
-                intentEdit.putExtra(Constants.BUNDLE_USER, user);
-                startActivity(intentEdit);
-                break;
-            case R.id.layout_fix_gps:
-                gpsTracker = new GPSTracker(this);
-                if (gpsTracker.handlePermissionsAndGetLocation()) {
-                    if (!gpsTracker.canGetLocation()) {
-                        CommonUtilities.settingRequestTurnOnLocation(PassengerSelectActionActivity.this);
-                    } else{
-                        for (Marker marker : markerList)
-                            if (marker.getTitle().equals("Vị trí của bạn")){
-                                CameraPosition cameraPosition = new CameraPosition.Builder()
-                                        .target(currentLocation.getPosition())// Sets the center of the map to current location
-                                        .zoom(16)                   // Sets the zoom
-                                        .tilt(45)                   // Sets the tilt of the camera to 0 degrees
-                                        .build();                   // Creates a CameraPosition from the builder
-                                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                return;
-                            }
-                        currentLocation.remove();
-                        currentLocation = mMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(gpsTracker.getLatitude(), gpsTracker.getLongitude()))
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.current))
-                                .title("Vị trí của bạn"));
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(currentLocation.getPosition())// Sets the center of the map to current location
-                                .zoom(16)                   // Sets the zoom
-                                .tilt(45)                   // Sets the tilt of the camera to 0 degrees
-                                .build();                   // Creates a CameraPosition from the builder
-                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                    }
-                }
-                break;
-        }
-
-    }
-
+    //======================================== Direction Finder implement ==========================
     @Override
     public void onDirectionFinderStart() {
 
@@ -816,22 +828,32 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
     }
 
+    //======================================== Select car type implement ===========================
+
     @Override
     public void onBookingClicked() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        ConfirmDialogFragment inputNameDialog = new ConfirmDialogFragment();
+        inputNameDialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog);
+        inputNameDialog.setCancelable(false);
+        inputNameDialog.setDialogTitle("Xác nhận thông tin");
+        inputNameDialog.show(fragmentManager, "Input Dialog");
         //showDialogBooking();
-        AnimUtils.fadeOut(layoutFixGPS,300);
+       /* AnimUtils.fadeOut(layoutFixGPS,300);
         SearchingCarLayout layout = new SearchingCarLayout(this,this);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         layout.setLayoutParams(params);
         layoutRoot.addView(layout);
         layout.setTranslationY(Defines.APP_SCREEN_HEIGHT);
-        AnimUtils.slideUp(layout,0);
+        AnimUtils.slideUp(layout,0);*/
     }
 
     @Override
     public void onSelectVehicle(Car car) {
 
     }
+
+    //====================================== Searching car implement================================
 
     @Override
     public void onSearchCarSuccess() {

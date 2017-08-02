@@ -70,10 +70,9 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
 
     private void dummyData() {
         transports = new ArrayList<>();
-        transports.add(new Car(1,"Taxi 4 chỗ","http://www.pngall.com/wp-content/uploads/2016/07/Car-Download-PNG.png",41000));
-        transports.add(new Car(1,"Taxi 7 chỗ","http://www.pngall.com/wp-content/uploads/2016/07/Car.png",43000));
-        transports.add(new Car(1,"Taxi 16 chỗ","http://www.pngmart.com/files/4/Car-Transparent-PNG.png",64000));
-        transports.add(new Car(1,"Xe 45 chỗ","http://www.luxury-carhire-marbella.com/upload/1419505226floating-car.png",104000));
+        transports.add(new Car(4,"Taxi 4 chỗ",R.drawable.car_4_size,41000));
+        transports.add(new Car(5,"Taxi 5 chỗ",R.drawable.car_5_size,43000));
+        transports.add(new Car(8,"Taxi 8 chỗ",R.drawable.car_8_size,64000));
     }
 
     @Override

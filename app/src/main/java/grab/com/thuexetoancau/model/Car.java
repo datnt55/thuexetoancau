@@ -7,11 +7,11 @@ package grab.com.thuexetoancau.model;
 public class Car {
     private int id;
     private String name;
-    private String image;
+    private int image;
     private int price;
     private boolean selected;
 
-    public Car(int id, String name, String image, int price) {
+    public Car(int id, String name, int image, int price) {
         this.id = id;
         this.name = name;
         this.image = image;
@@ -51,11 +51,11 @@ public class Car {
         this.selected = selected;
     }
 
-    public String getImage() {
+    public int getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(int image) {
         this.image = image;
     }
 }

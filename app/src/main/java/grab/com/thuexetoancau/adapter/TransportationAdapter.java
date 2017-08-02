@@ -22,6 +22,7 @@ import java.util.List;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.listener.SimpleItemTouchHelperCallback;
 import grab.com.thuexetoancau.model.Car;
+import grab.com.thuexetoancau.utilities.CommonUtilities;
 
 /**
  * Created by DatNT on 7/19/2017.
@@ -68,17 +69,19 @@ public class TransportationAdapter extends RecyclerView.Adapter<TransportationAd
 
     @Override
     public void onBindViewHolder(final TransportationAdapter.ViewHolder holder, final int position) {
-        ImageLoader.getInstance().displayImage(arrayVehicle.get(position).getImage(),holder.imgTransport, options, new SimpleImageLoadingListener());
+       holder.imgTransport.setImageResource(arrayVehicle.get(position).getImage());
         holder.txtCarName.setText(arrayVehicle.get(position).getName());
-        holder.txtPrice.setText(arrayVehicle.get(position).getPrice()+"");
+        holder.txtPrice.setText(CommonUtilities.convertCurrency(arrayVehicle.get(position).getPrice())+" vnđ");
         if (arrayVehicle.get(position).isSelected()) {
             holder.layoutRoot.setBackground(ContextCompat.getDrawable(mContext, R.drawable.vehicle_shape_selected));
             holder.txtCarName.setTextColor(ContextCompat.getColor(mContext, R.color.white));
             holder.txtPrice.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+            holder.imgTransport.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
         }else {
             holder.layoutRoot.setBackground(ContextCompat.getDrawable(mContext, R.drawable.vehicle_shape));
             holder.txtCarName.setTextColor(ContextCompat.getColor(mContext, R.color.blue_light));
             holder.txtPrice.setTextColor(ContextCompat.getColor(mContext, R.color.blue_light));
+            holder.imgTransport.setColorFilter(ContextCompat.getColor(mContext,R.color.blue_light));
         }
         holder.layoutRoot.setOnClickListener(new View.OnClickListener() {
             @Override

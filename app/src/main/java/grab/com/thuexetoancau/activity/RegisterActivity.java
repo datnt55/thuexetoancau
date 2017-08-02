@@ -37,6 +37,7 @@ import org.json.JSONObject;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
+import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.BaseService;
 import grab.com.thuexetoancau.utilities.Constants;
 import grab.com.thuexetoancau.utilities.Defines;
@@ -52,6 +53,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private CountryCodePicker ccpPhone;
     private Context mContext;
     private boolean isLogin = true;
+    private ApiUtilities mApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +98,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
         txtNext.setOnClickListener(this);
         imgBack.setOnClickListener(this);
-
+        mApi = new ApiUtilities(this);
     }
 
     @Override
