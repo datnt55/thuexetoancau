@@ -17,9 +17,9 @@ public class Defines {
     public static  final String URL_LOGIN                       = HOSTNAME + "api2/customerLogin";
     public static  final String URL_CHECK_TOKEN                 = HOSTNAME + "api2/customerCheckToken";
     public static  final String URL_GET_POSTAGE                 = HOSTNAME + "api2/getPostage";
-    public static  final String URL_GET_CAR_MODEL           = HOSTNAME + "api/getCarModelListFromMade";
-    public static  final String URL_GET_WHO_HIRE            = HOSTNAME + "api/getCarWhoHire ";
-    public static  final String URL_BOOKING_TICKET          = HOSTNAME + "api/booking";
+    public static  final String URL_LOG_OUT                     = HOSTNAME + "api2/customerLogOut";
+    public static  final String URL_BOOKING                     = HOSTNAME + "api2/bookingGrab ";
+    public static  final String URL_CANCEL_TRIP                 = HOSTNAME + "api2/cancelTrip";
     public static  final String URL_GET__BOOKING            = HOSTNAME + "api/getBooking";
     public static  final String URL_BOOKING_FINAL           = HOSTNAME + "api/bookingFinal";
     public static  final String URL_REGISTER_DRIVER         = HOSTNAME + "api/driverRegister";

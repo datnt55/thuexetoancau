@@ -18,18 +18,20 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import grab.com.thuexetoancau.model.Position;
+
 
 public class DirectionFinder {
     private static final String DIRECTION_URL_API = "https://maps.googleapis.com/maps/api/directions/json?";
     private static final String GOOGLE_API_KEY = "AIzaSyDDXpZnxso9x_m3ffWZJ-8tCTRIAodPqC0";
     private DirectionFinderListener listener;
     private LatLng origin;
+    private ArrayList<Position> listWayPoint;
     private LatLng destination;
 
-    public DirectionFinder(DirectionFinderListener listener, LatLng origin, LatLng destination) {
+    public DirectionFinder(DirectionFinderListener listener, ArrayList<Position> listWayPoint) {
         this.listener = listener;
-        this.origin = origin;
-        this.destination = destination;
+        this.listWayPoint = listWayPoint;
     }
 
     public void execute() throws UnsupportedEncodingException {
@@ -38,10 +40,15 @@ public class DirectionFinder {
     }
 
     private String createUrl() throws UnsupportedEncodingException {
-        String urlOrigin = origin.latitude+","+origin.longitude;
-        String urlDestination = destination.latitude+","+destination.longitude;
-
-        return DIRECTION_URL_API + "origin=" + urlOrigin + "&destination=" + urlDestination ;
+        String urlOrigin = listWayPoint.get(0).getLatLng().latitude+","+listWayPoint.get(0).getLatLng().longitude;
+        String urlDestination = listWayPoint.get(listWayPoint.size()-1).getLatLng().latitude+","+listWayPoint.get(listWayPoint.size()-1).getLatLng().longitude;
+        String urlWayPoint="";
+        for (int i = 1 ; i < listWayPoint.size()-1; i++) {
+            urlWayPoint += listWayPoint.get(i).getLatLng().latitude + "," + listWayPoint.get(i).getLatLng().longitude;
+            if (i < listWayPoint.size() - 2)
+                urlWayPoint += "|";
+        }
+        return DIRECTION_URL_API + "origin=" + urlOrigin + "&destination=" + urlDestination + "&waypoints="+urlWayPoint ;
     }
 
     private class DownloadRawData extends AsyncTask<String, Void, String> {

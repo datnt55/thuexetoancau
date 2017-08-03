@@ -26,5 +26,9 @@
             android:id="@+id/nav_support"
             android:icon="@drawable/ic_mail_outline_black_24dp"
             android:title="Hỗ trợ"/>
+        <item
+            android:id="@+id/nav_log_out"
+            android:icon="@drawable/ic_mail_outline_black_24dp"
+            android:title="Đăng xuất"/>
     </group>
 </menu>

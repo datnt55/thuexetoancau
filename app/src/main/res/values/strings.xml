@@ -74,6 +74,9 @@
     <string name="edit_customer_error">Sửa thông tin thất bại, Vui lòng kiểm tra kết nối mạng</string>
     <string name="prepare_cost_of_trip">Đang xác nhận thông tin</string>
     <string name="prepare_data">Đang chuẩn bị dữ liệu</string>
+    <string name="log_out">Đang đăng xuất</string>
+    <string name="log_out_success">Đăng xuất thành công</string>
+    <string name="log_out_error">Đăng xuất thất bại</string>
     <string name="name_of_customer">Tên hành khách</string>
     <string name="phone_of_customer">Số điện thoại hành khách</string>
     <string name="error_time_start">Chọn thời gian khởi hành</string>

@@ -112,9 +112,6 @@ public class SplashActivity extends AppCompatActivity {
     private void goToApplication(){
         if (preference.getToken() != null){
             checkTokenLogin();
-            Intent i = new Intent(SplashActivity.this, PassengerSelectActionActivity.class);
-            startActivity(i);
-            finish();
         }else{
             Intent i = new Intent(SplashActivity.this, LoginActivity.class);
             startActivity(i);
@@ -151,7 +148,7 @@ public class SplashActivity extends AppCompatActivity {
                     if (json.getString("status").equals("success")){
                         JSONArray array = json.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
-                        preference.saveToken(data.getString("token"));
+                       // preference.saveToken(data.getString("token"));
                         String email = data.getString("custom_email");
                         String phone = data.getString("custom_phone");
                         String name = data.getString("custom_name");

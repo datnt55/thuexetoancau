@@ -1,11 +1,14 @@
 package grab.com.thuexetoancau.utilities;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +17,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.activity.SplashActivity;
 import grab.com.thuexetoancau.model.Car;
 
 /**
@@ -64,6 +68,68 @@ public class ApiUtilities {
                             arrayPrice.add(new Car(carSize,CommonUtilities.getCarName(carSize), CommonUtilities.getCarImage(carSize), price01way, price02way, price11way));
                         }
 
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+        return arrayPrice;
+    }
+
+    public ArrayList<Car> logOut(){
+        if (!CommonUtilities.isOnline(mContext)) {
+            CommonUtilities.showDialogNetworkError(mContext, null);
+            return null;
+        }
+        final ArrayList<Car> arrayPrice = new ArrayList<>();
+        final ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setMessage(mContext.getString(R.string.log_out));
+        dialog.show();
+        final SharePreference preference = new SharePreference(mContext);
+        RequestParams params;
+        params = new RequestParams();
+        params.put("token", preference.getToken());
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_LOG_OUT,params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                try {
+                    JSONObject jsonObject = new JSONObject(new String(responseBody));
+                    String status = jsonObject.getString("status");
+                    if (status.equals("success")){
+                        Toast.makeText(mContext, mContext.getResources().getString(R.string.log_out_success), Toast.LENGTH_SHORT).show();
+                        preference.clearToken();
+                        Intent intent = new Intent(mContext, SplashActivity.class);
+                        mContext.startActivity(intent);
+                        ((Activity)mContext).finish();
+                    }else{
+                        Toast.makeText(mContext, mContext.getResources().getString(R.string.log_out_error), Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

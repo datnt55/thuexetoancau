@@ -5,9 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -21,6 +24,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -38,6 +43,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -47,6 +53,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.SphericalUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
@@ -64,6 +71,7 @@ import grab.com.thuexetoancau.DirectionFinder.Route;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.LastSearchAdapter;
 import grab.com.thuexetoancau.fragment.LastSearchFragment;
+import grab.com.thuexetoancau.listener.ChangeTripInfo;
 import grab.com.thuexetoancau.model.Car;
 import grab.com.thuexetoancau.model.Position;
 import grab.com.thuexetoancau.model.Trip;
@@ -80,6 +88,8 @@ import grab.com.thuexetoancau.widget.DriverInformationLayout;
 import grab.com.thuexetoancau.widget.SearchBarLayout;
 import grab.com.thuexetoancau.widget.SearchingCarLayout;
 import grab.com.thuexetoancau.widget.TransportationLayout;
+
+import static grab.com.thuexetoancau.DirectionFinder.GoogleMapUtis.bearingBetweenLatLngs;
 
 public class PassengerSelectActionActivity extends AppCompatActivity implements
         SearchBarLayout.Callback,
@@ -116,13 +126,14 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private Position mFrom, mEnd;
     private int typeTrip = 1;
     private int totalDistance = 0;
-
+    private ApiUtilities mApi;
+    private ChangeTripInfo changeTrip;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_select_action);
         initComponents();
-        ApiUtilities mApi = new ApiUtilities(this);
+        mApi = new ApiUtilities(this);
         carPrice = mApi.getPostage();
     }
 
@@ -150,6 +161,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.nav_log_out:
+                        mApi.logOut();
+                        break;
+                }
                 menuItem.setChecked(true);
                 drawerLayout.closeDrawers();
                 return true;
@@ -289,7 +305,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         layoutDirection.setOnCallBackDirection(this);
         // Initial and show layout select and booking car
         if (layoutTransport == null) {
-            layoutTransport = new TransportationLayout(this, carPrice, totalDistance,typeTrip);
+            layoutTransport = new TransportationLayout(this,carPrice);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             layoutTransport.setLayoutParams(params);
@@ -301,11 +317,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     private void sendRequestFindDirection() {
         removeAllMarker();
+        mFrom = listStopPoint.get(0);
+        mEnd = listStopPoint.get(listStopPoint.size()-1);
         try {
-            for (int i= 0; i< listStopPoint.size()-1; i++) {
-                mFrom = listStopPoint.get(i);
-                Position mTo = listStopPoint.get(i+1);
-                if (CommonUtilities.distanceInMeter(mFrom.getLatLng(), currentLocation.getPosition()) < Defines.MIN_CURRENT_DISTANCE ){
+            for (Position location : listStopPoint) {
+                if (CommonUtilities.distanceInMeter(location.getLatLng(), currentLocation.getPosition()) < Defines.MIN_CURRENT_DISTANCE ){
                     markerList.add(mMap.addMarker(new MarkerOptions()
                             //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
                             .title(currentLocation.getTitle())
@@ -314,27 +330,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 }else {
                     markerList.add(mMap.addMarker(new MarkerOptions()
                             //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
-                            .title(mFrom.getPrimaryText())
-                            .position(mFrom.getLatLng())));
+                            .title(location.getPrimaryText())
+                            .position(location.getLatLng())));
                 }
-                if (i == listStopPoint.size()-2) {
-                    mEnd = listStopPoint.get(i + 1);
-                    if (CommonUtilities.distanceInMeter(mEnd.getLatLng(), currentLocation.getPosition()) < Defines.MIN_CURRENT_DISTANCE ){
-                        markerList.add(mMap.addMarker(new MarkerOptions()
-                                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
-                                .title(currentLocation.getTitle())
-                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.current))
-                                .position(currentLocation.getPosition())));
-                    }else {
-                        markerList.add(mMap.addMarker(new MarkerOptions()
-                                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
-                                .title(mEnd.getPrimaryText())
-                                .position(mEnd.getLatLng())));
-                    }
-                    updateMapCamera();
-                }
-                new DirectionFinder(this, mFrom.getLatLng(), mTo.getLatLng()).execute();
             }
+            new DirectionFinder(this, listStopPoint).execute();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -359,8 +359,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             builder.include(marker.getPosition());
         }
         LatLngBounds bounds = builder.build();
-        int padding = (int)CommonUtilities.convertDpToPixel(30,mContext); // offset from edges of the map in pixels
-        mMap.setPadding(padding,measureView(layoutDirection)+(int)CommonUtilities.convertDpToPixel(50,mContext),padding, measureView(layoutTransport));
+        int padding = (int)CommonUtilities.convertDpToPixel(40,mContext); // offset from edges of the map in pixels
+        mMap.setPadding(padding,measureView(layoutDirection)+(int)CommonUtilities.convertDpToPixel(50,mContext),padding, measureView(layoutTransport)+(int)CommonUtilities.convertDpToPixel(20,mContext));
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 0);
         mMap.animateCamera(cu);
     }
@@ -373,6 +373,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             } else
                 showCurrentLocationToMap(gpsTracker.getLatitude(), gpsTracker.getLongitude());
         }
+    }
+
+    public void setOnChangeTripListener (ChangeTripInfo changeTrip){
+        this.changeTrip = changeTrip;
     }
 
     @Override
@@ -609,6 +613,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onSetTripType(int type) {
         typeTrip = type;
+        if (changeTrip != null)
+            changeTrip.onChangeTrip(typeTrip);
     }
 
     //======================================== Predict location implement ==========================
@@ -664,10 +670,46 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             polylinePaths.add(mMap.addPolyline(polylineOptions));
             totalDistance+= route.distance.value;
         }
+        if (changeTrip != null)
+            changeTrip.onChangeDistance(totalDistance);
+        updateMapCamera();
+        animateLocation();
     }
-
     //======================================== Select car type implement ===========================
 
+    private void animateLocation(){
+        final Marker markerMove = mMap.addMarker(new MarkerOptions().position(mFrom.getLatLng()).title("Vị trí của bạn"));
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = mMap.getProjection();
+        Point startPoint = proj.toScreenLocation(markerMove.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 5500;
+
+        final Interpolator interpolator = new LinearInterpolator();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed / duration);
+                LatLng intermediatePosition = SphericalUtil.interpolate(mFrom.getLatLng(), mEnd.getLatLng(), t);
+                markerMove.setPosition(intermediatePosition);
+
+
+                if (t < 1.0) {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, 16);
+                } else {
+                    markerMove.setVisible(true);
+                }
+            }
+        });
+    }
+    private static final int ANIMATE_SPEEED = 1500;
+    private static final int ANIMATE_SPEEED_TURN = 1000;
+    private static final int BEARING_OFFSET = 20;
+    private final Interpolator interpolator = new LinearInterpolator();
     @Override
     public void onBookingClicked() {
         Position startPoint = listStopPoint.get(0);

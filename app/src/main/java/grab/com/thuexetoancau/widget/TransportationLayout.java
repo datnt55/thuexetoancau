@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
 import grab.com.thuexetoancau.adapter.TransportationAdapter;
+import grab.com.thuexetoancau.listener.ChangeTripInfo;
 import grab.com.thuexetoancau.model.Car;
 import grab.com.thuexetoancau.utilities.Defines;
 
@@ -22,7 +23,7 @@ import grab.com.thuexetoancau.utilities.Defines;
  * Created by DatNT on 7/20/2017.
  */
 
-public class TransportationLayout extends LinearLayout implements View.OnClickListener{
+public class TransportationLayout extends LinearLayout implements View.OnClickListener,ChangeTripInfo{
     private  Context mContext;
     private RecyclerView listTrans;
     private TransportationAdapter adapter;
@@ -30,15 +31,14 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     private OnTransportationListener listener;
     private ArrayList<Car> transports;
     private int totalDistance;
-    private int tripType;
+    private int tripType = 1;
 
-    public TransportationLayout(PassengerSelectActionActivity activity, ArrayList<Car> carPrice, int totalDistance, int tripType ) {
+    public TransportationLayout(PassengerSelectActionActivity activity, ArrayList<Car> carPrice) {
         super(activity);
         this.mContext = activity;
         this.listener = activity;
         this.transports = carPrice;
-        this.tripType = tripType;
-        this.totalDistance = totalDistance;
+        activity.setOnChangeTripListener(this);
         initLayout();
     }
 
@@ -46,6 +46,14 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         super(context, attrs);
         this.mContext = context;
         initLayout();
+    }
+
+    public void setTotalDistance(int totalDistance) {
+        this.totalDistance = totalDistance;
+    }
+
+    public void setTripType(int tripType) {
+        this.tripType = tripType;
     }
 
     private void initLayout() {
@@ -57,7 +65,7 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         listTrans.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         listTrans.setLayoutManager(layoutManager);
-        setCarPrice();
+        setCarPrice(totalDistance);
         adapter = new TransportationAdapter(mContext, transports);
         listTrans.setAdapter(adapter);
         adapter.setOnClickListener(new TransportationAdapter.OnItemClickListener() {
@@ -69,14 +77,15 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         });
     }
 
-    private void setCarPrice() {
+    private void setCarPrice(int distance) {
         for (Car car : transports)
             if (totalDistance < Defines.MAX_DISTANCE)
-                car.setTotalPrice(car.getPrice11way()*totalDistance);
+                car.setTotalPrice(car.getPrice11way()*distance/1000);
             else if (tripType == 1)
-                car.setTotalPrice(car.getPrice01way()*totalDistance);
-            else
-                car.setTotalPrice(car.getPrice02way()*totalDistance);
+                car.setTotalPrice(car.getPrice01way()*distance/1000);
+            else {
+                car.setTotalPrice((car.getPrice02way()*distance +car.getPrice02way() * distance)/ 1000);
+            }
     }
 
     @Override
@@ -87,6 +96,20 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
                     listener.onBookingClicked();
                 break;
         }
+    }
+
+    @Override
+    public void onChangeDistance(int distance) {
+        this.totalDistance = distance;
+        setCarPrice(distance);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onChangeTrip(int tripType) {
+        this.tripType = tripType;
+        setCarPrice(totalDistance);
+        adapter.notifyDataSetChanged();
     }
 
     public interface OnTransportationListener{
