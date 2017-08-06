@@ -1,5 +1,6 @@
 package grab.com.thuexetoancau.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,6 +34,7 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.BaseService;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
+import grab.com.thuexetoancau.utilities.DialogUtils;
 import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.SharePreference;
@@ -73,7 +75,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void checkOnline() {
         if (!CommonUtilities.isOnline(this)){
-            CommonUtilities.showDialogNetworkError(this, new CommonUtilities.TryAgain() {
+            DialogUtils.showDialogNetworkError(this, new DialogUtils.TryAgain() {
                 @Override
                 public void onTryAgain() {
                     checkOnline();
@@ -129,8 +131,6 @@ public class SplashActivity extends AppCompatActivity {
         params.put("os", 1);
         /*if (user.getEmail() != null)
             params.put("custom_email", edtCustomerEmail.getText().toString());*/
-        params.put("regId", preference.getRegId());
-        params.put("os",1);
         Log.e("TAG",params.toString());
         BaseService.getHttpClient().post(Defines.URL_CHECK_TOKEN, params, new AsyncHttpResponseHandler() {
 
@@ -149,15 +149,31 @@ public class SplashActivity extends AppCompatActivity {
                         JSONArray array = json.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
                        // preference.saveToken(data.getString("token"));
+                        int  id = data.getInt("user_id");
                         String email = data.getString("custom_email");
                         String phone = data.getString("custom_phone");
                         String name = data.getString("custom_name");
 
-                        user = new User(name,phone,email,"");
+                        user = new User(id, name,phone,email,"");
                         Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
                         intent.putExtra(Defines.BUNDLE_USER, user);
                         startActivity(intent);
                         finish();
+                    }else {
+                        DialogUtils.showCheckTokenDialog((Activity) mContext, new DialogUtils.YesNoListenter() {
+                            @Override
+                            public void onYes() {
+                                preference.clearToken();
+                                Intent intent = new Intent(mContext, LoginActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+
+                            @Override
+                            public void onNo() {
+
+                            }
+                        });
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

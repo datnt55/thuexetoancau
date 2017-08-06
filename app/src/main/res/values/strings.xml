@@ -81,4 +81,12 @@
     <string name="phone_of_customer">Số điện thoại hành khách</string>
     <string name="error_time_start">Chọn thời gian khởi hành</string>
     <string name="error_time_back">Chọn thời gian khứ hồi</string>
+    <string name="logout_content_dialog">Bạn chắc chắn muốn đăng xuất?</string>
+    <string name="check_token_content_dialog">Ai đó đã đăng nhập vào tài khoản của bạn</string>
+    <string name="rating_title">Đánh giá chuyến đi</string>
+    <string name="rating_content">Hãy để lại đánh giá của bạn để chúng tôi có thể phát triển hơn. Xin cảm ơn</string>
+    <string name="booking_car_message">Đang đăng ký chuyến xe</string>
+    <string name="booking_car_error">Đặt xe thất bại</string>
+    <string name="booking_cancel_message">Bạn hãy nhập lý do hủy chuyến</string>
 </resources>
+

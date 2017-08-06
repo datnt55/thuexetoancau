@@ -153,7 +153,7 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
                 txtOneWay.setTextColor(ContextCompat.getColor(mContext,R.color.white));
                 imgOneWay.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
                 if (mCallback != null)
-                    mCallback.onSetTripType(2);
+                    mCallback.onSetTripType(0);
                 break;
         }
     }

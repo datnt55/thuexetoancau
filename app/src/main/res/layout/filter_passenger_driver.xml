@@ -2,52 +2,56 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="5dp">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:id="@+id/layout_place_from"
         android:layout_marginTop="20dp"
+        android:paddingBottom="5dp"
         android:layout_height="wrap_content">
 
         <TextView
             android:text="Điểm đi (Bỏ trống nếu tìm tất cả điểm đi)"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/color_text_dark"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/colorPrimary"
             android:id="@+id/textView10" />
 
-        <LinearLayout
+        <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:background="@drawable/btn_role"
-            android:layout_marginTop="5dp"
-            android:weightSum="1"
-            android:layout_height="match_parent">
+            android:background="@drawable/search_shape"
+            android:elevation="@dimen/spacing_2"
+            android:layout_margin="10dp"
+            android:padding="15dp"
+            android:layout_height="wrap_content">
             <AutoCompleteTextView
                 android:id="@+id/auto_place_from"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.9"
                 android:background="@android:color/transparent"
                 android:paddingLeft="10dp"
                 android:maxLines="1"
+                android:layout_marginRight="18dp"
+                android:ellipsize="end"
                 android:inputType="text"
                 android:textSize="14sp"
                 android:layout_gravity="center_vertical"
                 android:hint="Quận huyện, đường phố, thị trấn..."
                 />
             <ImageView
-                android:layout_width="0dp"
-                android:layout_weight="0.1"
-                android:layout_height="wrap_content"
-                android:src="@drawable/cancel"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_close_black_24dp"
                 android:visibility="gone"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="10dp"
+                android:layout_alignParentRight="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:id="@+id/img_from" />
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
     <LinearLayout
@@ -61,49 +65,50 @@
             android:text="Điểm đến (Bỏ trống nếu tìm tất cả điểm đến)"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/color_text_dark"
+            android:textColor="@color/colorPrimary"
+            android:layout_marginLeft="10dp"
             android:id="@+id/textView" />
 
-        <LinearLayout
+        <RelativeLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:layout_marginTop="5dp"
-            android:weightSum="1"
-            android:background="@drawable/btn_role">
-
+            android:background="@drawable/search_shape"
+            android:elevation="@dimen/spacing_2"
+            android:layout_margin="10dp"
+            android:padding="15dp"
+            android:layout_height="wrap_content">
             <AutoCompleteTextView
                 android:id="@+id/auto_place_to"
-                android:layout_width="0dp"
-                android:layout_weight="0.9"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
+                android:layout_marginRight="18dp"
                 android:textSize="14sp"
                 android:background="@android:color/transparent"
                 android:maxLines="1"
+                android:ellipsize="end"
                 android:inputType="text"
                 android:hint="Quận huyện, đường phố, thị trấn..." />
             <ImageView
-                android:layout_width="0dp"
-                android:layout_weight="0.1"
-                android:layout_height="wrap_content"
-                android:src="@drawable/cancel"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_close_black_24dp"
                 android:visibility="gone"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_alignParentRight="true"
                 android:id="@+id/img_to" />
-        </LinearLayout>
+        </RelativeLayout>
 
     </LinearLayout>
     <Button
         android:text="Xác nhận"
         android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btn_confirm"
-        android:textSize="24sp"
-        android:background="@drawable/btn_confirm"
-        android:textColor="@color/white"
+        style="@style/button_white_title"
         />
 </LinearLayout>

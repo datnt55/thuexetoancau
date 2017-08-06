@@ -2,6 +2,7 @@
 <resources>
     <!-- Common -->
     <dimen name="spacing_0">0dp</dimen>
+    <dimen name="spacing_2">2dp</dimen>
     <dimen name="spacing_5">3dp</dimen>
     <dimen name="view_size_16">16dp</dimen>
     <dimen name="view_size_10">10dp</dimen>

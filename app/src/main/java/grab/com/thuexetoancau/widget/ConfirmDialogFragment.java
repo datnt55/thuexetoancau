@@ -1,17 +1,21 @@
 package grab.com.thuexetoancau.widget;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,12 +110,13 @@ public class ConfirmDialogFragment extends DialogFragment {
 
         btnConfirm = (Button) view.findViewById(R.id.btn_confirm);
 
-        txtSource.setText(mTrip.getSource());
-        txtDestination.setText(mTrip.getDestination());
+        txtSource.setText(mTrip.getListStopPoints().get(0).getFullPlace());
+        txtDestination.setText(mTrip.getListStopPoints().get(mTrip.getListStopPoints().size()-1).getFullPlace());
         txtTypeTrip.setText(CommonUtilities.getTripType(mTrip.getTripType()));
         totalDistance = mTrip.getDistance();
         txtDistance.setText(CommonUtilities.convertToKilometer(totalDistance));
-        txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice()));
+        txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
+        mTrip.setCustomerType(1);
 
         if (totalDistance < Defines.MAX_DISTANCE) {
             layoutStart.setVisibility(View.GONE);
@@ -166,8 +171,11 @@ public class ConfirmDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if (rFriend.isChecked()) {
-                    mTrip.setCustomerName(edtCustomerName.getText().toString());
-                    mTrip.setCustomerPhone(edtCustomerPhone.getText().toString());
+                    mTrip.setCustomerType(0);
+                    mTrip.setGuestName(edtCustomerName.getText().toString());
+                    mTrip.setGuestPhone(edtCustomerPhone.getText().toString());
+                }else if (rOwne.isChecked()){
+                    mTrip.setCustomerType(1);
                 }
                 if (totalDistance > Defines.MAX_DISTANCE) {
                     if (mTrip.getTripType() == 1) {

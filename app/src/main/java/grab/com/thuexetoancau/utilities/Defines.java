@@ -18,7 +18,7 @@ public class Defines {
     public static  final String URL_CHECK_TOKEN                 = HOSTNAME + "api2/customerCheckToken";
     public static  final String URL_GET_POSTAGE                 = HOSTNAME + "api2/getPostage";
     public static  final String URL_LOG_OUT                     = HOSTNAME + "api2/customerLogOut";
-    public static  final String URL_BOOKING                     = HOSTNAME + "api2/bookingGrab ";
+    public static  final String URL_BOOKING                     = HOSTNAME + "api2/bookingGrab";
     public static  final String URL_CANCEL_TRIP                 = HOSTNAME + "api2/cancelTrip";
     public static  final String URL_GET__BOOKING            = HOSTNAME + "api/getBooking";
     public static  final String URL_BOOKING_FINAL           = HOSTNAME + "api/bookingFinal";
@@ -54,7 +54,7 @@ public class Defines {
     public static final int REQUEST_CODE_CONTACT_PERMISSIONS = 235;
     public static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(new LatLng(8.412730, 102.144410), new LatLng(23.393395, 109.468975));
     public static final int GOOGLE_API_CLIENT_ID = 0;
-    public static final int DIRECTION_START_POINT = 1;
+    public static final int FRAMEWORK_REQUEST_CODE = 1;
     public static final int DIRECTION_ENDPOINT = 2;
     public static final int DIRECTION_NEW_STOP_POINT = 3;
     public static final String TYPE_POINT = "type direction point";

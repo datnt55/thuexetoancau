@@ -19,6 +19,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
+import com.facebook.accountkit.AccessToken;
+import com.facebook.accountkit.AccountKit;
+import com.facebook.accountkit.AccountKitLoginResult;
+import com.facebook.accountkit.PhoneNumber;
+import com.facebook.accountkit.ui.AccountKitActivity;
+import com.facebook.accountkit.ui.AccountKitConfiguration;
+import com.facebook.accountkit.ui.LoginType;
 import com.hbb20.CountryCodePicker;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -34,6 +42,8 @@ import grab.com.thuexetoancau.utilities.BaseService;
 import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.SharePreference;
+
+import static grab.com.thuexetoancau.utilities.Defines.FRAMEWORK_REQUEST_CODE;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView txtPolicy, txtNext, txtRegister, txtTitle;
@@ -207,10 +217,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         JSONObject data = array.getJSONObject(0);
                         preference.saveCustomerId(data.getString("id"));
                         preference.saveToken(data.getString("token"));
-                        if (user == null) {
-                            user = new User(edtCustomerName.getText().toString(),customerPhone,edtCustomerEmail.getText().toString(),null);
-                        }else
-                            user.setPhone(customerPhone);
+                        int  id = data.getInt("id");
+                        String customerName = data.getString("custom_name");
+                        String customerEmail = data.getString("custom_email");
+                        String customerPhone = data.getString("custom_phone");
+                        user = new User(id, customerName,customerPhone,customerEmail,null);
                         Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
                         intent.putExtra(Defines.BUNDLE_USER, user);
                         startActivity(intent);
@@ -277,16 +288,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     if (json.getString("status").equals("success")){
                         JSONArray array = json.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
-                        preference.saveCustomerId(data.getString("id"));
+                        preference.saveCustomerId(data.getString("user_id"));
                         preference.saveToken(data.getString("token"));
-                        if (user == null) {
-                            user = new User(edtCustomerName.getText().toString(),customerPhone,edtCustomerEmail.getText().toString(),null);
-                        }else
-                            user.setPhone(customerPhone);
-                        Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
+                        int  id = data.getInt("user_id");
+                        String customerName = data.getString("custom_name");
+                        String customerEmail = data.getString("custom_email");
+                        String customerPhone = data.getString("custom_phone");
+                        user = new User(id, customerName,customerPhone,customerEmail,null);
+                        accountKitCheck();
+                      /*  Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
                         intent.putExtra(Defines.BUNDLE_USER, user);
                         startActivity(intent);
-                        finish();
+                        finish();*/
                     }
                     Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
@@ -309,5 +322,42 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 dialog.dismiss();
             }
         });
+    }
+
+    private void accountKitCheck() {
+        AccountKit.initialize(getApplicationContext());
+        final Intent intent = new Intent(this, AccountKitActivity.class);
+        final AccountKitConfiguration.AccountKitConfigurationBuilder configurationBuilder = new AccountKitConfiguration.AccountKitConfigurationBuilder(LoginType.PHONE, AccountKitActivity.ResponseType.TOKEN);
+       // configurationBuilder.setInitialPhoneNumber(new PhoneNumber(ccpPhone.getSelectedCountryNameCode(), edtCustomerPhone.getText().toString()));
+        final AccountKitConfiguration configuration = configurationBuilder.build();
+        intent.putExtra(AccountKitActivity.ACCOUNT_KIT_ACTIVITY_CONFIGURATION, configuration);
+        startActivityForResult(intent, FRAMEWORK_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != FRAMEWORK_REQUEST_CODE) {
+            return;
+        }
+        final String toastMessage;
+        final AccountKitLoginResult loginResult = AccountKit.loginResultWithIntent(data);
+        if (loginResult == null || loginResult.wasCancelled()) {
+            toastMessage = "Login Cancelled";
+        } else if (loginResult.getError() != null) {
+            Toast.makeText(this, "Nhập sai mã số", Toast.LENGTH_LONG).show();
+        } else {
+            final AccessToken accessToken = loginResult.getAccessToken();
+            final long tokenRefreshIntervalInSeconds = loginResult.getTokenRefreshIntervalInSeconds();
+            if (accessToken != null) {
+                Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
+                intent.putExtra(Defines.BUNDLE_USER, user);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(this, "Nhập sai mã số", Toast.LENGTH_LONG).show();
+            }
+        }
+
     }
 }

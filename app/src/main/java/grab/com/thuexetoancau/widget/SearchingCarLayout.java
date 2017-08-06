@@ -2,6 +2,7 @@ package grab.com.thuexetoancau.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -24,8 +25,11 @@ import android.widget.TextView;
 import com.dd.CircularProgressButton;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.utilities.AnimUtils;
+import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
+import grab.com.thuexetoancau.utilities.DialogUtils;
 import grab.com.thuexetoancau.utilities.Global;
 
 import static grab.com.thuexetoancau.utilities.AnimUtils.EASE_IN;
@@ -39,11 +43,15 @@ public class SearchingCarLayout extends LinearLayout {
     private ImageView imgCircle, imgCircle1;
     private CircularProgressButton btnCancel;
     private SearchingCallBack callBack;
+    private String bookingId;
+    private Trip trip;
 
-    public SearchingCarLayout(Context context, SearchingCallBack callBack) {
+    public SearchingCarLayout(Context context, SearchingCallBack callBack, String bookingId, Trip trip) {
         super(context);
         this.mContext = context;
         this.callBack = callBack;
+        this.bookingId = bookingId;
+        this.trip = trip;
         initLayout();
     }
 
@@ -67,24 +75,38 @@ public class SearchingCarLayout extends LinearLayout {
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (btnCancel.getProgress() == 0) {
-                    btnCancel.setProgress(50);
-                } else if (btnCancel.getProgress() == 100) {
-                    btnCancel.setProgress(0);
-                } else {
-                    btnCancel.setProgress(100);
-                }
-                new Handler().postDelayed(new Runnable() {
+                DialogUtils.showCancelTripConfirm((Activity) mContext, new DialogUtils.ConfirmListenter() {
                     @Override
-                    public void run() {
-                        AnimUtils.slideDown(SearchingCarLayout.this, Global.APP_SCREEN_HEIGHT);
-                        if (callBack!= null)
-                            callBack.onSearchCarSuccess();
+                    public void onConfirm(String reason) {
+                        if (btnCancel.getProgress() == 0) {
+                            btnCancel.setProgress(50);
+                        }
+                        requestCancelTrip(reason);
                     }
-                },2000);
+                });
             }
         });
 
+    }
+
+    private void requestCancelTrip(String reason) {
+        ApiUtilities mApi = new ApiUtilities(mContext);
+        mApi.cancelTrip(bookingId, trip.getCustomerPhone(), reason, new ApiUtilities.CancelTripCarListener() {
+            @Override
+            public void onSuccess() {
+
+                if (callBack!= null)
+                    callBack.onSearchCarCancel();
+                btnCancel.setProgress(100);
+                AnimUtils.slideDown(SearchingCarLayout.this, Global.APP_SCREEN_HEIGHT);
+            }
+
+            @Override
+            public void onFail() {
+                btnCancel.setProgress(0);
+
+            }
+        });
     }
 
     private void startAnimation(final View view, int delay) {
@@ -114,6 +136,6 @@ public class SearchingCarLayout extends LinearLayout {
     public interface SearchingCallBack{
         void onSearchCarSuccess();
         void onSearchCarError();
-        void onSearchCarBack();
+        void onSearchCarCancel();
     }
 }

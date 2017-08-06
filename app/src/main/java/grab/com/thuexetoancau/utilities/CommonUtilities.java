@@ -68,23 +68,6 @@ public class CommonUtilities {
         return result;
     }
 
-    public interface TryAgain{
-        void onTryAgain();
-    }
-
-    public static void showDialogNetworkError(Context mContext, final TryAgain again){
-        AlertDialog dialog = new AlertDialog.Builder(mContext)
-                .setTitle(mContext.getString(R.string.app_name))
-                .setMessage(mContext.getString(R.string.error_network))
-                .setPositiveButton(mContext.getString(R.string.try_again), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (again != null)
-                            again.onTryAgain();
-                    }
-                })
-                .setCancelable(false)
-                .show();
-    }
     public static void systemUiVisibility(Activity activity) {
 //         This work only for android 4.4+
         final View decorView = activity.getWindow().getDecorView();
@@ -138,6 +121,12 @@ public class CommonUtilities {
         return dateFrom;
     }
     public static String convertCurrency(int currency){
+        int nature = currency / 1000;
+        int fractiona = currency - nature*1000;
+        if (fractiona > 500)
+            currency = (nature+1)*1000;
+        else
+            currency = nature*1000;
         NumberFormat formatter = NumberFormat.getInstance();
         String moneyString = formatter.format(currency);
         if (moneyString.endsWith(".00")) {
@@ -146,6 +135,7 @@ public class CommonUtilities {
                 moneyString = moneyString.substring(0, centsIndex);
             }
         }
+
         return moneyString;
     }
     public static final String md5(final String s) {
@@ -228,7 +218,7 @@ public class CommonUtilities {
         switch (type){
             case 1:
                 return "Một chiều";
-            case 2:
+            case 0:
                 return "Khứ hồi";
         }
         return null;
@@ -238,29 +228,6 @@ public class CommonUtilities {
         float kilometer = (float)meter/1000;
         return kilometer + " km";
 
-    }
-
-    // Show dialog request turn on gps
-    public static void settingRequestTurnOnLocation(final Activity mActivity) {
-        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(mActivity);
-        alertDialogBuilder.setTitle(R.string.notice);  // GPS not found
-        alertDialogBuilder.setMessage(R.string.gps_notice_content)
-                .setCancelable(false)
-                .setPositiveButton(R.string.gps_continue,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent callGPSSettingIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                mActivity.startActivityForResult(callGPSSettingIntent,1000);
-                            }
-                        });
-        alertDialogBuilder.setNegativeButton(R.string.gps_no,
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-        android.app.AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
     }
 
     public static void getListPhone (Context mContext){

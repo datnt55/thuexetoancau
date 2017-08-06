@@ -32,12 +32,14 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     private ArrayList<Car> transports;
     private int totalDistance;
     private int tripType = 1;
-
+    private Car carSelect;
     public TransportationLayout(PassengerSelectActionActivity activity, ArrayList<Car> carPrice) {
         super(activity);
         this.mContext = activity;
         this.listener = activity;
         this.transports = carPrice;
+        transports.get(0).setSelected(true);
+        carSelect = transports.get(0);
         activity.setOnChangeTripListener(this);
         initLayout();
     }
@@ -68,11 +70,13 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         setCarPrice(totalDistance);
         adapter = new TransportationAdapter(mContext, transports);
         listTrans.setAdapter(adapter);
+
         adapter.setOnClickListener(new TransportationAdapter.OnItemClickListener() {
             @Override
             public void onClicked(Car car) {
+                carSelect = car;
                 if (listener != null)
-                    listener.onSelectVehicle(car);
+                    listener.onSelectVehicle(carSelect);
             }
         });
     }
@@ -103,6 +107,8 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         this.totalDistance = distance;
         setCarPrice(distance);
         adapter.notifyDataSetChanged();
+        if (listener != null)
+            listener.onSelectVehicle(carSelect);
     }
 
     @Override

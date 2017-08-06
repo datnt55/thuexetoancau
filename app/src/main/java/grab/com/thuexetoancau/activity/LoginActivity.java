@@ -121,7 +121,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
           //  Toast.makeText(getApplicationContext(),acct.getEmail(),Toast.LENGTH_LONG).show();
-            user = new User(acct.getDisplayName(),"", acct.getEmail(), String.valueOf(acct.getPhotoUrl()));
+            user = new User(1,acct.getDisplayName(),"", acct.getEmail(), String.valueOf(acct.getPhotoUrl()));
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             intent.putExtra(Defines.BUNDLE_USER, user);
             startActivity(intent);
@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             JSONObject picture = profile.getJSONObject("picture");
             JSONObject data = picture.getJSONObject("data");
             String url = data.getString("url");
-            user = new User(fullName,"",email,url);
+            user = new User(1,fullName,"",email,url);
         } catch (JSONException e) {
             e.printStackTrace();
         }

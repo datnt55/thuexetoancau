@@ -65,4 +65,8 @@ public class Position {
     public void setFullPlace(String fullPlace) {
         this.fullPlace = fullPlace;
     }
+
+    public String getLatLngToString() {
+        return latLng.latitude + ","+ latLng.longitude;
+    }
 }

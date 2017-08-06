@@ -24,6 +24,16 @@ public class Car {
         this.price11way = price11way;
     }
 
+    public Car(Car car) {
+        this.size = car.size;
+        this.name = car.name;
+        this.image = car.image;
+        this.selected = false;
+        this.price01way = car.price01way;
+        this.price02way = car.price02way;
+        this.price11way = car.price11way;
+    }
+
     public int getSize() {
         return size;
     }

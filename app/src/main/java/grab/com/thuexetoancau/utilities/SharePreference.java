@@ -61,7 +61,7 @@ public class SharePreference {
     }
     public String getToken() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
-        return sp.getString(TOKEN, "");
+        return sp.getString(TOKEN, null);
     }
     public void clearToken() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
