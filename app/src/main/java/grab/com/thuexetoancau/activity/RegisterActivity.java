@@ -27,6 +27,9 @@ import com.facebook.accountkit.PhoneNumber;
 import com.facebook.accountkit.ui.AccountKitActivity;
 import com.facebook.accountkit.ui.AccountKitConfiguration;
 import com.facebook.accountkit.ui.LoginType;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.hbb20.CountryCodePicker;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -34,6 +37,8 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.concurrent.TimeUnit;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
@@ -63,6 +68,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_register);
         mContext = this;
         initComponent();
+        accountKitCheck();
     }
 
     private void initComponent() {
@@ -325,15 +331,32 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void accountKitCheck() {
-        AccountKit.initialize(getApplicationContext());
+        /*AccountKit.initialize(getApplicationContext());
         final Intent intent = new Intent(this, AccountKitActivity.class);
         final AccountKitConfiguration.AccountKitConfigurationBuilder configurationBuilder = new AccountKitConfiguration.AccountKitConfigurationBuilder(LoginType.PHONE, AccountKitActivity.ResponseType.TOKEN);
        // configurationBuilder.setInitialPhoneNumber(new PhoneNumber(ccpPhone.getSelectedCountryNameCode(), edtCustomerPhone.getText().toString()));
         final AccountKitConfiguration configuration = configurationBuilder.build();
         intent.putExtra(AccountKitActivity.ACCOUNT_KIT_ACTIVITY_CONFIGURATION, configuration);
-        startActivityForResult(intent, FRAMEWORK_REQUEST_CODE);
+        startActivityForResult(intent, FRAMEWORK_REQUEST_CODE);*/
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                "+841668596286",        // Phone number to verify
+                60,                 // Timeout duration
+                TimeUnit.SECONDS,   // Unit of timeout
+                this,               // Activity (for callback binding)
+                mCallbacks);        // OnVerificationStateChangedCallbacks
     }
 
+    PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+        @Override
+        public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
+            Toast.makeText(mContext,phoneAuthCredential.getSmsCode(),Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onVerificationFailed(FirebaseException e) {
+            Toast.makeText(mContext,"Loi",Toast.LENGTH_SHORT).show();
+        }
+    };
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
