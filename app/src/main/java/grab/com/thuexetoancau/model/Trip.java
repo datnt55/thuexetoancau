@@ -8,7 +8,8 @@ import java.util.ArrayList;
  */
 
 public class Trip implements Serializable{
-    int userId;
+    private int id;
+    private int userId;
     private ArrayList<Position> listStopPoints;
     private int carSize;
     private int tripType;
@@ -22,9 +23,35 @@ public class Trip implements Serializable{
     private String guestName;
     private String guestPhone;
     private String note;
+    private String bookingTime;
+    private String bookingDateId;
+    private int statusBooking;
+    private int statusPayment;
+    private String cancelReason;
+    private int driverId;
+    private int carType;
+    private int realDistance;
+    private int realPrice;
 
+    public Trip(int id, int userId, ArrayList<Position> listStopPoints, int carSize, int tripType, int distance, int price, String startTime, String endTime, int customerType, String customerName, String customerPhone, String guestName, String guestPhone, String note) {
+        this.id = id;
+        this.userId = userId;
+        this.listStopPoints = listStopPoints;
+        this.carSize = carSize;
+        this.tripType = tripType;
+        this.distance = distance;
+        this.price = price;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.customerType = customerType;
+        this.customerName = customerName;
+        this.customerPhone = customerPhone;
+        this.guestName = guestName;
+        this.guestPhone = guestPhone;
+        this.note = note;
+    }
 
-    public Trip(int userId, String customerName, String customerPhone, ArrayList<Position> listStopPoints, int tripType, int distance,int carSize,  int price) {
+    public Trip(int userId, String customerName, String customerPhone, ArrayList<Position> listStopPoints, int tripType, int distance, int carSize, int price) {
         this.userId = userId;
         this.customerName = customerName;
         this.customerPhone = customerPhone;
@@ -33,6 +60,14 @@ public class Trip implements Serializable{
         this.distance = distance;
         this.price = price;
         this.carSize = carSize;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public ArrayList<Position> getListStopPoints() {
@@ -145,5 +180,77 @@ public class Trip implements Serializable{
 
     public void setGuestPhone(String guestPhone) {
         this.guestPhone = guestPhone;
+    }
+
+    public String getBookingTime() {
+        return bookingTime;
+    }
+
+    public void setBookingTime(String bookingTime) {
+        this.bookingTime = bookingTime;
+    }
+
+    public String getBookingDateId() {
+        return bookingDateId;
+    }
+
+    public void setBookingDateId(String bookingDateId) {
+        this.bookingDateId = bookingDateId;
+    }
+
+    public int getStatusBooking() {
+        return statusBooking;
+    }
+
+    public void setStatusBooking(int statusBooking) {
+        this.statusBooking = statusBooking;
+    }
+
+    public int getStatusPayment() {
+        return statusPayment;
+    }
+
+    public void setStatusPayment(int statusPayment) {
+        this.statusPayment = statusPayment;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
+    public int getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(int driverId) {
+        this.driverId = driverId;
+    }
+
+    public int getCarType() {
+        return carType;
+    }
+
+    public void setCarType(int carType) {
+        this.carType = carType;
+    }
+
+    public int getRealDistance() {
+        return realDistance;
+    }
+
+    public void setRealDistance(int realDistance) {
+        this.realDistance = realDistance;
+    }
+
+    public int getRealPrice() {
+        return realPrice;
+    }
+
+    public void setRealPrice(int realPrice) {
+        this.realPrice = realPrice;
     }
 }

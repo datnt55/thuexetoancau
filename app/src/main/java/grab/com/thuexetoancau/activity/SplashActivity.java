@@ -1,10 +1,8 @@
 package grab.com.thuexetoancau.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.AnimationDrawable;
@@ -26,12 +24,14 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
+import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.BaseService;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.DialogUtils;
@@ -45,6 +45,7 @@ public class SplashActivity extends AppCompatActivity {
     private LinearLayout layoutLoading;
     private User user;
     private Context mContext;
+    private ApiUtilities mApi;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -63,6 +64,8 @@ public class SplashActivity extends AppCompatActivity {
         FirebaseMessaging.getInstance().subscribeToTopic("test");
         CommonUtilities.dimensionScreen(this);
         CommonUtilities.getListPhone(this);
+        mApi = new ApiUtilities(this);
+
     }
 
     @Override
@@ -84,17 +87,24 @@ public class SplashActivity extends AppCompatActivity {
             return;
         }
 
-        layoutLoading.setVisibility(View.VISIBLE);
-        if (preference.getRegId().equals("")) {
-            LocalBroadcastManager.getInstance(this).registerReceiver(tokenReceiver, new IntentFilter("tokenReceiver"));
-        }else {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    goToApplication();
+        mApi.getCurrentTime(new ApiUtilities.ServerTimeListener() {
+            @Override
+            public void onSuccess(long time) {
+                DateTime current = new DateTime();
+                Global.serverTimeDiff = time - current.getMillis();
+                layoutLoading.setVisibility(View.VISIBLE);
+                if (preference.getRegId().equals("")) {
+                    LocalBroadcastManager.getInstance(mContext).registerReceiver(tokenReceiver, new IntentFilter("tokenReceiver"));
+                }else {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            goToApplication();
+                        }
+                    }, 2000);
                 }
-            }, 2000);
-        }
+            }
+        });
     }
     BroadcastReceiver tokenReceiver = new BroadcastReceiver() {
         @Override
@@ -102,7 +112,7 @@ public class SplashActivity extends AppCompatActivity {
             String token = intent.getStringExtra("token");
             if(token != null)
             {
-                Intent i = new Intent(SplashActivity.this, LoginActivity.class);
+                Intent i = new Intent(SplashActivity.this, SelectMethodLoginActivity.class);
                 startActivity(i);
                 finish();
             }
@@ -115,7 +125,7 @@ public class SplashActivity extends AppCompatActivity {
         if (preference.getToken() != null){
             checkTokenLogin();
         }else{
-            Intent i = new Intent(SplashActivity.this, LoginActivity.class);
+            Intent i = new Intent(SplashActivity.this, SelectMethodLoginActivity.class);
             startActivity(i);
             finish();
         }
@@ -129,6 +139,9 @@ public class SplashActivity extends AppCompatActivity {
         params.put("token", preference.getToken());
         params.put("regId", preference.getRegId());
         params.put("os", 1);
+        DateTime current = new DateTime();
+        long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
+        params.put("key", key);
         /*if (user.getEmail() != null)
             params.put("custom_email", edtCustomerEmail.getText().toString());*/
         Log.e("TAG",params.toString());
@@ -164,7 +177,7 @@ public class SplashActivity extends AppCompatActivity {
                             @Override
                             public void onYes() {
                                 preference.clearToken();
-                                Intent intent = new Intent(mContext, LoginActivity.class);
+                                Intent intent = new Intent(mContext, SelectMethodLoginActivity.class);
                                 startActivity(intent);
                                 finish();
                             }

@@ -33,126 +33,139 @@
             android:text="Tiếp theo"
             android:textColor="@color/white"
             android:textSize="18sp"/>
-    </RelativeLayout>
 
-    <TextView
-        android:id="@+id/txt_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:gravity="center"
-        android:text="@string/login_message"
-        android:textColor="@color/white"
-        android:textSize="18sp"/>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/text_input_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColorHint="@color/grey_blur"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:visibility="gone"
-        app:hintEnabled="false">
-
-        <EditText
-            android:id="@+id/edt_customer_name"
+        <LinearLayout
+            android:id="@+id/layout_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/green"
-            android:ems="10"
-            android:hint="Tên hành khách"
-            android:inputType="textPersonName"
-            android:paddingLeft="15dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/grey"/>
-    </android.support.design.widget.TextInputLayout>
+            android:orientation="vertical"
+            android:layout_below="@+id/txt_next">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/text_input_email"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:visibility="gone"
-        android:textColorHint="@color/grey_blur"
-        app:hintEnabled="false">
+            <TextView
+                android:id="@+id/txt_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:gravity="center"
+                android:text="@string/login_message"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
 
-        <EditText
-            android:id="@+id/edt_customer_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/green"
-            android:ems="10"
-            android:hint="Email"
-            android:paddingLeft="15dp"
-            android:inputType="textEmailAddress"
-            android:textColor="@color/white"
-            android:textColorHint="@color/grey"/>
-    </android.support.design.widget.TextInputLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="horizontal">
-
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_weight="3">
-
-            <com.hbb20.CountryCodePicker
-                android:id="@+id/ccp_phone"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:ccp_divider_color="@color/green"
-                app:ccp_textColor="@color/white"/>
-        </FrameLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/text_input_phone"
-            android:layout_width="0dp"
-            android:layout_weight="5"
-            android:layout_height="wrap_content"
-            android:textColorHint="@color/grey_blur"
-            app:hintEnabled="false">
-
-            <EditText
-                android:id="@+id/edt_customer_phone"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/text_input_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:backgroundTint="@color/green"
-                android:ems="10"
-                android:paddingLeft="15dp"
-                android:inputType="phone"
-                android:hint="Số điện thoại "
-                android:textColorHint="@color/grey"
-                android:textColor="@color/white"/>
-        </android.support.design.widget.TextInputLayout>
-    </LinearLayout>
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:textColorHint="@color/grey_blur"
+                android:visibility="gone"
+                app:hintEnabled="false">
 
-    <TextView
-        android:id="@+id/text_register"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:text="@string/not_have_account"
-        android:textColor="@color/white"
-        android:textSize="16sp"/>
+                <EditText
+                    android:id="@+id/edt_customer_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/green"
+                    android:ems="10"
+                    android:hint="Tên hành khách"
+                    android:inputType="textPersonName"
+                    android:paddingLeft="15dp"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/grey" />
+            </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/text_policy"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:text="@string/register_policy"
-        android:textColor="@color/white"
-        android:textSize="16sp"/>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/text_input_email"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:textColorHint="@color/grey_blur"
+                android:visibility="gone"
+                app:hintEnabled="false">
+
+                <EditText
+                    android:id="@+id/edt_customer_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/green"
+                    android:ems="10"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"
+                    android:paddingLeft="15dp"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/grey" />
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="3">
+
+                    <com.hbb20.CountryCodePicker
+                        android:id="@+id/ccp_phone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        app:ccp_divider_color="@color/green"
+                        app:ccp_textColor="@color/white" />
+                </FrameLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/text_input_phone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:textColorHint="@color/grey_blur"
+                    app:hintEnabled="false">
+
+                    <EditText
+                        android:id="@+id/edt_customer_phone"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="@color/green"
+                        android:ems="10"
+                        android:hint="Số điện thoại "
+                        android:inputType="phone"
+                        android:paddingLeft="15dp"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/grey" />
+                </android.support.design.widget.TextInputLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/text_policy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="@string/register_policy"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/text_register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="@string/not_have_account"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+        <include
+            layout="@layout/activity_digit"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
 </LinearLayout>

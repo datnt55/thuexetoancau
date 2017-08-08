@@ -10,6 +10,7 @@ import android.widget.Toast;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -202,11 +203,12 @@ public class ApiUtilities {
                 params.put("come_back_time", trip.getEndTime());
             }
         }else {
-            params.put("start_time", "null");
-            params.put("come_back", "null");
+            params.put("start_time",new DateTime());
         }
         params.put("custom_note", trip.getNote());
-
+        DateTime current = new DateTime();
+        long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
+        params.put("key", key);
         Log.e("TAG",params.toString());
         BaseService.getHttpClient().post(Defines.URL_BOOKING,params, new AsyncHttpResponseHandler() {
 
@@ -301,6 +303,57 @@ public class ApiUtilities {
         });
     }
 
+    public void getCurrentTime(final ServerTimeListener listener){
+        if (!CommonUtilities.isOnline(mContext)) {
+            DialogUtils.showDialogNetworkError(mContext, null);
+            return ;
+        }
+        BaseService.getHttpClient().get(Defines.URL_GET_SERVER_TIME, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                try {
+                    JSONObject jsonObject = new JSONObject(new String(responseBody));
+                    String status = jsonObject.getString("status");
+                    if (status.equals("success")){
+                        JSONArray array = jsonObject.getJSONArray("data");
+                        JSONObject data = array.getJSONObject(0);
+                        long serverTime = data.getLong("TotalMilliseconds");
+                        if (listener != null)
+                            listener.onSuccess(serverTime);
+                    }else{
+                        Toast.makeText(mContext, mContext.getResources().getString(R.string.log_out_error), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+        return;
+    }
+    public interface ServerTimeListener{
+        void onSuccess(long time);
+    }
+
     public interface BookingCarListener{
         void onSuccess(String id);
         void onFail();
@@ -310,4 +363,5 @@ public class ApiUtilities {
         void onSuccess();
         void onFail();
     }
+
 }

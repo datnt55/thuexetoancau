@@ -1,59 +1,35 @@
 {
   "project_info": {
-    "project_number": "989692241948",
-    "firebase_url": "https://thuexetoancau-150306.firebaseio.com",
-    "project_id": "thuexetoancau-150306",
-    "storage_bucket": "thuexetoancau-150306.appspot.com"
+    "project_number": "62619624645",
+    "firebase_url": "https://noicar-113ff.firebaseio.com",
+    "project_id": "noicar-113ff",
+    "storage_bucket": "noicar-113ff.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:989692241948:android:519260169cc162a4",
+        "mobilesdk_app_id": "1:62619624645:android:519260169cc162a4",
         "android_client_info": {
           "package_name": "grab.com.thuexetoancau"
         }
       },
       "oauth_client": [
         {
-          "client_id": "989692241948-htsqdnu1vgcrt6dllp9vf6oubaduj3m7.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "grab.com.thuexetoancau",
-            "certificate_hash": "fe510d57b97a1f75abf023bfdfb7fb5ee033254a"
-          }
+          "client_id": "62619624645-47flq1d4c9udm9ibff1u3pqmcduv8de9.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
-          "client_id": "989692241948-8j833f393q3vvhefasi0de6ao3pm44jb.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "grab.com.thuexetoancau",
-            "certificate_hash": "593d4b896a49f688e74d4f00409fea6cf23f8621"
-          }
-        },
-        {
-          "client_id": "989692241948-b3td67vgda3h4jgql4brqg0q4bmstsan.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "grab.com.thuexetoancau",
-            "certificate_hash": "e57f1653e530f13fb026b2092c0c517dd790e6de"
-          }
-        },
-        {
-          "client_id": "989692241948-15citepv0b3ircllnnn5c4ck6s1gede3.apps.googleusercontent.com",
+          "client_id": "62619624645-772o9eud6fbtgovvbqs8vbuannr5e6t1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "grab.com.thuexetoancau",
             "certificate_hash": "6b8d317b144a20040b5b3fd6764b918282f2fd9e"
           }
-        },
-        {
-          "client_id": "989692241948-cd5dqu3ogi1nrdlu8oj3k7tp1nq9be0d.apps.googleusercontent.com",
-          "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCgG3LELb9KRs6_iJrOTBsOGq6YFC2TIKw"
+          "current_key": "AIzaSyB9IpaUeJQJlvzK3Nug8cp9tGTETJV0GHs"
         }
       ],
       "services": {
@@ -64,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "989692241948-cd5dqu3ogi1nrdlu8oj3k7tp1nq9be0d.apps.googleusercontent.com",
+              "client_id": "62619624645-47flq1d4c9udm9ibff1u3pqmcduv8de9.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

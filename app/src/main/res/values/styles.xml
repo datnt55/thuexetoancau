@@ -28,39 +28,6 @@
         <item name="android:background">@color/blue_light</item>
     </style>
 
-
-    <style name="Theme.AccountKit.Outline" parent="Theme.AccountKit">
-        <item name="com_accountkit_secondary_color">?attr/com_accountkit_primary_color</item>
-
-        <item name="com_accountkit_button_disabled_border_color">
-            ?attr/com_accountkit_input_border_color
-        </item>
-        <item name="com_accountkit_button_disabled_text_color">
-            ?attr/com_accountkit_input_accent_color
-        </item>
-        <item name="com_accountkit_button_pressed_border_color">
-            ?attr/com_accountkit_input_border_color
-        </item>
-        <item name="com_accountkit_input_accent_color">?attr/com_accountkit_secondary_color</item>
-        <item name="com_accountkit_input_background_color">
-            ?attr/com_accountkit_background_color
-        </item>
-        <item name="com_accountkit_input_border_color">?attr/com_accountkit_secondary_color</item>
-    </style>
-
-    <style name="AppLoginTheme.Grab" parent="Theme.AccountKit.Outline">
-        <item name="com_accountkit_primary_color">#ff5a5f</item>
-        <item name="com_accountkit_primary_text_color">@android:color/white</item>
-        <item name="com_accountkit_secondary_text_color">@android:color/white</item>
-
-        <item name="com_accountkit_background">@drawable/bg_register</item>
-        <item name="com_accountkit_background_color">#66000000</item>
-        <item name="com_accountkit_input_accent_color">@android:color/white</item>
-        <item name="com_accountkit_input_background_color">#00000000</item>
-        <item name="com_accountkit_input_border_color">@android:color/white</item>
-    </style>
-
-
     <style name="BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/bottomSheetStyleWrapper</item>
     </style>

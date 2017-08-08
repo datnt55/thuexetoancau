@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_digit"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_register"
+    android:padding="20dp"
+    android:layout_below="@+id/txt_next"
+    tools:context="grab.com.thuexetoancau.activity.DigitActivity">
+    <TextView
+        android:id="@+id/textView16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        style="@style/text_direction"
+        android:text="@string/digit_message" />
+
+    <grab.com.thuexetoancau.widget.OtpView
+        android:id="@+id/edt_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:textColor="#FFFFFF"
+        app:otp_hint="----">
+    </grab.com.thuexetoancau.widget.OtpView>
+
+    <TextView
+        android:id="@+id/textView17"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/text_direction"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/digit_no_get_sms" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/custom_progress_margin"
+        android:layout_gravity="center_horizontal">
+
+        <grab.com.thuexetoancau.widget.CustomProgress
+            android:id="@+id/btn_resend"
+            android:layout_width="@dimen/custom_progress_width"
+            android:layout_height="@dimen/custom_progress_height"
+            android:layout_gravity="center_horizontal" />
+        <TextView
+            android:id="@+id/textView19"
+            style="@style/text_direction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="@string/digit_re_send" />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

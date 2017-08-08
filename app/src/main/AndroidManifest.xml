@@ -26,12 +26,6 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
         <meta-data
-            android:name="com.facebook.accountkit.ApplicationName"
-            android:value="@string/app_name" />
-        <meta-data
-            android:name="com.facebook.accountkit.ClientToken"
-            android:value="@string/ACCOUNT_KIT_CLIENT_TOKEN" />
-        <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
@@ -63,18 +57,13 @@
             android:name=".activity.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme" />
-        <activity android:name=".activity.LoginActivity" />
+        <activity android:name=".activity.SelectMethodLoginActivity" />
         <activity
             android:name=".activity.ConfigureAccountActivity"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activity.RegisterActivity"
-            android:theme="@style/FullScreen"></activity>
-        <activity
-            android:name="com.facebook.accountkit.ui.AccountKitActivity"
-            android:theme="@style/AppLoginTheme.Grab"
-            tools:replace="android:theme"
-            />
+            android:theme="@style/FullScreen" />
     </application>
 
 </manifest>

@@ -3,6 +3,7 @@ package grab.com.thuexetoancau.activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,39 +17,40 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.FacebookSdk;
-import com.facebook.accountkit.AccessToken;
-import com.facebook.accountkit.AccountKit;
-import com.facebook.accountkit.AccountKitLoginResult;
-import com.facebook.accountkit.PhoneNumber;
-import com.facebook.accountkit.ui.AccountKitActivity;
-import com.facebook.accountkit.ui.AccountKitConfiguration;
-import com.facebook.accountkit.ui.LoginType;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.hbb20.CountryCodePicker;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.model.Position;
+import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.BaseService;
 import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.SharePreference;
-
-import static grab.com.thuexetoancau.utilities.Defines.FRAMEWORK_REQUEST_CODE;
+import grab.com.thuexetoancau.widget.CustomProgress;
+import grab.com.thuexetoancau.widget.OtpView;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView txtPolicy, txtNext, txtRegister, txtTitle;
@@ -61,17 +63,28 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private Context mContext;
     private boolean isLogin = true;
     private ApiUtilities mApi;
-
+    private LinearLayout layoutRegister, layoutDigits;
+    private boolean mVerificationInProgress = false;
+    private String mVerificationId;
+    private CustomProgress btnResend;
+    private PhoneAuthProvider.ForceResendingToken mResendToken;
+    private OtpView edtCode;
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         mContext = this;
         initComponent();
-        accountKitCheck();
+
     }
 
     private void initComponent() {
+        layoutRegister = (LinearLayout) findViewById(R.id.layout_login);
+        layoutDigits = (LinearLayout) findViewById(R.id.layout_digit);
+        btnResend = (CustomProgress) findViewById(R.id.btn_resend);
+        edtCode = (OtpView) findViewById(R.id.edt_code);
+        btnResend.setOnClickListener(this);
         txtPolicy  = (TextView) findViewById(R.id.text_policy);
         txtNext = (TextView) findViewById(R.id.txt_next);
         txtRegister  = (TextView) findViewById(R.id.text_register);
@@ -113,11 +126,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.txt_next:
-                if (isLogin)
+                if (layoutDigits.isShown()){
                     loginCustomer();
-                else
-                if (checkValidData())
-                    registerCustomer();
+                }else {
+                    accountKitCheck();
+                }
                 break;
             case R.id.btn_back:
                 if (!isLogin) {
@@ -129,6 +142,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             case R.id.text_register:
                 isLogin = false;
                 showRegisterLayout();
+                break;
+            case R.id.btn_resend:
+                resendVerificationCode("+"+customerPhone, mResendToken);
                 break;
         }
 
@@ -257,22 +273,25 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void loginCustomer() {
+        customerPhone = ccpPhone.getSelectedCountryCode() + edtCustomerPhone.getText().toString();
         if (edtCustomerPhone.getText().toString().equals("") || edtCustomerPhone.getText().toString() == null){
             textInputPhone.setError("Bạn chưa nhập số điện thoại");
             requestFocus(edtCustomerPhone);
             return;
         }
-        customerPhone = ccpPhone.getSelectedCountryCode() + edtCustomerPhone.getText().toString();
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage(getString(R.string.register_message));
+        dialog.setMessage(getString(R.string.login_message_dialog));
         dialog.show();
 
         final SharePreference preference = new SharePreference(this);
         RequestParams params;
         params = new RequestParams();
         params.put("custom_phone", customerPhone);
+        DateTime current = new DateTime();
+        long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
+        params.put("key", key);
         /*if (user.getEmail() != null)
             params.put("custom_email", edtCustomerEmail.getText().toString());*/
         params.put("regId", preference.getRegId());
@@ -296,16 +315,23 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         JSONObject data = array.getJSONObject(0);
                         preference.saveCustomerId(data.getString("user_id"));
                         preference.saveToken(data.getString("token"));
-                        int  id = data.getInt("user_id");
+                        int  useId = data.getInt("user_id");
                         String customerName = data.getString("custom_name");
                         String customerEmail = data.getString("custom_email");
                         String customerPhone = data.getString("custom_phone");
-                        user = new User(id, customerName,customerPhone,customerEmail,null);
-                        accountKitCheck();
-                      /*  Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
+                        String sBooking = data.getString("booking_data");
+                        Trip trip = null;
+                        if (!sBooking.equals("null")) {
+                            JSONObject booking = data.getJSONObject("booking_data");
+                            trip = parseBookingData(booking,customerName,useId);
+                        }
+                        user = new User(useId, customerName,customerPhone,customerEmail,null);
+                        Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
                         intent.putExtra(Defines.BUNDLE_USER, user);
+                        if (trip != null)
+                            intent.putExtra(Defines.BUNDLE_TRIP, trip);
                         startActivity(intent);
-                        finish();*/
+                        finish();
                     }
                     Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
@@ -330,57 +356,145 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
-    private void accountKitCheck() {
-        /*AccountKit.initialize(getApplicationContext());
-        final Intent intent = new Intent(this, AccountKitActivity.class);
-        final AccountKitConfiguration.AccountKitConfigurationBuilder configurationBuilder = new AccountKitConfiguration.AccountKitConfigurationBuilder(LoginType.PHONE, AccountKitActivity.ResponseType.TOKEN);
-       // configurationBuilder.setInitialPhoneNumber(new PhoneNumber(ccpPhone.getSelectedCountryNameCode(), edtCustomerPhone.getText().toString()));
-        final AccountKitConfiguration configuration = configurationBuilder.build();
-        intent.putExtra(AccountKitActivity.ACCOUNT_KIT_ACTIVITY_CONFIGURATION, configuration);
-        startActivityForResult(intent, FRAMEWORK_REQUEST_CODE);*/
+    private Trip parseBookingData(JSONObject booking, String customerName, int useId){
+        int id = 0;
+        Trip trip = null;
+        try {
+            id = booking.getInt("id");
+            int carSize = booking.getInt("car_size");
+            String startPointName = booking.getString("start_point_name");
+            String listEndPointName = booking.getString("list_end_point_name");
+            long startPointLon = booking.getLong("start_point_lon");
+            long startPointLat = booking.getLong("start_point_lat");
+            String listEndPointLon = booking.getString("list_end_point_lon");
+            String listEndPointLat = booking.getString("list_end_point_lat");
+            String listEndPoin = booking.getString("list_end_point");
+            int isOneWay = booking.getInt("is_one_way");
+            int isMineTrip = booking.getInt("is_mine_trip");
+            int price = booking.getInt("price");
+            int distance = booking.getInt("distance");
+            String startTime = null ,backTime = null, note = null ;
+            if (booking.getString("start_time")!= null)
+                startTime = booking.getString("start_time");
+            if (booking.getString("back_time")!= null)
+                backTime = booking.getString("back_time");
+            if (booking.getString("note")!= null)
+                note = booking.getString("note");
+            String bookingTime = booking.getString("book_time");
+            String bookDateId = booking.getString("book_date_id");
+            int statusBooking = booking.getInt("status_booking");
+            int statusPayment = booking.getInt("status_payment");
+            String cancelReason = null, guestPhone = null , guestName = null;
+            if (booking.getString("cancel_reason")!= null)
+                cancelReason = booking.getString("cancel_reason");
+            if (booking.getString("guest_phone")!= null)
+                guestPhone = booking.getString("guest_phone");
+            if (booking.getString("guest_name")!= null)
+                guestName = booking.getString("guest_name");
+            int driverId = booking.getInt("driver_id");
+            int carType = booking.getInt("car_type");
+            int realDistance = booking.getInt("real_distance");
+            int realPrice = booking.getInt("real_price");
+            ArrayList<Position> listStopPoint = new ArrayList<Position>();
+            Position from = new Position(startPointName,new LatLng(startPointLat,startPointLon));
+            listStopPoint.add(from);
+            String[] arrEndPointName = listEndPointName.split("_");
+            String[] arrEndPointGeo = listEndPoin.split("_");
+            for (int i = 0 ; i <arrEndPointName.length; i++){
+                double lat = Double.valueOf(arrEndPointGeo[i].split(",")[0]);
+                double lon = Double.valueOf(arrEndPointGeo[i].split(",")[1]);
+                Position position = new Position(arrEndPointName[i],new LatLng(lat,lon));
+                listStopPoint.add(position);
+            }
+            trip = new Trip(id,useId,listStopPoint,carSize,isOneWay,distance,price,startTime,backTime,isMineTrip,customerName,customerPhone,guestName,guestPhone,note);
+            trip.setBookingDateId(bookDateId);
+            trip.setBookingTime(bookingTime);
+            trip.setStatusBooking(statusBooking);
+            trip.setStatusPayment(statusPayment);
+            trip.setCancelReason(cancelReason);
+            trip.setDriverId(driverId);
+            trip.setCarType(carType);
+            trip.setRealDistance(realDistance);
+            trip.setRealPrice(realPrice);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return trip;
+    }
+    private void resendVerificationCode(String phoneNumber,
+                                        PhoneAuthProvider.ForceResendingToken token) {
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
-                "+841668596286",        // Phone number to verify
+                phoneNumber,        // Phone number to verify
+                60,                 // Timeout duration
+                TimeUnit.SECONDS,   // Unit of timeout
+                this,               // Activity (for callback binding)
+                mCallbacks,         // OnVerificationStateChangedCallbacks
+                token);             // ForceResendingToken from callbacks
+    }
+
+    private void accountKitCheck() {
+        customerPhone = ccpPhone.getSelectedCountryCode() + edtCustomerPhone.getText().toString();
+        layoutDigits.setVisibility(View.VISIBLE);
+        layoutRegister.setVisibility(View.GONE);
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+                "+"+customerPhone,        // Phone number to verify
                 60,                 // Timeout duration
                 TimeUnit.SECONDS,   // Unit of timeout
                 this,               // Activity (for callback binding)
                 mCallbacks);        // OnVerificationStateChangedCallbacks
+
+
     }
 
     PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
         @Override
         public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
             Toast.makeText(mContext,phoneAuthCredential.getSmsCode(),Toast.LENGTH_SHORT).show();
+            edtCode.setOTP(phoneAuthCredential.getSmsCode());
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (isLogin)
+                        loginCustomer();
+                    else
+                    if (checkValidData())
+                        registerCustomer();
+                }
+            },1500);
+            mVerificationInProgress = false;
         }
 
         @Override
         public void onVerificationFailed(FirebaseException e) {
-            Toast.makeText(mContext,"Loi",Toast.LENGTH_SHORT).show();
+
+            if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                // Invalid request
+                // [START_EXCLUDE]
+                Toast.makeText(mContext,"Invalid phone number",Toast.LENGTH_SHORT).show();
+                // [END_EXCLUDE]
+            } else if (e instanceof FirebaseTooManyRequestsException) {
+                // The SMS quota for the project has been exceeded
+                // [START_EXCLUDE]
+                Toast.makeText(mContext,"Quota exceeded",Toast.LENGTH_SHORT).show();
+            }
+
+            mVerificationInProgress = false;
+        }
+        @Override
+        public void onCodeSent(String verificationId,
+                               PhoneAuthProvider.ForceResendingToken token) {
+            // The SMS verification code has been sent to the provided phone number, we
+            // now need to ask the user to enter the code and then construct a credential
+            // by combining the code with a verification ID.
+            Log.d("TAG", "onCodeSent:" + verificationId);
+            Toast.makeText(mContext,"onCodeSent:" + verificationId,Toast.LENGTH_SHORT).show();
+            // Save verification ID and resending token so we can use them later
+            mVerificationId = verificationId;
+            mResendToken = token;
+
+
+            // ...
         }
     };
-    @Override
-    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != FRAMEWORK_REQUEST_CODE) {
-            return;
-        }
-        final String toastMessage;
-        final AccountKitLoginResult loginResult = AccountKit.loginResultWithIntent(data);
-        if (loginResult == null || loginResult.wasCancelled()) {
-            toastMessage = "Login Cancelled";
-        } else if (loginResult.getError() != null) {
-            Toast.makeText(this, "Nhập sai mã số", Toast.LENGTH_LONG).show();
-        } else {
-            final AccessToken accessToken = loginResult.getAccessToken();
-            final long tokenRefreshIntervalInSeconds = loginResult.getTokenRefreshIntervalInSeconds();
-            if (accessToken != null) {
-                Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                intent.putExtra(Defines.BUNDLE_USER, user);
-                startActivity(intent);
-                finish();
-            } else {
-                Toast.makeText(this, "Nhập sai mã số", Toast.LENGTH_LONG).show();
-            }
-        }
-
-    }
 }

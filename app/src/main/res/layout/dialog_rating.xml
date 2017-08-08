@@ -56,7 +56,21 @@
             android:layout_height="wrap_content"
             android:progressTint="@color/yellow"
             android:progressBackgroundTint="@color/white"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="10dp" />
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:inputType="textPersonName"
+            style="@style/text_direction"
+            android:focusable="true"
+            android:textColorHint="@color/white"
+            android:hint="Nhận xét" />
+
         <TextView
             android:id="@+id/btn_ok"
             android:layout_width="match_parent"

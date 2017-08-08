@@ -20,7 +20,7 @@ public class Defines {
     public static  final String URL_LOG_OUT                     = HOSTNAME + "api2/customerLogOut";
     public static  final String URL_BOOKING                     = HOSTNAME + "api2/bookingGrab";
     public static  final String URL_CANCEL_TRIP                 = HOSTNAME + "api2/cancelTrip";
-    public static  final String URL_GET__BOOKING            = HOSTNAME + "api/getBooking";
+    public static  final String URL_GET_SERVER_TIME             = HOSTNAME + "api2/getServerTime";
     public static  final String URL_BOOKING_FINAL           = HOSTNAME + "api/bookingFinal";
     public static  final String URL_REGISTER_DRIVER         = HOSTNAME + "api/driverRegister";
     public static  final String URL_GET_AIRPORT             = HOSTNAME + "api/getAirportName";
@@ -60,6 +60,7 @@ public class Defines {
     public static final String TYPE_POINT = "type direction point";
     public static final String POSITION_POINT = "position direction point";
     public static final String BUNDLE_USER = "bundle user";
+    public static final String BUNDLE_TRIP = "bundle trip";
     // Main Screen Dimension, will be set when app startup
 
 

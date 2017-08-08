@@ -86,7 +86,13 @@ public class SearchingCarLayout extends LinearLayout {
                 });
             }
         });
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (callBack!= null)
+                    callBack.onSearchCarSuccess();
+            }
+        },2000);
     }
 
     private void requestCancelTrip(String reason) {

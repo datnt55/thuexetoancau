@@ -29,6 +29,8 @@
     <dimen name="nav_header_height">200dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
-    <color name="facebook_click">#23386e</color>
-    <color name="facebook">#324e97</color>
+    <dimen name="custom_progress_width">120dp</dimen>
+    <dimen name="custom_progress_height">45dp</dimen>
+    <dimen name="custom_progress_margin">10dp</dimen>
+
 </resources>

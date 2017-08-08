@@ -37,9 +37,8 @@ import java.util.Arrays;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.Defines;
-import grab.com.thuexetoancau.utilities.Global;
 
-public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class SelectMethodLoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private CallbackManager callbackManager ;
     private AccessTokenTracker accessTokenTracker ;
     private static final int RC_SIGN_IN = 9001;
@@ -84,7 +83,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             public void onClick(View view) {
 
 
-                LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, Arrays.asList("public_profile","email","user_friends"));
+                LoginManager.getInstance().logInWithReadPermissions(SelectMethodLoginActivity.this, Arrays.asList("public_profile","email","user_friends"));
 
             }
         });
@@ -105,7 +104,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         btnLoginPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                Intent intent = new Intent(SelectMethodLoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
             }
         });
@@ -122,7 +121,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             GoogleSignInAccount acct = result.getSignInAccount();
           //  Toast.makeText(getApplicationContext(),acct.getEmail(),Toast.LENGTH_LONG).show();
             user = new User(1,acct.getDisplayName(),"", acct.getEmail(), String.valueOf(acct.getPhotoUrl()));
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            Intent intent = new Intent(SelectMethodLoginActivity.this, RegisterActivity.class);
             intent.putExtra(Defines.BUNDLE_USER, user);
             startActivity(intent);
         }
@@ -136,7 +135,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 Log.e("JSON",object.toString());
                // Toast.makeText(getApplicationContext(),object.toString(),Toast.LENGTH_LONG).show();
                 parseFacebookProfile(object);
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                Intent intent = new Intent(SelectMethodLoginActivity.this, RegisterActivity.class);
                 intent.putExtra(Defines.BUNDLE_USER, user);
                 startActivity(intent);
             }
