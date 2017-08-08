@@ -4,12 +4,16 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -61,10 +65,23 @@ public class ListPassengerBookingActivity extends AppCompatActivity implements L
     private void initComponents() {
         viewPager       =   (ViewPager) findViewById(R.id.viewpager);
         tabLayout       = (TabLayout)   findViewById(R.id.tabs);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Tìm xe chiều về, đi chung");
         setupTabView();
         setupGoogleApi();
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
 
+        return super.onOptionsItemSelected(item);
+    }
     // Init listener pass data to list vehicle fragment
     public void updateRefresh(FormRefreshListener dataRefresh){
         this.onFormRefresh = dataRefresh;
@@ -82,6 +99,25 @@ public class ListPassengerBookingActivity extends AppCompatActivity implements L
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setIcon(tabIcons[0]);
         tabLayout.getTabAt(1).setIcon(tabIcons[1]);
+        tabLayout.getTabAt(0).getIcon().setColorFilter(ContextCompat.getColor(mContext, R.color.blue_light), PorterDuff.Mode.SRC_IN);
+        tabLayout.getTabAt(1).getIcon().setColorFilter(ContextCompat.getColor(mContext, R.color.grey_1), PorterDuff.Mode.SRC_IN);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                tab.getIcon().setColorFilter(ContextCompat.getColor(mContext, R.color.blue_light), PorterDuff.Mode.SRC_IN);
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                tab.getIcon().setColorFilter(ContextCompat.getColor(mContext, R.color.grey_1), PorterDuff.Mode.SRC_IN);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     // Init google api

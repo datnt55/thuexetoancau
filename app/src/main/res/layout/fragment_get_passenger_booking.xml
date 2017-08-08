@@ -33,7 +33,7 @@
         android:layout_marginRight="@dimen/passenger_booking_floating_button_margin"
         app:fabSize="normal"
         android:scaleType="center"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/green"
         android:layout_gravity="bottom|right"
         app:srcCompat="@drawable/loc"
         android:id="@+id/btn_filter" />

@@ -21,12 +21,16 @@ public class Defines {
     public static  final String URL_BOOKING                     = HOSTNAME + "api2/bookingGrab";
     public static  final String URL_CANCEL_TRIP                 = HOSTNAME + "api2/cancelTrip";
     public static  final String URL_GET_SERVER_TIME             = HOSTNAME + "api2/getServerTime";
-    public static  final String URL_BOOKING_FINAL           = HOSTNAME + "api/bookingFinal";
-    public static  final String URL_REGISTER_DRIVER         = HOSTNAME + "api/driverRegister";
-    public static  final String URL_GET_AIRPORT             = HOSTNAME + "api/getAirportName";
+    public static  final String URL_GET_LIKE_TRIP               = HOSTNAME + "api2/getLikeTrip";
+    public static  final String URL_REVIEW_TRIP                 = HOSTNAME + "api2/reviewTrip";
+    public static  final String URL_LIKE_TRIP                   = HOSTNAME + "api2/likeTrip";
     public static  final String URL_GET_LONLAT_AIRPORT      = HOSTNAME + "api/getLonLatAirport";
-    public static  final String URL_NOTICE                  = HOSTNAME + "api/getNotice";
+    public static  final String URL_GET_WHO_HIRE            = HOSTNAME + "api/getCarWhoHire ";
+    public static  final String URL_GET_AIRPORT             = HOSTNAME + "api/getAirportName";
     public static  final String URL_BOOKING_LOG             = HOSTNAME + "api/bookingLog";
+    public static  final String URL_GET_CAR_SIZE            = HOSTNAME + "api/getCarSize";
+    public static  final String URL_GET_CAR_HIRE_TYPE       = HOSTNAME + "api/getCarHireType";
+    public static  final String URL_BOOKING_TICKET          = HOSTNAME + "api/booking";
     public static  final String URL_GET_BOOKING_LOG         = HOSTNAME + "api/getBookingLog";
     public static  final String URL_GET_BOOKING_CUSTOMER    = HOSTNAME + "api/getBookingForCustomer";
     public static  final String URL_GET_LIST_BOOKING_LOG    = HOSTNAME + "api/getlistbookinglog";
@@ -49,7 +53,8 @@ public class Defines {
     public static int MAX_DISTANCE                              = 50000;
     public static int MIN_CURRENT_DISTANCE                      = 20;
     public static final int REQUEST_CODE_PICKER                 = 100;
-
+    public static final int TIME_BEFORE_AUCTION_LONG                 = 5*60*60*1000;
+    public static final int TIME_BEFORE_AUCTION_SHORT                 = 1*60*60*1000;
     public static final int REQUEST_CODE_LOCATION_PERMISSIONS = 234;
     public static final int REQUEST_CODE_CONTACT_PERMISSIONS = 235;
     public static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(new LatLng(8.412730, 102.144410), new LatLng(23.393395, 109.468975));

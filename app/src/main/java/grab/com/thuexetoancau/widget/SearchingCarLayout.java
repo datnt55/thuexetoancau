@@ -6,21 +6,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
-import android.view.animation.AnimationSet;
-import android.view.animation.BounceInterpolator;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.dd.CircularProgressButton;
 
@@ -28,7 +19,6 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.utilities.AnimUtils;
 import grab.com.thuexetoancau.utilities.ApiUtilities;
-import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.DialogUtils;
 import grab.com.thuexetoancau.utilities.Global;
 
@@ -97,10 +87,9 @@ public class SearchingCarLayout extends LinearLayout {
 
     private void requestCancelTrip(String reason) {
         ApiUtilities mApi = new ApiUtilities(mContext);
-        mApi.cancelTrip(bookingId, trip.getCustomerPhone(), reason, new ApiUtilities.CancelTripCarListener() {
+        mApi.cancelTrip(bookingId, trip.getCustomerPhone(), reason, new ApiUtilities.ResponseRequestListener() {
             @Override
             public void onSuccess() {
-
                 if (callBack!= null)
                     callBack.onSearchCarCancel();
                 btnCancel.setProgress(100);

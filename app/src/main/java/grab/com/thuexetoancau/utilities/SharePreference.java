@@ -12,8 +12,8 @@ public class SharePreference {
     private String CUSTOMER_ID  = "customer_id";
     private String THE_FIRST    = "the_first";
     private String TOKEN        = "token";
-    private String DRIVER_ID    = "driver id";
-    private String ROLE         = "role";
+    private String NAME    = "customer_name";
+    private String PHONE         = "customer phone";
     private String CAR_NUMBER   = "car number";
     private String STATUS       = "status";
     private String TEMP_PHONE   = "temp phone";
@@ -69,25 +69,25 @@ public class SharePreference {
         editor.remove(TOKEN);
         editor.apply();
     }
-    public void saveDriverId(int id) {
+    public void saveName(String name) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putInt(DRIVER_ID, id);
+        editor.putString(NAME, name);
         editor.apply();
     }
-    public int getDriverId() {
+    public String getName() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
-        return sp.getInt(DRIVER_ID,0);
+        return sp.getString(NAME,"");
     }
-    public void saveRole(int id) {
+    public void savePhone(String phone) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putInt(ROLE, id);
+        editor.putString(PHONE, phone);
         editor.apply();
     }
-    public int getRole() {
+    public String getPhone() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
-        return sp.getInt(ROLE,0);
+        return sp.getString(PHONE,"");
     }
     public void saveCarNumber(String carNumber) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);

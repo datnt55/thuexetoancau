@@ -206,68 +206,29 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private void registerCustomer() {
         customerPhone = ccpPhone.getSelectedCountryCode() + edtCustomerPhone.getText().toString();
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage(getString(R.string.register_message));
-        dialog.show();
-
-        final SharePreference preference = new SharePreference(this);
-        RequestParams params;
-        params = new RequestParams();
-        params.put("custom_phone", customerPhone);
-        params.put("custom_email", edtCustomerEmail.getText().toString());
-        params.put("custom_name", edtCustomerName.getText().toString());
-        params.put("regId", preference.getRegId());
-        params.put("os",1);
-        Log.e("TAG",params.toString());
-        BaseService.getHttpClient().post(Defines.URL_REGISTER, params, new AsyncHttpResponseHandler() {
-
+        mApi.registerCustomer(customerPhone, edtCustomerEmail.getText().toString(), edtCustomerName.getText().toString(), new ApiUtilities.ResponseJSonListener() {
             @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-                // called when response HTTP status is "200 OK"
-                Log.i("JSON", new String(responseBody));
+            public void onSuccess(JSONObject json) {
+                JSONArray array = null;
                 try {
-                    JSONObject json = new JSONObject(new String(responseBody));
-                    if (json.getString("status").equals("success")){
-                        JSONArray array = json.getJSONArray("data");
-                        JSONObject data = array.getJSONObject(0);
-                        preference.saveCustomerId(data.getString("id"));
-                        preference.saveToken(data.getString("token"));
-                        int  id = data.getInt("id");
-                        String customerName = data.getString("custom_name");
-                        String customerEmail = data.getString("custom_email");
-                        String customerPhone = data.getString("custom_phone");
-                        user = new User(id, customerName,customerPhone,customerEmail,null);
-                        Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                        intent.putExtra(Defines.BUNDLE_USER, user);
-                        startActivity(intent);
-                        finish();
-                    }
-                    Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
+                    array = json.getJSONArray("data");
+                    JSONObject data = array.getJSONObject(0);
+                    SharePreference preference = new SharePreference(mContext);
+                    preference.saveCustomerId(data.getString("id"));
+                    preference.saveToken(data.getString("token"));
+                    int  id = data.getInt("id");
+                    String customerName = data.getString("custom_name");
+                    String customerEmail = data.getString("custom_email");
+                    String customerPhone = data.getString("custom_phone");
+                    user = new User(id, customerName,customerPhone,customerEmail,null);
+                    Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
+                    intent.putExtra(Defines.BUNDLE_USER, user);
+                    startActivity(intent);
+                    finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                dialog.dismiss();
-            }
 
-            @Override
-            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-                Toast.makeText(mContext, getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-            }
-
-            @Override
-            public void onRetry(int retryNo) {
-                // called when request is retried
-                Toast.makeText(mContext, getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
             }
         });
     }
@@ -279,79 +240,37 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             requestFocus(edtCustomerPhone);
             return;
         }
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setMessage(getString(R.string.login_message_dialog));
-        dialog.show();
-
-        final SharePreference preference = new SharePreference(this);
-        RequestParams params;
-        params = new RequestParams();
-        params.put("custom_phone", customerPhone);
-        DateTime current = new DateTime();
-        long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
-        params.put("key", key);
-        /*if (user.getEmail() != null)
-            params.put("custom_email", edtCustomerEmail.getText().toString());*/
-        params.put("regId", preference.getRegId());
-        params.put("os",1);
-        Log.e("TAG",params.toString());
-        BaseService.getHttpClient().post(Defines.URL_LOGIN, params, new AsyncHttpResponseHandler() {
-
+        mApi.loginCustomer(customerPhone, edtCustomerEmail.getText().toString(), new ApiUtilities.ResponseJSonListener() {
             @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-                // called when response HTTP status is "200 OK"
-                Log.i("JSON", new String(responseBody));
+            public void onSuccess(JSONObject json) {
+                JSONArray array = null;
                 try {
-                    JSONObject json = new JSONObject(new String(responseBody));
-                    if (json.getString("status").equals("success")){
-                        JSONArray array = json.getJSONArray("data");
-                        JSONObject data = array.getJSONObject(0);
-                        preference.saveCustomerId(data.getString("user_id"));
-                        preference.saveToken(data.getString("token"));
-                        int  useId = data.getInt("user_id");
-                        String customerName = data.getString("custom_name");
-                        String customerEmail = data.getString("custom_email");
-                        String customerPhone = data.getString("custom_phone");
-                        String sBooking = data.getString("booking_data");
-                        Trip trip = null;
-                        if (!sBooking.equals("null")) {
-                            JSONObject booking = data.getJSONObject("booking_data");
-                            trip = parseBookingData(booking,customerName,useId);
-                        }
-                        user = new User(useId, customerName,customerPhone,customerEmail,null);
-                        Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                        intent.putExtra(Defines.BUNDLE_USER, user);
-                        if (trip != null)
-                            intent.putExtra(Defines.BUNDLE_TRIP, trip);
-                        startActivity(intent);
-                        finish();
+                    array = json.getJSONArray("data");
+                    JSONObject data = array.getJSONObject(0);
+                    SharePreference preference = new SharePreference(mContext);
+                    preference.saveCustomerId(data.getString("user_id"));
+                    preference.saveToken(data.getString("token"));
+                    int  useId = data.getInt("user_id");
+                    String customerName = data.getString("custom_name");
+                    String customerEmail = data.getString("custom_email");
+                    String customerPhone = data.getString("custom_phone");
+                    String sBooking = data.getString("booking_data");
+                    Trip trip = null;
+                    if (!sBooking.equals("null")) {
+                        JSONObject booking = data.getJSONObject("booking_data");
+                        trip = parseBookingData(booking,customerName,useId);
                     }
-                    Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
+                    user = new User(useId, customerName,customerPhone,customerEmail,null);
+                    Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
+                    intent.putExtra(Defines.BUNDLE_USER, user);
+                    if (trip != null)
+                        intent.putExtra(Defines.BUNDLE_TRIP, trip);
+                    startActivity(intent);
+                    finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                dialog.dismiss();
-            }
 
-            @Override
-            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-                Toast.makeText(mContext, getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-            }
-
-            @Override
-            public void onRetry(int retryNo) {
-                // called when request is retried
-                Toast.makeText(mContext, getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
             }
         });
     }
@@ -471,12 +390,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             if (e instanceof FirebaseAuthInvalidCredentialsException) {
                 // Invalid request
                 // [START_EXCLUDE]
-                Toast.makeText(mContext,"Invalid phone number",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,mContext.getString(R.string.invalid_phone_number),Toast.LENGTH_SHORT).show();
                 // [END_EXCLUDE]
             } else if (e instanceof FirebaseTooManyRequestsException) {
                 // The SMS quota for the project has been exceeded
                 // [START_EXCLUDE]
-                Toast.makeText(mContext,"Quota exceeded",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext,mContext.getString(R.string.exceeded_request),Toast.LENGTH_SHORT).show();
             }
 
             mVerificationInProgress = false;

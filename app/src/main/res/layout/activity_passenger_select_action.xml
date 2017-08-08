@@ -56,7 +56,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/button_action_margin"
-                    android:text="Đặt xe trực tuyến"/>
+                    android:text="Đăng chuyến đấu giá"/>
 
                 <Button
                     android:id="@+id/btn_infor"

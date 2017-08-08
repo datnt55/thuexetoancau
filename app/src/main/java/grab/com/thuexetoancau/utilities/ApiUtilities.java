@@ -18,9 +18,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
 import grab.com.thuexetoancau.activity.SplashActivity;
 import grab.com.thuexetoancau.model.Car;
 import grab.com.thuexetoancau.model.Trip;
+import grab.com.thuexetoancau.model.User;
 
 /**
  * Created by DatNT on 8/2/2017.
@@ -33,6 +35,132 @@ public class ApiUtilities {
         this.mContext = mContext;
     }
 
+    public void registerCustomer(String customerPhone, String customerEmail, String customerName, final ResponseJSonListener listener ){
+        if (!CommonUtilities.isOnline(mContext)) {
+            DialogUtils.showDialogNetworkError(mContext, null);
+            return;
+        }
+        final ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setMessage(mContext.getString(R.string.register_message));
+        dialog.show();
+
+        final SharePreference preference = new SharePreference(mContext);
+        RequestParams params;
+        params = new RequestParams();
+        params.put("custom_phone", customerPhone);
+        params.put("custom_email", customerEmail);
+        params.put("custom_name", customerName);
+        params.put("regId", preference.getRegId());
+        params.put("os",1);
+        DateTime current = new DateTime();
+        long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
+        params.put("key", key);
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_REGISTER, params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.getString("status").equals("success")){
+                        if (listener != null)
+                            listener.onSuccess(json);
+                    }
+                    Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+    }
+
+    public void loginCustomer (String customerPhone, String customerEmail, final ResponseJSonListener listener  ){
+        if (!CommonUtilities.isOnline(mContext)) {
+            DialogUtils.showDialogNetworkError(mContext, null);
+            return;
+        }
+        final ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setMessage(mContext.getString(R.string.login_message_dialog));
+        dialog.show();
+
+        final SharePreference preference = new SharePreference(mContext);
+        RequestParams params;
+        params = new RequestParams();
+        params.put("custom_phone", customerPhone);
+        DateTime current = new DateTime();
+        long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
+        params.put("key", key);
+        /*if (user.getEmail() != null)
+            params.put("custom_email", customerEmail);*/
+        params.put("regId", preference.getRegId());
+        params.put("os",1);
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_LOGIN, params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.getString("status").equals("success")){
+                        if (listener != null)
+                            listener.onSuccess(json);
+                    }
+                    Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext,mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+    }
     public ArrayList<Car> getPostage(){
         if (!CommonUtilities.isOnline(mContext)) {
             DialogUtils.showDialogNetworkError(mContext, null);
@@ -80,14 +208,14 @@ public class ApiUtilities {
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
 
             @Override
             public void onRetry(int retryNo) {
                 // called when request is retried
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
@@ -142,14 +270,14 @@ public class ApiUtilities {
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
 
             @Override
             public void onRetry(int retryNo) {
                 // called when request is retried
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
@@ -242,20 +370,20 @@ public class ApiUtilities {
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
 
             @Override
             public void onRetry(int retryNo) {
                 // called when request is retried
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
     }
 
-    public void cancelTrip(String bookingId, String customerPhone, String reason, final CancelTripCarListener listener){
+    public void cancelTrip(String bookingId, String customerPhone, String reason, final ResponseRequestListener listener){
         RequestParams params;
         params = new RequestParams();
         params.put("id_booking", bookingId);
@@ -292,13 +420,13 @@ public class ApiUtilities {
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onRetry(int retryNo) {
                 // called when request is retried
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -339,17 +467,146 @@ public class ApiUtilities {
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onRetry(int retryNo) {
                 // called when request is retried
-                Toast.makeText(mContext, mContext.getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
             }
         });
         return;
     }
+
+    public void reviewTrip(int userId, final int idBooking, int  customRating, String customComment, final ResponseRequestListener listener){
+        if (!CommonUtilities.isOnline(mContext)) {
+            DialogUtils.showDialogNetworkError(mContext, null);
+            return ;
+        }
+        RequestParams params;
+        params = new RequestParams();
+        params.put("user_id", userId);
+        params.put("id_booking",idBooking);
+        params.put("custom_rating",customRating);
+        params.put("custom_comment",customComment);
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_REVIEW_TRIP,params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                int id = Integer.valueOf(new String(responseBody));
+                if (id == idBooking){
+                    if (listener != null)
+                        listener.onSuccess();
+                }else{
+                    if (listener != null)
+                        listener.onFail();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void likeTrip(int userId, final int idBooking, final ResponseRequestListener listener){
+        if (!CommonUtilities.isOnline(mContext)) {
+            DialogUtils.showDialogNetworkError(mContext, null);
+            return ;
+        }
+        RequestParams params;
+        params = new RequestParams();
+        params.put("user_id", userId);
+        params.put("id_booking",idBooking);
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_LIKE_TRIP,params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                int id = Integer.valueOf(new String(responseBody));
+                if (id == idBooking){
+                    if (listener != null)
+                        listener.onSuccess();
+                }else{
+                    if (listener != null)
+                        listener.onFail();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void getLikeTrip(int userId, final ResponseRequestListener listener){
+        if (!CommonUtilities.isOnline(mContext)) {
+            DialogUtils.showDialogNetworkError(mContext, null);
+            return ;
+        }
+        RequestParams params;
+        params = new RequestParams();
+        params.put("user_id", userId);
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_GET_LIKE_TRIP,params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public interface ServerTimeListener{
         void onSuccess(long time);
     }
@@ -359,9 +616,14 @@ public class ApiUtilities {
         void onFail();
     }
 
-    public interface CancelTripCarListener{
+    public interface ResponseRequestListener {
         void onSuccess();
         void onFail();
     }
+
+    public interface ResponseJSonListener {
+        void onSuccess(JSONObject json);
+    }
+
 
 }

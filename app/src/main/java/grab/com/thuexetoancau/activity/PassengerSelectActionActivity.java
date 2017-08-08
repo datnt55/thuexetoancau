@@ -132,6 +132,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private int totalDistance = 0, typeTrip = 1, totalPrice = 0, carSize = 0;
     private ApiUtilities mApi;
     private ChangeTripInfo changeTrip;
+    private Trip lastTrip;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -207,6 +208,19 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     .build();
             ImageLoader.getInstance().displayImage(user.getUrl(), imgAvatar, options, new SimpleImageLoadingListener());
         }
+        if (getIntent().hasExtra(Defines.BUNDLE_TRIP)) {
+            lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_TRIP);
+            showCurrentTripAction();
+        }
+    }
+
+    private void showCurrentTripAction() {
+        hideLayoutSearchOrigin();
+        layoutDriveInfo = new DriverInformationLayout(this);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        layoutDriveInfo.setLayoutParams(params);
+        layoutRoot.addView(layoutDriveInfo);
     }
 
     // Init google api
@@ -833,6 +847,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onRatingSuccess() {
+
         showLayoutSearchOrigin();
         layoutRoot.removeView(layoutDriveInfo);
         layoutSearch.setShowLastSearch(false);

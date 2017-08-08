@@ -92,5 +92,7 @@
     <string name="digit_message">Mã số đã đươc gửi vào số $s</string>
     <string name="digit_no_get_sms">Chưa nhận được SMS?</string>
     <string name="digit_re_send">Gửi lại</string>
+    <string name="invalid_phone_number">Số điện thoại của bạn không khả dụng</string>
+    <string name="exceeded_request">Số yêu cầu vượt quá sự cho phép. Vui lòng chờ trong ít phút</string>
 </resources>
 
