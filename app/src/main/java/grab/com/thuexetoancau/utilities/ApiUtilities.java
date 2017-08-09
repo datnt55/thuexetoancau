@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -21,6 +22,7 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
 import grab.com.thuexetoancau.activity.SplashActivity;
 import grab.com.thuexetoancau.model.Car;
+import grab.com.thuexetoancau.model.Position;
 import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.model.User;
 
@@ -35,7 +37,7 @@ public class ApiUtilities {
         this.mContext = mContext;
     }
 
-    public void registerCustomer(String customerPhone, String customerEmail, String customerName, final ResponseJSonListener listener ){
+    public void registerCustomer(String customerPhone, String customerEmail, String customerName, final ResponseRegisterListener listener ){
         if (!CommonUtilities.isOnline(mContext)) {
             DialogUtils.showDialogNetworkError(mContext, null);
             return;
@@ -73,8 +75,18 @@ public class ApiUtilities {
                 try {
                     JSONObject json = new JSONObject(new String(responseBody));
                     if (json.getString("status").equals("success")){
+                        JSONArray array = json.getJSONArray("data");
+                        JSONObject data = array.getJSONObject(0);
+                        SharePreference preference = new SharePreference(mContext);
+                        preference.saveCustomerId(data.getString("id"));
+                        preference.saveToken(data.getString("token"));
+                        int  id = data.getInt("id");
+                        String customerName = data.getString("custom_name");
+                        String customerEmail = data.getString("custom_email");
+                        String customerPhone = data.getString("custom_phone");
+                        User user = new User(id, customerName,customerPhone,customerEmail,null);
                         if (listener != null)
-                            listener.onSuccess(json);
+                            listener.onSuccess(user);
                     }
                     Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
@@ -99,7 +111,7 @@ public class ApiUtilities {
         });
     }
 
-    public void loginCustomer (String customerPhone, String customerEmail, final ResponseJSonListener listener  ){
+    public void loginCustomer (String customerPhone, String customerEmail, final ResponseLoginListener listener  ){
         if (!CommonUtilities.isOnline(mContext)) {
             DialogUtils.showDialogNetworkError(mContext, null);
             return;
@@ -136,8 +148,24 @@ public class ApiUtilities {
                 try {
                     JSONObject json = new JSONObject(new String(responseBody));
                     if (json.getString("status").equals("success")){
+                        JSONArray array = json.getJSONArray("data");
+                        JSONObject data = array.getJSONObject(0);
+                        SharePreference preference = new SharePreference(mContext);
+                        preference.saveCustomerId(data.getString("user_id"));
+                        preference.saveToken(data.getString("token"));
+                        int  useId = data.getInt("user_id");
+                        String customerName = data.getString("custom_name");
+                        String customerEmail = data.getString("custom_email");
+                        String customerPhone = data.getString("custom_phone");
+                        String sBooking = data.getString("booking_data");
+                        Trip trip = null;
+                        if (!sBooking.equals("null")) {
+                            JSONObject booking = data.getJSONObject("booking_data");
+                            trip = parseBookingData(booking,customerName,useId,customerPhone);
+                        }
+                        User user = new User(useId, customerName,customerPhone,customerEmail,null);
                         if (listener != null)
-                            listener.onSuccess(json);
+                            listener.onSuccess(trip, user);
                     }
                     Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
@@ -160,6 +188,71 @@ public class ApiUtilities {
                 dialog.dismiss();
             }
         });
+    }
+    private Trip parseBookingData(JSONObject booking, String customerName, int useId, String customerPhone){
+        int id = 0;
+        Trip trip = null;
+        try {
+            id = booking.getInt("id");
+            int carSize = booking.getInt("car_size");
+            String startPointName = booking.getString("start_point_name");
+            String listEndPointName = booking.getString("list_end_point_name");
+            long startPointLon = booking.getLong("start_point_lon");
+            long startPointLat = booking.getLong("start_point_lat");
+            String listEndPointLon = booking.getString("list_end_point_lon");
+            String listEndPointLat = booking.getString("list_end_point_lat");
+            String listEndPoin = booking.getString("list_end_point");
+            int isOneWay = booking.getInt("is_one_way");
+            int isMineTrip = booking.getInt("is_mine_trip");
+            int price = booking.getInt("price");
+            int distance = booking.getInt("distance");
+            String startTime = null ,backTime = null, note = null ;
+            if (booking.getString("start_time")!= null)
+                startTime = booking.getString("start_time");
+            if (booking.getString("back_time")!= null)
+                backTime = booking.getString("back_time");
+            if (booking.getString("note")!= null)
+                note = booking.getString("note");
+            String bookingTime = booking.getString("book_time");
+            String bookDateId = booking.getString("book_date_id");
+            int statusBooking = booking.getInt("status_booking");
+            int statusPayment = booking.getInt("status_payment");
+            String cancelReason = null, guestPhone = null , guestName = null;
+            if (booking.getString("cancel_reason")!= null)
+                cancelReason = booking.getString("cancel_reason");
+            if (booking.getString("guest_phone")!= null)
+                guestPhone = booking.getString("guest_phone");
+            if (booking.getString("guest_name")!= null)
+                guestName = booking.getString("guest_name");
+            int driverId = booking.getInt("driver_id");
+            int carType = booking.getInt("car_type");
+            int realDistance = booking.getInt("real_distance");
+            int realPrice = booking.getInt("real_price");
+            ArrayList<Position> listStopPoint = new ArrayList<Position>();
+            Position from = new Position(startPointName,new LatLng(startPointLat,startPointLon));
+            listStopPoint.add(from);
+            String[] arrEndPointName = listEndPointName.split("_");
+            String[] arrEndPointGeo = listEndPoin.split("_");
+            for (int i = 0 ; i <arrEndPointName.length; i++){
+                double lat = Double.valueOf(arrEndPointGeo[i].split(",")[0]);
+                double lon = Double.valueOf(arrEndPointGeo[i].split(",")[1]);
+                Position position = new Position(arrEndPointName[i],new LatLng(lat,lon));
+                listStopPoint.add(position);
+            }
+            trip = new Trip(id,useId,listStopPoint,carSize,isOneWay,distance,price,startTime,backTime,isMineTrip,customerName,customerPhone,guestName,guestPhone,note);
+            trip.setBookingDateId(bookDateId);
+            trip.setBookingTime(bookingTime);
+            trip.setStatusBooking(statusBooking);
+            trip.setStatusPayment(statusPayment);
+            trip.setCancelReason(cancelReason);
+            trip.setDriverId(driverId);
+            trip.setCarType(carType);
+            trip.setRealDistance(realDistance);
+            trip.setRealPrice(realPrice);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return trip;
     }
     public ArrayList<Car> getPostage(){
         if (!CommonUtilities.isOnline(mContext)) {
@@ -621,9 +714,11 @@ public class ApiUtilities {
         void onFail();
     }
 
-    public interface ResponseJSonListener {
-        void onSuccess(JSONObject json);
+    public interface ResponseLoginListener {
+        void onSuccess(Trip trip, User user);
     }
 
-
+    public interface ResponseRegisterListener {
+        void onSuccess(User user);
+    }
 }
