@@ -12,11 +12,16 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
@@ -424,7 +429,8 @@ public class ApiUtilities {
                 params.put("come_back_time", trip.getEndTime());
             }
         }else {
-            params.put("start_time",new DateTime());
+            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-mm'T'hh:mm:ss.SSS");
+            params.put("start_time", dtf.print(new DateTime()));
         }
         params.put("custom_note", trip.getNote());
         DateTime current = new DateTime();
