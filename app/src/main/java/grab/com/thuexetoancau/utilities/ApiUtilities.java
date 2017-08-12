@@ -410,7 +410,7 @@ public class ApiUtilities {
         params.put("start_point", trip.getListStopPoints().get(0).getLatLngToString());
         String listEndPoint="", listEndName = "";
         for (int i = 1; i < trip.getListStopPoints().size(); i++)
-            if (i < trip.getListStopPoints().size()-1 ) {
+            if (i == trip.getListStopPoints().size()-1 ) {
                 listEndPoint += trip.getListStopPoints().get(i).getLatLngToString();
                 listEndName  += trip.getListStopPoints().get(i).getFullPlace();
             }else {
