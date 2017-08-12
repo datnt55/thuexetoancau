@@ -2,6 +2,7 @@ package grab.com.thuexetoancau.widget;
 
 import android.app.Dialog;
 import android.graphics.Point;
+import android.media.Rating;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -15,13 +16,18 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
+
+import com.google.android.gms.common.api.Api;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,6 +36,8 @@ import java.util.GregorianCalendar;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.Trip;
+import grab.com.thuexetoancau.model.User;
+import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
 
@@ -40,6 +48,12 @@ import grab.com.thuexetoancau.utilities.Defines;
 public class RatingFragment extends DialogFragment implements View.OnClickListener {
     private String title;
     private TextView btnOK;
+    private CheckBox cbFavorite;
+    private User user;
+    private Trip trip;
+    private RatingBar rating;
+    private EditText edtReview;
+
     private RatingCallBackListener listener;
     public interface RatingCallBackListener{
         void onRatingSuccess();
@@ -102,10 +116,43 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_ok:
+                setCustomerRating();
                 this.dismiss();
                 if (listener != null)
                     listener.onRatingSuccess();
                 break;
         }
+    }
+
+    private void setCustomerRating() {
+        final ApiUtilities mApi = new ApiUtilities(getActivity());
+        if (cbFavorite.isChecked()){
+            mApi.likeTrip(user.getId(), trip.getId(), new ApiUtilities.ResponseRequestListener() {
+                @Override
+                public void onSuccess() {
+                    ratingAction(mApi);
+                }
+
+                @Override
+                public void onFail() {
+                    ratingAction(mApi);
+                }
+            });
+        }else
+            ratingAction(mApi);
+    }
+
+    private void ratingAction(ApiUtilities mApi) {
+        mApi.reviewTrip(user.getId(), trip.getId(), rating.getNumStars(), edtReview.getText().toString(), new ApiUtilities.ResponseRequestListener() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(getActivity(), getString(R.string.review_message),Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFail() {
+                Toast.makeText(getActivity(), getString(R.string.review_message),Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

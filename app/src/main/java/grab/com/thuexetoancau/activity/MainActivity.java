@@ -1,3 +1,4 @@
+/*
 package grab.com.thuexetoancau.activity;
 
 import android.os.Bundle;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_favorite) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
 
@@ -97,3 +98,4 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 }
+*/

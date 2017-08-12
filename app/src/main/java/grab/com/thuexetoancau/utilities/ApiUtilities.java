@@ -166,7 +166,7 @@ public class ApiUtilities {
                         Trip trip = null;
                         if (!sBooking.equals("null")) {
                             JSONObject booking = data.getJSONObject("booking_data");
-                            trip = parseBookingData(booking,customerName,useId,customerPhone);
+                            trip = parseBookingData(json);
                         }
                         User user = new User(useId, customerName,customerPhone,customerEmail,null);
                         if (listener != null)
@@ -194,16 +194,18 @@ public class ApiUtilities {
             }
         });
     }
-    private Trip parseBookingData(JSONObject booking, String customerName, int useId, String customerPhone){
-        int id = 0;
+    private Trip parseBookingData(JSONObject booking){
         Trip trip = null;
         try {
-            id = booking.getInt("id");
+            int id = booking.getInt("id");
+            int useId = booking.getInt("user_id");
+            String customerPhone = booking.getString("custom_phone");
+            String customerName = booking.getString("custom_name");
             int carSize = booking.getInt("car_size");
             String startPointName = booking.getString("start_point_name");
             String listEndPointName = booking.getString("list_end_point_name");
-            long startPointLon = booking.getLong("start_point_lon");
-            long startPointLat = booking.getLong("start_point_lat");
+            double startPointLon = booking.getDouble("start_point_lon");
+            double startPointLat = booking.getDouble("start_point_lat");
             String listEndPointLon = booking.getString("list_end_point_lon");
             String listEndPointLat = booking.getString("list_end_point_lat");
             String listEndPoin = booking.getString("list_end_point");
@@ -229,10 +231,12 @@ public class ApiUtilities {
                 guestPhone = booking.getString("guest_phone");
             if (booking.getString("guest_name")!= null)
                 guestName = booking.getString("guest_name");
-            int driverId = booking.getInt("driver_id");
             int carType = booking.getInt("car_type");
-            int realDistance = booking.getInt("real_distance");
-            int realPrice = booking.getInt("real_price");
+            int realDistance = 0, realPrice = 0;
+            if (!booking.getString("real_distance").equals("null"))
+                realDistance = booking.getInt("real_distance");
+            if (!booking.getString("real_price").equals("null"))
+                realPrice = booking.getInt("real_price");
             ArrayList<Position> listStopPoint = new ArrayList<Position>();
             Position from = new Position(startPointName,new LatLng(startPointLat,startPointLon));
             listStopPoint.add(from);
@@ -250,7 +254,6 @@ public class ApiUtilities {
             trip.setStatusBooking(statusBooking);
             trip.setStatusPayment(statusPayment);
             trip.setCancelReason(cancelReason);
-            trip.setDriverId(driverId);
             trip.setCarType(carType);
             trip.setRealDistance(realDistance);
             trip.setRealPrice(realPrice);
@@ -670,11 +673,16 @@ public class ApiUtilities {
         });
     }
 
-    public void getLikeTrip(int userId, final ResponseRequestListener listener){
+    public void getLikeTrip(int userId, final ResponseTripListener listener){
         if (!CommonUtilities.isOnline(mContext)) {
             DialogUtils.showDialogNetworkError(mContext, null);
             return ;
         }
+        final ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setMessage("Đang tải dữ liệu");
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
         RequestParams params;
         params = new RequestParams();
         params.put("user_id", userId);
@@ -690,6 +698,89 @@ public class ApiUtilities {
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
                 // called when response HTTP status is "200 OK"
                 Log.i("JSON", new String(responseBody));
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.getString("status").equals("success")){
+                        ArrayList<Trip> arrayTrip = new ArrayList<Trip>();
+                        JSONArray array = json.getJSONArray("data");
+                        JSONObject data = array.getJSONObject(0);
+                        JSONArray bookingList = data.getJSONArray("bookinglist");
+                        for (int i = 0 ; i < bookingList.length(); i++) {
+                            JSONObject booking = bookingList.getJSONObject(i);
+                            Trip trip = parseBookingData(booking);
+                            arrayTrip.add(trip);
+                        }
+                        if (listener != null)
+                            listener.onSuccess(arrayTrip);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    if (listener != null)
+                        listener.onSuccess(null);
+                }
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void getHistoryTrip(int userId, final ResponseTripListener listener){
+        if (!CommonUtilities.isOnline(mContext)) {
+            DialogUtils.showDialogNetworkError(mContext, null);
+            return ;
+        }
+        final ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setMessage("Đang tải dữ liệu");
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
+        RequestParams params;
+        params = new RequestParams();
+        params.put("user_id", userId);
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_GET_HISTORY_TRIP,params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.getString("status").equals("success")){
+                        ArrayList<Trip> arrayTrip = new ArrayList<Trip>();
+                        JSONArray array = json.getJSONArray("data");
+                        JSONObject data = array.getJSONObject(0);
+                        JSONArray bookingList = data.getJSONArray("bookinglist");
+                        for (int i = 0 ; i < bookingList.length(); i++) {
+                            JSONObject booking = bookingList.getJSONObject(i);
+                            Trip trip = parseBookingData(booking);
+                            arrayTrip.add(trip);
+                        }
+                        if (listener != null)
+                            listener.onSuccess(arrayTrip);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    if (listener != null)
+                        listener.onSuccess(null);
+                }
+                dialog.dismiss();
             }
 
             @Override
@@ -727,4 +818,8 @@ public class ApiUtilities {
     public interface ResponseRegisterListener {
         void onSuccess(User user);
     }
+    public interface ResponseTripListener {
+        void onSuccess(ArrayList<Trip> arrayTrip);
+    }
+
 }

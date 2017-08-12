@@ -104,6 +104,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         ConfirmDialogFragment.ConfirmDialogListener,
         SearchingCarLayout.SearchingCallBack,
         RatingFragment.RatingCallBackListener,
+        NavigationView.OnNavigationItemSelectedListener,
         TransportationLayout.OnTransportationListener {
 
     private Button btnBooking, btnInfor;
@@ -133,6 +134,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private ApiUtilities mApi;
     private ChangeTripInfo changeTrip;
     private Trip lastTrip;
+    private DrawerLayout drawerLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,31 +165,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         setupActionBarDrawerToogle();
     }
     private void setupActionBarDrawerToogle() {
-        final DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override public boolean onNavigationItemSelected(MenuItem menuItem) {
-                switch (menuItem.getItemId()){
-                    case R.id.nav_log_out:
-                        DialogUtils.showLoginDialog((Activity) mContext, new DialogUtils.YesNoListenter() {
-                            @Override
-                            public void onYes() {
-                                mApi.logOut();
-                            }
-
-                            @Override
-                            public void onNo() {
-
-                            }
-                        });
-
-                        break;
-                }
-                menuItem.setChecked(true);
-                drawerLayout.closeDrawers();
-                return true;
-            }
-        });
+        navigationView.setNavigationItemSelectedListener(this);
         if (getIntent().hasExtra(Defines.BUNDLE_USER)) {
             //receive
             user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
@@ -575,8 +556,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onMenuButtonClicked() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.openDrawer(GravityCompat.START);
+        drawerLayout.openDrawer(GravityCompat.START);
     }
 
     /**
@@ -862,5 +842,39 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         removeAllMarker();
         getCurrentPosition();
 
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nav_log_out:
+                DialogUtils.showLoginDialog((Activity) mContext, new DialogUtils.YesNoListenter() {
+                    @Override
+                    public void onYes() {
+                        mApi.logOut();
+                    }
+
+                    @Override
+                    public void onNo() {
+
+                    }
+                });
+                break;
+            case R.id.nav_favorite:
+                Intent intent = new Intent(mContext, FavoriteTripActivity.class);
+                intent.putExtra(Defines.BUNDLE_USER, user.getId());
+                startActivity(intent);
+                break;
+
+            case R.id.nav_history:
+                Intent intentHisroty = new Intent(mContext, HistoryTripActivity.class);
+                intentHisroty.putExtra(Defines.BUNDLE_USER, user.getId());
+                startActivity(intentHisroty);
+                break;
+
+        }
+        item.setChecked(true);
+        drawerLayout.closeDrawers();
+        return true;
     }
 }

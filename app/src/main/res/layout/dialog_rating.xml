@@ -68,8 +68,21 @@
             android:inputType="textPersonName"
             style="@style/text_direction"
             android:focusable="true"
+            android:backgroundTint="@color/white"
             android:textColorHint="@color/white"
             android:hint="Nhận xét" />
+
+        <CheckBox
+            android:id="@+id/cb_favorite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:buttonTint="@color/white"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:text="Lưu chuyến yêu thích" />
 
         <TextView
             android:id="@+id/btn_ok"

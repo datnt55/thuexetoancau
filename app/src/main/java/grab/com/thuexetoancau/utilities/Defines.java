@@ -21,6 +21,7 @@ public class Defines {
     public static  final String URL_BOOKING                     = HOSTNAME + "api2/bookingGrab";
     public static  final String URL_CANCEL_TRIP                 = HOSTNAME + "api2/cancelTrip";
     public static  final String URL_GET_SERVER_TIME             = HOSTNAME + "api2/getServerTime";
+    public static  final String URL_GET_HISTORY_TRIP            = HOSTNAME + "api2/getHistoryTrip";
     public static  final String URL_GET_LIKE_TRIP               = HOSTNAME + "api2/getLikeTrip";
     public static  final String URL_REVIEW_TRIP                 = HOSTNAME + "api2/reviewTrip";
     public static  final String URL_LIKE_TRIP                   = HOSTNAME + "api2/likeTrip";

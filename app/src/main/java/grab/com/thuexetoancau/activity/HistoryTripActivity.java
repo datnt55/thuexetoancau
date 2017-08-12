@@ -1,8 +1,8 @@
 package grab.com.thuexetoancau.activity;
 
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -14,7 +14,7 @@ import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
 
-public class FavoriteTripActivity extends AppCompatActivity {
+public class HistoryTripActivity extends AppCompatActivity {
     private RecyclerView listFavorite;
     private FavoriteTripAdapter adapter;
     private Context mContext;
@@ -35,7 +35,7 @@ public class FavoriteTripActivity extends AppCompatActivity {
         listFavorite.setLayoutManager(layoutManager);
 
         ApiUtilities mApi = new ApiUtilities(this);
-        mApi.getLikeTrip(userId, new ApiUtilities.ResponseTripListener() {
+        mApi.getHistoryTrip(userId, new ApiUtilities.ResponseTripListener() {
             @Override
             public void onSuccess(ArrayList<Trip> arrayTrip) {
                 adapter = new FavoriteTripAdapter(mContext, arrayTrip);
