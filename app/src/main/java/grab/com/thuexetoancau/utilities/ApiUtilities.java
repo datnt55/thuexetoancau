@@ -747,7 +747,7 @@ public class ApiUtilities {
         dialog.show();
         RequestParams params;
         params = new RequestParams();
-        params.put("user_id", userId);
+        params.put("user_id", 45);
         Log.e("TAG",params.toString());
         BaseService.getHttpClient().post(Defines.URL_GET_HISTORY_TRIP,params, new AsyncHttpResponseHandler() {
 
@@ -766,7 +766,7 @@ public class ApiUtilities {
                         ArrayList<Trip> arrayTrip = new ArrayList<Trip>();
                         JSONArray array = json.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
-                        JSONArray bookingList = data.getJSONArray("bookinglist");
+                        JSONArray bookingList = data.getJSONArray("list");
                         for (int i = 0 ; i < bookingList.length(); i++) {
                             JSONObject booking = bookingList.getJSONObject(i);
                             Trip trip = parseBookingData(booking);

@@ -36,8 +36,6 @@ import grab.com.thuexetoancau.widget.TextDrawable;
  */
 
 public class FavoriteTripAdapter extends RecyclerView.Adapter<FavoriteTripAdapter.ViewHolder> implements ItemTouchHelperAdapter {
-
-
     private static final String LOG_TAG = PassengerCarAdapter.class.getSimpleName();
     private Context mContext;
     private List<Trip> arrayTrip;
@@ -70,14 +68,13 @@ public class FavoriteTripAdapter extends RecyclerView.Adapter<FavoriteTripAdapte
         holder.txtSource.setText(arrayTrip.get(position).getListStopPoints().get(0).getFullPlace());
         int size = arrayTrip.get(position).getListStopPoints().size();
         holder.txtDestination.setText(arrayTrip.get(position).getListStopPoints().get(size -1).getFullPlace());
-        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-mm'T'hh:mm:ss.SSS");
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-mm'T'HH:mm:ss.SSS");
         DateTime dateTime = dtf.parseDateTime(arrayTrip.get(position).getBookingTime());
         holder.txtDate.setText(dateTime.getDayOfMonth()+"/"+dateTime.getMonthOfYear()+"/"+dateTime.getYear());
         holder.txtTime.setText(dateTime.getHourOfDay()+":"+dateTime.getMinuteOfHour());
-        holder.txtDistance.setText(arrayTrip.get(position).getDistance());
+        holder.txtDistance.setText(CommonUtilities.convertToKilometer(arrayTrip.get(position).getDistance()));
         holder.txtCarSize.setText(arrayTrip.get(position).getCarSize()+" chỗ");
-        holder.txtPrice.setText(CommonUtilities.convertCurrency(arrayTrip.get(position).getDistance()));
-
+        holder.txtPrice.setText(CommonUtilities.convertCurrency(arrayTrip.get(position).getPrice())+" vnđ");
     }
 
     @Override
