@@ -4,15 +4,18 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Serializable;
+
 /**
  * Created by DatNT on 7/18/2017.
  */
 
-public class Position {
+public class Position implements Serializable{
     private String placeId;
     private String primaryText;
     private String secondText;
-    private LatLng latLng;
+    private double latitude;
+    private double longitude;
     private String fullPlace;
     public Position(String placeId, String primaryText, String secondText) {
         this.placeId = placeId;
@@ -22,7 +25,8 @@ public class Position {
     }
 
     public Position(String fullPath, LatLng latLng) {
-        this.latLng = latLng;
+        this.latitude = latLng.latitude;
+        this.longitude = latLng.longitude;
         this.fullPlace = fullPath;
     }
 
@@ -51,11 +55,12 @@ public class Position {
     }
 
     public LatLng getLatLng() {
-        return latLng;
+        return new LatLng(latitude, longitude);
     }
 
     public void setLatLng(LatLng latLng) {
-        this.latLng = latLng;
+        this.latitude = latLng.latitude;
+        this.longitude = latLng.longitude;
     }
 
     public String getFullPlace() {
@@ -67,6 +72,6 @@ public class Position {
     }
 
     public String getLatLngToString() {
-        return latLng.latitude + ","+ latLng.longitude;
+        return latitude + ","+ longitude;
     }
 }

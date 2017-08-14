@@ -95,5 +95,6 @@
     <string name="invalid_phone_number">Số điện thoại của bạn không khả dụng</string>
     <string name="exceeded_request">Số yêu cầu vượt quá sự cho phép. Vui lòng chờ trong ít phút</string>
     <string name="review_message">Cám ơn bạn đã để lại ý kiến của mình</string>
+    <string name="in_trip">Đang trong chuyến đi</string>
 </resources>
 

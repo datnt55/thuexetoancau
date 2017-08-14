@@ -25,6 +25,7 @@ import java.util.Date;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
+import grab.com.thuexetoancau.activity.SelectMethodLoginActivity;
 import grab.com.thuexetoancau.activity.SplashActivity;
 import grab.com.thuexetoancau.model.Car;
 import grab.com.thuexetoancau.model.Position;
@@ -156,17 +157,18 @@ public class ApiUtilities {
                         JSONArray array = json.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
                         SharePreference preference = new SharePreference(mContext);
-                        preference.saveCustomerId(data.getString("user_id"));
                         preference.saveToken(data.getString("token"));
-                        int  useId = data.getInt("user_id");
-                        String customerName = data.getString("custom_name");
-                        String customerEmail = data.getString("custom_email");
-                        String customerPhone = data.getString("custom_phone");
+                        JSONObject customData  = data.getJSONObject("custom_data");
+                        preference.saveCustomerId(customData.getString("id"));
+                        int  useId = customData.getInt("id");
+                        String customerName = customData.getString("custom_name");
+                        String customerEmail = customData.getString("custom_email");
+                        String customerPhone = customData.getString("custom_phone");
                         String sBooking = data.getString("booking_data");
                         Trip trip = null;
                         if (!sBooking.equals("null")) {
                             JSONObject booking = data.getJSONObject("booking_data");
-                            trip = parseBookingData(json);
+                            trip = parseBookingData(booking);
                         }
                         User user = new User(useId, customerName,customerPhone,customerEmail,null);
                         if (listener != null)
@@ -194,6 +196,73 @@ public class ApiUtilities {
             }
         });
     }
+
+    public void checkTokenLogin(final ResponseLoginListener listener ) {
+        final SharePreference preference = new SharePreference(mContext);
+        RequestParams params;
+        params = new RequestParams();
+        params.put("token", preference.getToken());
+        params.put("regId", preference.getRegId());
+        params.put("os", 1);
+        DateTime current = new DateTime();
+        long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
+        params.put("key", key);
+        /*if (user.getEmail() != null)
+            params.put("custom_email", edtCustomerEmail.getText().toString());*/
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_CHECK_TOKEN, params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                Log.i("JSON", new String(responseBody));
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.getString("status").equals("success")){
+                        JSONArray array = json.getJSONArray("data");
+                        JSONObject data = array.getJSONObject(0);
+                        SharePreference preference = new SharePreference(mContext);
+                        preference.saveToken(data.getString("token"));
+                        JSONObject customData  = data.getJSONObject("custom_data");
+                        preference.saveCustomerId(customData.getString("id"));
+                        int  useId = customData.getInt("id");
+                        String customerName = customData.getString("custom_name");
+                        String customerEmail = customData.getString("custom_email");
+                        String customerPhone = customData.getString("custom_phone");
+                        String sBooking = data.getString("booking_data");
+                        Trip trip = null;
+                        if (!sBooking.equals("null")) {
+                            JSONObject booking = data.getJSONObject("booking_data");
+                            trip = parseBookingData(booking);
+                        }
+                        User user = new User(useId, customerName,customerPhone,customerEmail,null);
+                        if (listener != null)
+                            listener.onSuccess(trip, user);
+                    }
+                    //Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private Trip parseBookingData(JSONObject booking){
         Trip trip = null;
         try {

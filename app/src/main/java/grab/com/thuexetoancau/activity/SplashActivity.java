@@ -30,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.BaseService;
@@ -96,12 +97,7 @@ public class SplashActivity extends AppCompatActivity {
                 if (preference.getRegId().equals("")) {
                     LocalBroadcastManager.getInstance(mContext).registerReceiver(tokenReceiver, new IntentFilter("tokenReceiver"));
                 }else {
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            goToApplication();
-                        }
-                    }, 2000);
+                    goToApplication();
                 }
             }
         });
@@ -123,7 +119,17 @@ public class SplashActivity extends AppCompatActivity {
 
     private void goToApplication(){
         if (preference.getToken() != null){
-            checkTokenLogin();
+            mApi.checkTokenLogin(new ApiUtilities.ResponseLoginListener() {
+                @Override
+                public void onSuccess(Trip trip, User user) {
+                    Intent intent = new Intent(SplashActivity.this, PassengerSelectActionActivity.class);
+                    intent.putExtra(Defines.BUNDLE_USER, user);
+                    if (trip != null)
+                        intent.putExtra(Defines.BUNDLE_TRIP, trip);
+                    startActivity(intent);
+                    finish();
+                }
+            });
         }else{
             Intent i = new Intent(SplashActivity.this, SelectMethodLoginActivity.class);
             startActivity(i);
@@ -132,78 +138,4 @@ public class SplashActivity extends AppCompatActivity {
 
     }
 
-    private void checkTokenLogin() {
-        final SharePreference preference = new SharePreference(this);
-        RequestParams params;
-        params = new RequestParams();
-        params.put("token", preference.getToken());
-        params.put("regId", preference.getRegId());
-        params.put("os", 1);
-        DateTime current = new DateTime();
-        long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
-        params.put("key", key);
-        /*if (user.getEmail() != null)
-            params.put("custom_email", edtCustomerEmail.getText().toString());*/
-        Log.e("TAG",params.toString());
-        BaseService.getHttpClient().post(Defines.URL_CHECK_TOKEN, params, new AsyncHttpResponseHandler() {
-
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-                // called when response HTTP status is "200 OK"
-                Log.i("JSON", new String(responseBody));
-                try {
-                    JSONObject json = new JSONObject(new String(responseBody));
-                    if (json.getString("status").equals("success")){
-                        JSONArray array = json.getJSONArray("data");
-                        JSONObject data = array.getJSONObject(0);
-                       // preference.saveToken(data.getString("token"));
-                        int  id = data.getInt("user_id");
-                        String email = data.getString("custom_email");
-                        String phone = data.getString("custom_phone");
-                        String name = data.getString("custom_name");
-
-                        user = new User(id, name,phone,email,"");
-                        Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                        intent.putExtra(Defines.BUNDLE_USER, user);
-                        startActivity(intent);
-                        finish();
-                    }else {
-                        DialogUtils.showCheckTokenDialog((Activity) mContext, new DialogUtils.YesNoListenter() {
-                            @Override
-                            public void onYes() {
-                                preference.clearToken();
-                                Intent intent = new Intent(mContext, SelectMethodLoginActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
-
-                            @Override
-                            public void onNo() {
-
-                            }
-                        });
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-                Toast.makeText(mContext, getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onRetry(int retryNo) {
-                // called when request is retried
-                Toast.makeText(mContext, getResources().getString(R.string.register_error), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }

@@ -20,7 +20,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -135,7 +137,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private ChangeTripInfo changeTrip;
     private Trip lastTrip;
     private DrawerLayout drawerLayout;
-
+    private Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +148,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     private void initComponents(){
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         btnBooking  = (Button)      findViewById(R.id.btn_booking);
         btnInfor    = (Button)      findViewById(R.id.btn_infor);
         layoutRoot  = (RelativeLayout) findViewById(R.id.root);
@@ -166,6 +169,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
     private void setupActionBarDrawerToogle() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         if (getIntent().hasExtra(Defines.BUNDLE_USER)) {
@@ -196,6 +203,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     private void showCurrentTripAction() {
+        toolbar.setVisibility(View.VISIBLE);
+        toolbar.setTitle(getString(R.string.in_trip));
         hideLayoutSearchOrigin();
         layoutDriveInfo = new DriverInformationLayout(this);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -768,6 +777,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onSearchCarSuccess() {
+        toolbar.setVisibility(View.VISIBLE);
+        toolbar.setTitle(getString(R.string.in_trip));
         hideLayoutDirection();
         layoutRoot.removeView(layoutSeachingCar);
         layoutDriveInfo = new DriverInformationLayout(this);
@@ -777,13 +788,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         layoutRoot.addView(layoutDriveInfo);
         AnimUtils.fadeIn(layoutFixGPS,300);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+       /* FragmentManager fragmentManager = getSupportFragmentManager();
         RatingFragment dialogFragment = new RatingFragment();
         dialogFragment.setOnRatingCallBack(this);
         dialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog);
         dialogFragment.setCancelable(false);
         dialogFragment.setDialogTitle(getString(R.string.rating_title));
-        dialogFragment.show(fragmentManager, "Input Dialog");
+        dialogFragment.show(fragmentManager, "Input Dialog");*/
 
     }
 
@@ -827,7 +838,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onRatingSuccess() {
-
+        toolbar.setVisibility(View.GONE);
         showLayoutSearchOrigin();
         layoutRoot.removeView(layoutDriveInfo);
         layoutSearch.setShowLastSearch(false);
