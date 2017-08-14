@@ -40,9 +40,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
             </grab.com.thuexetoancau.widget.SearchBarLayout>
-            <include
-                layout="@layout/common_header"
-                android:visibility="gone"/>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/blue_light"
+                android:paddingTop="20dp"
+                android:minHeight="?attr/actionBarSize"
+                app:titleTextColor="@color/white"
+                android:elevation="2dp"
+                app:contentInsetStartWithNavigation="@dimen/spacing_0"
+                app:titleTextAppearance="@style/Toolbar.TitleText"
+                android:visibility="gone"
+                android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
             <LinearLayout
                 android:id="@+id/layout_find_car"
                 android:layout_width="match_parent"

@@ -69,5 +69,11 @@ public class Defines {
     public static final String BUNDLE_TRIP = "bundle trip";
     // Main Screen Dimension, will be set when app startup
 
+    public static final String DRIVER_CANCEL_TRIP = "driverCancelTrip";
+    public static final String SUCCESS= "success";
+    public static final String BOOKING_GRAB= "bookingGrab";
+    public static final String NOT_FOUND_DRIVER= "notfounddriver";
+    public static final String RECEIVED_TRIP= "receivedTrip";
+
 
 }

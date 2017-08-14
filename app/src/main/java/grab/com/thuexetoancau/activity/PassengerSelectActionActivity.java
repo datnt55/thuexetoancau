@@ -787,7 +787,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         layoutDriveInfo.setLayoutParams(params);
         layoutRoot.addView(layoutDriveInfo);
         AnimUtils.fadeIn(layoutFixGPS,300);
-
+        setTheme(R.style.AppTheme);
        /* FragmentManager fragmentManager = getSupportFragmentManager();
         RatingFragment dialogFragment = new RatingFragment();
         dialogFragment.setOnRatingCallBack(this);
