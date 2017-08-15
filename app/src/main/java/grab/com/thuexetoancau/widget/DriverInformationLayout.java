@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import com.dd.CircularProgressButton;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.utilities.AnimUtils;
 import grab.com.thuexetoancau.utilities.Defines;
 
@@ -28,13 +29,21 @@ public class DriverInformationLayout extends LinearLayout {
     private Context mContext;
     private ImageView imgCircle, imgCircle1;
     private CircularProgressButton btnCancel;
+    private Trip trip;
 
-    public DriverInformationLayout(Context context) {
+    public DriverInformationLayout(Context context, int bookingId) {
         super(context);
         mContext = context;
+        trip = new Trip();
+        trip.setId(bookingId);
         initLayout();
     }
-
+    public DriverInformationLayout(Context context, Trip trip) {
+        super(context);
+        mContext = context;
+        this.trip = trip;
+        initLayout();
+    }
     public DriverInformationLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mContext = context;

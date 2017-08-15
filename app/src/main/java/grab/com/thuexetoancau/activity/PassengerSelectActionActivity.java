@@ -2,8 +2,10 @@ package grab.com.thuexetoancau.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -18,6 +20,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -138,6 +141,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private Trip lastTrip;
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
+    private TextView txtName, txtEmail;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,6 +149,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         initComponents();
         mApi = new ApiUtilities(this);
         listCar = mApi.getPostage();
+        LocalBroadcastManager.getInstance(this).registerReceiver(tokenReceiver, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
     }
 
     private void initComponents(){
@@ -178,8 +183,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         if (getIntent().hasExtra(Defines.BUNDLE_USER)) {
             //receive
             user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
-            TextView txtName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_name);
-            TextView txtEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_email);
+            txtName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_name);
+            txtEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_email);
             ImageView imgAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar);
             ImageView imgEdit= (ImageView) navigationView.getHeaderView(0).findViewById(R.id.img_edit);
             imgEdit.setOnClickListener(this);
@@ -206,7 +211,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         toolbar.setVisibility(View.VISIBLE);
         toolbar.setTitle(getString(R.string.in_trip));
         hideLayoutSearchOrigin();
-        layoutDriveInfo = new DriverInformationLayout(this);
+        layoutDriveInfo = new DriverInformationLayout(this,lastTrip);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutDriveInfo.setLayoutParams(params);
@@ -470,6 +475,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     }
                 }
                 break;
+            case Defines.CONFIGURE_CODE:
+                if (resultCode == RESULT_OK) {
+                    // get String data from Intent
+                    User user = (User) data.getSerializableExtra(Defines.BUNDLE_USER);
+                    this.user = user;
+                    txtEmail.setText(user.getEmail());
+                    txtName.setText(user.getName());
+                }
+                break;
         }
     }
 
@@ -488,7 +502,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             case R.id.img_edit:
                 Intent intentEdit= new Intent(PassengerSelectActionActivity.this, ConfigureAccountActivity.class);
                 intentEdit.putExtra(Defines.BUNDLE_USER, user);
-                startActivity(intentEdit);
+                startActivityForResult(intentEdit, Defines.CONFIGURE_CODE);
                 break;
             case R.id.layout_fix_gps:
                 gpsTracker = new GPSTracker(this);
@@ -765,6 +779,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         dialogConfirm.setCancelable(false);
         dialogConfirm.setDialogTitle("Xác nhận thông tin");
         dialogConfirm.show(fragmentManager, "Input Dialog");
+
     }
 
     @Override
@@ -777,7 +792,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onSearchCarSuccess() {
-        toolbar.setVisibility(View.VISIBLE);
+        /*toolbar.setVisibility(View.VISIBLE);
         toolbar.setTitle(getString(R.string.in_trip));
         hideLayoutDirection();
         layoutRoot.removeView(layoutSeachingCar);
@@ -786,8 +801,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutDriveInfo.setLayoutParams(params);
         layoutRoot.addView(layoutDriveInfo);
-        AnimUtils.fadeIn(layoutFixGPS,300);
-        setTheme(R.style.AppTheme);
+        AnimUtils.fadeIn(layoutFixGPS,300);*/
        /* FragmentManager fragmentManager = getSupportFragmentManager();
         RatingFragment dialogFragment = new RatingFragment();
         dialogFragment.setOnRatingCallBack(this);
@@ -835,6 +849,29 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
 
     }
+
+    BroadcastReceiver tokenReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                User user = (User) intent.getSerializableExtra(Defines.BUNDLE_USER);
+                int bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
+                AnimUtils.slideDown(layoutSeachingCar, Global.APP_SCREEN_HEIGHT);
+                toolbar.setVisibility(View.VISIBLE);
+                toolbar.setTitle(getString(R.string.wait_driver));
+                hideLayoutDirection();
+                layoutRoot.removeView(layoutSeachingCar);
+                layoutDriveInfo = new DriverInformationLayout(mContext,bookingId);
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                layoutDriveInfo.setLayoutParams(params);
+                layoutRoot.addView(layoutDriveInfo);
+                AnimUtils.fadeIn(layoutFixGPS,300);
+                Toast.makeText(mContext, "Chúng tôi đã tìm thấy tài xế cho bạn",Toast.LENGTH_SHORT).show();
+            } catch (IllegalStateException e) {
+            }
+        }
+    };
 
     @Override
     public void onRatingSuccess() {

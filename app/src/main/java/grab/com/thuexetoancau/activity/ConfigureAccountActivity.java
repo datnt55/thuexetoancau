@@ -27,6 +27,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +37,7 @@ import java.util.ArrayList;
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.BaseService;
+import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.SharePreference;
@@ -91,6 +93,7 @@ public class ConfigureAccountActivity extends AppCompatActivity implements View.
             mProfileName.setText(user.getName());
             mName.setText(user.getName());
             mEmail.setText(user.getEmail());
+            mPhone.setText(CommonUtilities.convertTelephone(user.getPhone()));
             DisplayImageOptions options = new DisplayImageOptions.Builder()
                     .showImageOnLoading(R.drawable.loading)
                     .showImageForEmptyUri(R.drawable.loading)
@@ -105,7 +108,7 @@ public class ConfigureAccountActivity extends AppCompatActivity implements View.
     }
 
     private void editCustomerInformation() {
-        String customerPhone = countryCodePicker.getSelectedCountryCode() + mPhone.getText().toString();
+        final String customerPhone = countryCodePicker.getSelectedCountryCode() + mPhone.getText().toString();
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
@@ -120,7 +123,10 @@ public class ConfigureAccountActivity extends AppCompatActivity implements View.
         params.put("custom_name", mName.getText().toString());
         params.put("regId", preference.getRegId());
         params.put("os",1);
-        params.put("os",preference.getCustomerId());
+        params.put("user_id",preference.getCustomerId());
+        DateTime current = new DateTime();
+        long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
+        params.put("key", key);
         Log.e("TAG",params.toString());
         BaseService.getHttpClient().post(Defines.URL_REGISTER, params, new AsyncHttpResponseHandler() {
 
@@ -138,10 +144,13 @@ public class ConfigureAccountActivity extends AppCompatActivity implements View.
                     if (json.getString("status").equals("success")){
                         JSONArray array = json.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
-                        preference.saveCustomerId(data.getString("id"));
+                        user.setPhone(customerPhone);
+                        user.setName( mName.getText().toString());
+                        user.setEmail(mEmail.getText().toString());
                         preference.saveToken(data.getString("token"));
-                        Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                        startActivity(intent);
+                        Intent returnIntent = getIntent();
+                        returnIntent.putExtra(Defines.BUNDLE_USER,user);
+                        setResult(RESULT_OK,returnIntent);
                         finish();
                     }
                     Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
@@ -186,6 +195,9 @@ public class ConfigureAccountActivity extends AppCompatActivity implements View.
         }
     }
 
+    public void backClick(View view){
+        finish();
+    }
     @Override
     public void onClick(View v) {
         switch (v.getId()){

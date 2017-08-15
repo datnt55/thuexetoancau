@@ -90,7 +90,7 @@
                         app:srcCompat="@drawable/ic_location_on_black_24dp" />
 
                     <TextView
-                        android:id="@+id/textView5"
+                        android:id="@+id/txt_source"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="10"
@@ -116,7 +116,7 @@
                         app:srcCompat="@drawable/ic_gps_fixed_black_24dp" />
 
                     <TextView
-                        android:id="@+id/textView6"
+                        android:id="@+id/txt_destination"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="10"
@@ -147,12 +147,12 @@
                         android:orientation="horizontal"
                         android:layout_weight="10">
                         <TextView
-                            android:id="@+id/txt_distance"
+                            android:id="@+id/txt_car_size"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="TextView" />
                         <TextView
-                            android:id="@+id/txt_price"
+                            android:id="@+id/txt_note"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"

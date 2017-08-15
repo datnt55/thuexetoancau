@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.dd.CircularProgressButton;
 
@@ -35,7 +36,7 @@ public class SearchingCarLayout extends LinearLayout {
     private SearchingCallBack callBack;
     private String bookingId;
     private Trip trip;
-
+    private TextView txtSource, txtDestination, txtCarSize, txtNote;
     public SearchingCarLayout(Context context, SearchingCallBack callBack, String bookingId, Trip trip) {
         super(context);
         this.mContext = context;
@@ -59,7 +60,15 @@ public class SearchingCarLayout extends LinearLayout {
         // imgCircle2 = (ImageView) view.findViewById(R.id.img_circle_2);
         startAnimation(imgCircle, 0);
         startAnimation(imgCircle1, 1000);
-
+        txtSource = (TextView) findViewById(R.id.txt_source);
+        txtDestination = (TextView) findViewById(R.id.txt_destination);
+        txtCarSize = (TextView) findViewById(R.id.txt_car_size);
+        txtNote = (TextView) findViewById(R.id.txt_note);
+        txtSource.setText(trip.getListStopPoints().get(0).getFullPlace());
+        int size =trip.getListStopPoints().size();
+        txtDestination.setText(trip.getListStopPoints().get(size -1).getFullPlace());
+        txtNote.setText(trip.getNote());
+        txtCarSize.setText(trip.getCarSize()+" chỗ");
         btnCancel = (CircularProgressButton) findViewById(R.id.btn_cancel);
         btnCancel.setIndeterminateProgressMode(true);
         btnCancel.setOnClickListener(new View.OnClickListener() {
@@ -76,13 +85,6 @@ public class SearchingCarLayout extends LinearLayout {
                 });
             }
         });
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (callBack!= null)
-                    callBack.onSearchCarSuccess();
-            }
-        },2000);
     }
 
     private void requestCancelTrip(String reason) {

@@ -43,7 +43,7 @@ public class ApiUtilities {
         this.mContext = mContext;
     }
 
-    public void registerCustomer(String customerPhone, String customerEmail, String customerName, final ResponseRegisterListener listener ){
+    public void registerCustomer(final String customerPhone, final String customerEmail, final String customerName, final ResponseRegisterListener listener ){
         if (!CommonUtilities.isOnline(mContext)) {
             DialogUtils.showDialogNetworkError(mContext, null);
             return;
@@ -87,9 +87,6 @@ public class ApiUtilities {
                         preference.saveCustomerId(data.getString("id"));
                         preference.saveToken(data.getString("token"));
                         int  id = data.getInt("id");
-                        String customerName = data.getString("custom_name");
-                        String customerEmail = data.getString("custom_email");
-                        String customerPhone = data.getString("custom_phone");
                         User user = new User(id, customerName,customerPhone,customerEmail,null);
                         if (listener != null)
                             listener.onSuccess(user);
@@ -226,7 +223,7 @@ public class ApiUtilities {
                         JSONArray array = json.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
                         SharePreference preference = new SharePreference(mContext);
-                        preference.saveToken(data.getString("token"));
+                       // preference.saveToken(data.getString("token"));
                         JSONObject customData  = data.getJSONObject("custom_data");
                         preference.saveCustomerId(customData.getString("id"));
                         int  useId = customData.getInt("id");
@@ -242,6 +239,21 @@ public class ApiUtilities {
                         User user = new User(useId, customerName,customerPhone,customerEmail,null);
                         if (listener != null)
                             listener.onSuccess(trip, user);
+                    }else {
+                        DialogUtils.showCheckTokenDialog(((Activity)mContext), new DialogUtils.YesNoListenter() {
+                            @Override
+                            public void onYes() {
+                                preference.clearToken();
+                                Intent intent = new Intent(mContext, SelectMethodLoginActivity.class);
+                                mContext.startActivity(intent);
+                                ((Activity)mContext).finish();
+                            }
+
+                            @Override
+                            public void onNo() {
+
+                            }
+                        });
                     }
                     //Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {

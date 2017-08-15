@@ -61,12 +61,13 @@ public class Defines {
     public static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(new LatLng(8.412730, 102.144410), new LatLng(23.393395, 109.468975));
     public static final int GOOGLE_API_CLIENT_ID = 0;
     public static final int FRAMEWORK_REQUEST_CODE = 1;
-    public static final int DIRECTION_ENDPOINT = 2;
+    public static final int CONFIGURE_CODE = 2;
     public static final int DIRECTION_NEW_STOP_POINT = 3;
     public static final String TYPE_POINT = "type direction point";
     public static final String POSITION_POINT = "position direction point";
     public static final String BUNDLE_USER = "bundle user";
     public static final String BUNDLE_TRIP = "bundle trip";
+    public static final String BUNDLE_NOT_FOUND_DRIVER = "bundle not found driver";
     // Main Screen Dimension, will be set when app startup
 
     public static final String DRIVER_CANCEL_TRIP = "driverCancelTrip";
@@ -74,6 +75,7 @@ public class Defines {
     public static final String BOOKING_GRAB= "bookingGrab";
     public static final String NOT_FOUND_DRIVER= "notfounddriver";
     public static final String RECEIVED_TRIP= "receivedTrip";
+    public static final String BROADCAST_RECEIVED_TRIP= "broadcast received Trip";
 
 
 }

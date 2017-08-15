@@ -84,6 +84,10 @@ public class CommonUtilities {
             });
         }
     }
+
+    public static String  convertTelephone(String phone){
+        return phone.substring(2);
+    }
     public static String convertTime(DateTime current){
         String dateFrom = current.getDayOfMonth()+"/"+current.getMonthOfYear();
         dateFrom+=" ";

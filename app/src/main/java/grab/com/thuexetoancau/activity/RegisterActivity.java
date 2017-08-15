@@ -118,17 +118,25 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch (v.getId()){
             case R.id.txt_next:
                 if (layoutDigits.isShown()){
-                    loginCustomer();
+                    if (isLogin)
+                        loginCustomer();
+                    else
+                        registerCustomer();
                 }else {
                     accountKitCheck();
                 }
                 break;
             case R.id.btn_back:
-                if (!isLogin) {
+                if (layoutDigits.isShown()){
                     showLoginLayout();
                     isLogin = true;
-                }else
-                    finish();
+                }else {
+                    if (!isLogin) {
+                        showLoginLayout();
+                        isLogin = true;
+                    } else
+                        finish();
+                }
                 break;
             case R.id.text_register:
                 isLogin = false;
@@ -225,6 +233,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (trip != null)
                     intent.putExtra(Defines.BUNDLE_TRIP, trip);
                 startActivity(intent);
+                Log.e("TOKEN",new SharePreference(mContext).getToken());
                 finish();
             }
         });
