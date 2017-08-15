@@ -124,8 +124,11 @@ public class SplashActivity extends AppCompatActivity {
                 public void onSuccess(Trip trip, User user) {
                     Intent intent = new Intent(SplashActivity.this, PassengerSelectActionActivity.class);
                     intent.putExtra(Defines.BUNDLE_USER, user);
-                    if (trip != null)
+                    if (trip != null) {
                         intent.putExtra(Defines.BUNDLE_TRIP, trip);
+                        if (trip.getDriverId() != 0)
+                            intent.putExtra(Defines.BUNDLE_DRIVER,true);
+                    }
                     startActivity(intent);
                     finish();
                 }

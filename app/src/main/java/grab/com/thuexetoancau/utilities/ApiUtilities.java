@@ -313,11 +313,14 @@ public class ApiUtilities {
             if (booking.getString("guest_name")!= null)
                 guestName = booking.getString("guest_name");
             int carType = booking.getInt("car_type");
-            int realDistance = 0, realPrice = 0;
+            int realDistance = 0, realPrice = 0, driverId = 0;
             if (!booking.getString("real_distance").equals("null"))
                 realDistance = booking.getInt("real_distance");
             if (!booking.getString("real_price").equals("null"))
                 realPrice = booking.getInt("real_price");
+            String x = booking.getString("driver_id");
+            if (!booking.getString("driver_id").equals("null"))
+                driverId = booking.getInt("driver_id");
             ArrayList<Position> listStopPoint = new ArrayList<Position>();
             Position from = new Position(startPointName,new LatLng(startPointLat,startPointLon));
             listStopPoint.add(from);
@@ -338,6 +341,7 @@ public class ApiUtilities {
             trip.setCarType(carType);
             trip.setRealDistance(realDistance);
             trip.setRealPrice(realPrice);
+            trip.setDriverId(driverId);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -539,7 +543,7 @@ public class ApiUtilities {
                         JSONArray array = jsonObject.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
                        if (listener != null)
-                           listener.onSuccess(data.getString("id_booking"));
+                           listener.onSuccess(data.getInt("id_booking"));
                     }else{
                         if (listener != null)
                             listener.onFail();
@@ -566,7 +570,7 @@ public class ApiUtilities {
         });
     }
 
-    public void cancelTrip(String bookingId, String customerPhone, String reason, final ResponseRequestListener listener){
+    public void cancelTrip(int bookingId, String customerPhone, String reason, final ResponseRequestListener listener){
         RequestParams params;
         params = new RequestParams();
         params.put("id_booking", bookingId);
@@ -883,7 +887,7 @@ public class ApiUtilities {
     }
 
     public interface BookingCarListener{
-        void onSuccess(String id);
+        void onSuccess(int id);
         void onFail();
     }
 

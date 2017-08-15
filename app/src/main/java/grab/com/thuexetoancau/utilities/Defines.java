@@ -67,6 +67,7 @@ public class Defines {
     public static final String POSITION_POINT = "position direction point";
     public static final String BUNDLE_USER = "bundle user";
     public static final String BUNDLE_TRIP = "bundle trip";
+    public static final String BUNDLE_DRIVER= "bundle driver";
     public static final String BUNDLE_NOT_FOUND_DRIVER = "bundle not found driver";
     // Main Screen Dimension, will be set when app startup
 
@@ -76,6 +77,7 @@ public class Defines {
     public static final String NOT_FOUND_DRIVER= "notfounddriver";
     public static final String RECEIVED_TRIP= "receivedTrip";
     public static final String BROADCAST_RECEIVED_TRIP= "broadcast received Trip";
+    public static final String BROADCAST_CANCEL_TRIP= "broadcast cancel Trip";
 
 
 }

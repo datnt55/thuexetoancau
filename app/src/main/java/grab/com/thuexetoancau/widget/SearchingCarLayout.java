@@ -34,10 +34,10 @@ public class SearchingCarLayout extends LinearLayout {
     private ImageView imgCircle, imgCircle1;
     private CircularProgressButton btnCancel;
     private SearchingCallBack callBack;
-    private String bookingId;
+    private int bookingId;
     private Trip trip;
     private TextView txtSource, txtDestination, txtCarSize, txtNote;
-    public SearchingCarLayout(Context context, SearchingCallBack callBack, String bookingId, Trip trip) {
+    public SearchingCarLayout(Context context, SearchingCallBack callBack, int bookingId, Trip trip) {
         super(context);
         this.mContext = context;
         this.callBack = callBack;

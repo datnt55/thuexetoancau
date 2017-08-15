@@ -20,6 +20,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -150,6 +151,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         mApi = new ApiUtilities(this);
         listCar = mApi.getPostage();
         LocalBroadcastManager.getInstance(this).registerReceiver(tokenReceiver, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
+        LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
     }
 
     private void initComponents(){
@@ -203,7 +205,12 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
         if (getIntent().hasExtra(Defines.BUNDLE_TRIP)) {
             lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_TRIP);
-            showCurrentTripAction();
+            if (lastTrip.getDriverId() == 0){
+                hideLayoutSearchOrigin();
+                showLayoutSearchingDriver(lastTrip.getId(), lastTrip);
+            }else {
+                showCurrentTripAction();
+            }
         }
     }
 
@@ -211,7 +218,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         toolbar.setVisibility(View.VISIBLE);
         toolbar.setTitle(getString(R.string.in_trip));
         hideLayoutSearchOrigin();
-        layoutDriveInfo = new DriverInformationLayout(this,lastTrip);
+        layoutDriveInfo = new DriverInformationLayout(this,new User());
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutDriveInfo.setLayoutParams(params);
@@ -340,13 +347,17 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     private void hideLayoutDirection(){
-        AnimUtils.slideUp(layoutDirection,measureView(layoutDirection));
-        AnimUtils.slideDown(layoutTransport,measureView(layoutTransport));
+        if (layoutDirection != null)
+            AnimUtils.slideUp(layoutDirection,measureView(layoutDirection));
+        if (layoutTransport != null)
+            AnimUtils.slideDown(layoutTransport,measureView(layoutTransport));
     }
 
     private void showLayoutDirection(){
-        AnimUtils.slideDown(layoutDirection,0);
-        AnimUtils.slideUp(layoutTransport,0);
+        if (layoutDirection != null)
+            AnimUtils.slideDown(layoutDirection,0);
+        if (layoutTransport != null)
+            AnimUtils.slideUp(layoutTransport,0);
     }
 
     private void hideLayoutSearchOrigin(){
@@ -421,7 +432,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
     }
 
-    private void showLayoutSearchingDriver(String bookingId, Trip trip) {
+    private void showLayoutSearchingDriver(int bookingId, Trip trip) {
         AnimUtils.fadeOut(layoutFixGPS,300);
         layoutSeachingCar = new SearchingCarLayout(this,this,bookingId , trip);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -718,12 +729,18 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             PolylineOptions polylineOptions = new PolylineOptions().
                     geodesic(true).
                     color(Color.BLUE).
-                    width(10);
-
-            for (int i = 0; i < route.points.size(); i++)
+                    width(12);
+            PolylineOptions polylineOptions1 = new PolylineOptions().
+                    geodesic(true).
+                    color(ContextCompat.getColor(mContext,R.color.blue_light)).
+                    width(8);
+            for (int i = 0; i < route.points.size(); i++) {
                 polylineOptions.add(route.points.get(i));
+                polylineOptions1.add(route.points.get(i));
+            }
 
             polylinePaths.add(mMap.addPolyline(polylineOptions));
+            polylinePaths.add(mMap.addPolyline(polylineOptions1));
             totalDistance+= route.distance.value;
         }
         if (changeTrip != null)
@@ -837,7 +854,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     public void onConfirmed(final Trip trip) {
        mApi.bookingCar(trip, new ApiUtilities.BookingCarListener() {
            @Override
-           public void onSuccess(String bookingId) {
+           public void onSuccess(int bookingId) {
                showLayoutSearchingDriver(bookingId,trip);
            }
 
@@ -858,16 +875,44 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 int bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
                 AnimUtils.slideDown(layoutSeachingCar, Global.APP_SCREEN_HEIGHT);
                 toolbar.setVisibility(View.VISIBLE);
-                toolbar.setTitle(getString(R.string.wait_driver));
+                toolbar.setTitle(getString(R.string.in_trip));
                 hideLayoutDirection();
                 layoutRoot.removeView(layoutSeachingCar);
-                layoutDriveInfo = new DriverInformationLayout(mContext,bookingId);
+                layoutDriveInfo = new DriverInformationLayout(mContext,user);
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                 layoutDriveInfo.setLayoutParams(params);
                 layoutRoot.addView(layoutDriveInfo);
                 AnimUtils.fadeIn(layoutFixGPS,300);
                 Toast.makeText(mContext, "Chúng tôi đã tìm thấy tài xế cho bạn",Toast.LENGTH_SHORT).show();
+            } catch (IllegalStateException e) {
+            }
+        }
+    };
+
+    BroadcastReceiver tripCancel = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                toolbar.setVisibility(View.GONE);
+                showLayoutSearchOrigin();
+                layoutRoot.removeView(layoutDriveInfo);
+                layoutSearch.setShowLastSearch(false);
+                layoutSearch.setFinishSearchBar(true);
+
+                // Remove layout direction and layout transport from main layout
+                if (layoutDirection != null) {
+                    layoutRoot.removeView(layoutDirection);
+                    layoutDirection = null;
+                }
+
+                if (layoutTransport != null) {
+                    layoutRoot.removeView(layoutTransport);
+                    layoutTransport = null;
+                }
+                listStopPoint.clear();
+                removeAllMarker();
+                getCurrentPosition();
             } catch (IllegalStateException e) {
             }
         }

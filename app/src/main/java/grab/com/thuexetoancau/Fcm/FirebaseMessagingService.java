@@ -34,7 +34,9 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                     String driverPhone = remoteMessage.getData().get("driver_phone");
                     responseForPassenger("Tài xế " + driverName + " đã hủy chuyến đi");
                 }else{
-
+                    Intent intent = new Intent(Defines.BROADCAST_CANCEL_TRIP);
+                    LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+                    broadcastManager.sendBroadcast(intent);
                 }
             }
         } else if (function.equals(Defines.BOOKING_GRAB)) {
