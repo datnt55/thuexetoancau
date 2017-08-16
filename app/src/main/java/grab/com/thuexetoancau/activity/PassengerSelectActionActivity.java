@@ -43,6 +43,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
@@ -60,6 +61,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.maps.android.SphericalUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -90,6 +92,7 @@ import grab.com.thuexetoancau.utilities.DialogUtils;
 import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.GPSTracker;
+import grab.com.thuexetoancau.utilities.SharePreference;
 import grab.com.thuexetoancau.widget.ConfirmDialogFragment;
 import grab.com.thuexetoancau.widget.DirectionLayout;
 import grab.com.thuexetoancau.widget.DriverInformationLayout;
@@ -152,6 +155,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         listCar = mApi.getPostage();
         LocalBroadcastManager.getInstance(this).registerReceiver(tokenReceiver, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
+        LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
     }
 
     private void initComponents(){
@@ -746,7 +750,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         if (changeTrip != null)
             changeTrip.onChangeDistance(totalDistance);
         updateMapCamera();
-        animateLocation();
+        //animateLocation();
     }
     //======================================== Select car type implement ===========================
 
@@ -890,6 +894,17 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
     };
 
+    BroadcastReceiver notFoundDriver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                AnimUtils.slideDown(layoutSeachingCar, Global.APP_SCREEN_HEIGHT);
+                Toast.makeText(mContext,"Rất tiếc, Không có tài xế nào quanh bạn", Toast.LENGTH_LONG).show();
+            } catch (IllegalStateException e) {
+            }
+        }
+    };
+
     BroadcastReceiver tripCancel = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -944,7 +959,26 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 DialogUtils.showLoginDialog((Activity) mContext, new DialogUtils.YesNoListenter() {
                     @Override
                     public void onYes() {
-                        mApi.logOut();
+                        mApi.logOut(new ApiUtilities.ResponseRequestListener() {
+                            @Override
+                            public void onSuccess() {
+                                SharePreference preference = new SharePreference(mContext);
+                                FirebaseAuth.getInstance().signOut();
+                                /*if (mGoogleApiClient.isConnected())
+                                    Auth.GoogleSignInApi.signOut(mGoogleApiClient);*/
+                                Toast.makeText(mContext, mContext.getResources().getString(R.string.log_out_success), Toast.LENGTH_SHORT).show();
+                                preference.clearToken();
+                                Intent intent = new Intent(mContext, SplashActivity.class);
+                                mContext.startActivity(intent);
+                                ((Activity)mContext).finish();
+                            }
+
+                            @Override
+                            public void onFail() {
+
+                            }
+                        });
+
                     }
 
                     @Override

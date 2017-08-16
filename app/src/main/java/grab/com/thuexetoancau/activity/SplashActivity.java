@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,7 +39,10 @@ import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.DialogUtils;
 import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
+import grab.com.thuexetoancau.utilities.PermissionUtils;
 import grab.com.thuexetoancau.utilities.SharePreference;
+
+import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
 
 public class SplashActivity extends AppCompatActivity {
     private SharePreference preference;
@@ -55,6 +59,11 @@ public class SplashActivity extends AppCompatActivity {
             // w.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
         super.onCreate(savedInstanceState);
+        if (PermissionUtils.checkAndRequestPermissions(this)){
+            initComponents();
+        }
+    }
+    private void initComponents(){
         setContentView(R.layout.activity_splash);
         mContext = this;
         preference = new SharePreference(this);
@@ -66,15 +75,20 @@ public class SplashActivity extends AppCompatActivity {
         CommonUtilities.dimensionScreen(this);
         CommonUtilities.getListPhone(this);
         mApi = new ApiUtilities(this);
-
+        checkOnline();
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PermissionUtils.REQUEST_ID_MULTIPLE_PERMISSIONS)
+            if ((grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED))
+                initComponents();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         layoutLoading = (LinearLayout) findViewById(R.id.layout_loading);
-        checkOnline();
-
     }
 
     private void checkOnline() {

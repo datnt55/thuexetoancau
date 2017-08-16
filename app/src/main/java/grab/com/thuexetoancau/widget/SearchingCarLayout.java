@@ -13,6 +13,7 @@ import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
 
@@ -96,6 +97,7 @@ public class SearchingCarLayout extends LinearLayout {
                     callBack.onSearchCarCancel();
                 btnCancel.setProgress(100);
                 AnimUtils.slideDown(SearchingCarLayout.this, Global.APP_SCREEN_HEIGHT);
+                Toast.makeText(mContext,"Hủy chuyến đi thành công", Toast.LENGTH_LONG).show();
             }
 
             @Override

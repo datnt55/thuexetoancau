@@ -25,6 +25,7 @@ public class Defines {
     public static  final String URL_GET_LIKE_TRIP               = HOSTNAME + "api2/getLikeTrip";
     public static  final String URL_REVIEW_TRIP                 = HOSTNAME + "api2/reviewTrip";
     public static  final String URL_LIKE_TRIP                   = HOSTNAME + "api2/likeTrip";
+    public static  final String URL_SCHEDULE_TRIP               = HOSTNAME + "api2/getTripSchedule";
     public static  final String URL_GET_LONLAT_AIRPORT      = HOSTNAME + "api/getLonLatAirport";
     public static  final String URL_GET_WHO_HIRE            = HOSTNAME + "api/getCarWhoHire ";
     public static  final String URL_GET_AIRPORT             = HOSTNAME + "api/getAirportName";
@@ -77,6 +78,7 @@ public class Defines {
     public static final String NOT_FOUND_DRIVER= "notfounddriver";
     public static final String RECEIVED_TRIP= "receivedTrip";
     public static final String BROADCAST_RECEIVED_TRIP= "broadcast received Trip";
+    public static final String BROADCAST_NOT_FOUND_DRIVER = "broadcast not found driver";
     public static final String BROADCAST_CANCEL_TRIP= "broadcast cancel Trip";
 
 

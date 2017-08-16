@@ -68,6 +68,7 @@
                     style="@style/button_white_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:foreground="?android:selectableItemBackground"
                     android:layout_marginBottom="@dimen/button_action_margin"
                     android:text="Đăng chuyến đấu giá"/>
 
@@ -76,6 +77,7 @@
                     style="@style/button_white_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:foreground="?android:selectableItemBackground"
                     android:text="Tìm xe chiều về/Đi chung"/>
             </LinearLayout>
             <FrameLayout

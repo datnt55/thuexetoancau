@@ -3,6 +3,7 @@ package grab.com.thuexetoancau.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,10 +21,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.hbb20.CountryCodePicker;
@@ -44,7 +49,7 @@ import grab.com.thuexetoancau.widget.CustomProgress;
 import grab.com.thuexetoancau.widget.OtpView;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
-    private TextView txtPolicy, txtNext, txtRegister, txtTitle;
+    private TextView txtPolicy, txtNext, txtRegister, txtTitle, txtTitleDigit;
     private User user;
     private TextInputLayout textInputName, textInputEmail, textInputPhone;
     private EditText edtCustomerName, edtCustomerEmail, edtCustomerPhone;
@@ -80,6 +85,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         txtNext = (TextView) findViewById(R.id.txt_next);
         txtRegister  = (TextView) findViewById(R.id.text_register);
         txtTitle = (TextView) findViewById(R.id.txt_title);
+        txtTitleDigit = (TextView) findViewById(R.id.txt_title_digit);
         edtCustomerName = (EditText) findViewById(R.id.edt_customer_name);
         edtCustomerEmail = (EditText) findViewById(R.id.edt_customer_email);
         edtCustomerPhone = (EditText) findViewById(R.id.edt_customer_phone);
@@ -129,6 +135,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             case R.id.btn_back:
                 if (layoutDigits.isShown()){
                     showLoginLayout();
+                    layoutRegister.setVisibility(View.VISIBLE);
+                    layoutDigits.setVisibility(View.GONE);
+                    btnResend.updateView();
                     isLogin = true;
                 }else {
                     if (!isLogin) {
@@ -143,7 +152,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 showRegisterLayout();
                 break;
             case R.id.btn_resend:
-                resendVerificationCode("+"+customerPhone, mResendToken);
+                if (btnResend.getCurrentPercentage() == 100) {
+                    resendVerificationCode("+" + customerPhone, mResendToken);
+                    btnResend.updateView();
+                }
                 break;
         }
 
@@ -254,6 +266,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private void accountKitCheck() {
         customerPhone = ccpPhone.getSelectedCountryCode() + edtCustomerPhone.getText().toString();
         layoutDigits.setVisibility(View.VISIBLE);
+        txtTitleDigit.setText( String.format(getString(R.string.digit_message, customerPhone)));
         layoutRegister.setVisibility(View.GONE);
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 "+"+customerPhone,        // Phone number to verify
@@ -282,6 +295,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 }
             },1500);
             mVerificationInProgress = false;
+            signInWithPhoneAuthCredential(phoneAuthCredential);
         }
 
         @Override
@@ -316,4 +330,22 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             // ...
         }
     };
+
+    // [START sign_in_with_phone]
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.e("Noi Car", "signInWithCredential:success");
+                            FirebaseUser user = task.getResult().getUser();
+                        } else {
+                            // Sign in failed, display a message and update the UI
+                            Log.e("Noi Car", "signInWithCredential:failure", task.getException());
+                        }
+                    }
+                });
+    }
 }

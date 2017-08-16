@@ -408,12 +408,11 @@ public class ApiUtilities {
         return arrayPrice;
     }
 
-    public void logOut(){
+    public void logOut(final ResponseRequestListener listener){
         if (!CommonUtilities.isOnline(mContext)) {
             DialogUtils.showDialogNetworkError(mContext, null);
             return;
         }
-        final ArrayList<Car> arrayPrice = new ArrayList<>();
         final ProgressDialog dialog = new ProgressDialog(mContext);
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
@@ -439,11 +438,8 @@ public class ApiUtilities {
                     JSONObject jsonObject = new JSONObject(new String(responseBody));
                     String status = jsonObject.getString("status");
                     if (status.equals("success")){
-                        Toast.makeText(mContext, mContext.getResources().getString(R.string.log_out_success), Toast.LENGTH_SHORT).show();
-                        preference.clearToken();
-                        Intent intent = new Intent(mContext, SplashActivity.class);
-                        mContext.startActivity(intent);
-                        ((Activity)mContext).finish();
+                        if (listener != null)
+                            listener.onSuccess();
                     }else{
                         Toast.makeText(mContext, mContext.getResources().getString(R.string.log_out_error), Toast.LENGTH_SHORT).show();
                     }

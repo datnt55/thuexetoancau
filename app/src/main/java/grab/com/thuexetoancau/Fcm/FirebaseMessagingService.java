@@ -44,6 +44,11 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             if (bookingCase.equals(Defines.NOT_FOUND_DRIVER)) {
                 if (!isAppInForeground(this))
                     responseForPassenger("Rất tiếc, chúng tôi không tìm thấy xe cho bạn");
+                else {
+                    Intent intent = new Intent(Defines.BROADCAST_NOT_FOUND_DRIVER);
+                    LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+                    broadcastManager.sendBroadcast(intent);
+                }
             }
         } else if (function.equals(Defines.RECEIVED_TRIP)) {
             String receiveCase = remoteMessage.getData().get("case");

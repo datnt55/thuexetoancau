@@ -30,7 +30,7 @@
     <!-- GPS Dialog-->
     <string name="notice">Thông báo</string>
     <string name="gps_notice_content">Chức năng này cần lấy vị trí hiện tại của bạn.Bạn có muốn bật định vị</string>
-    <string name="gps_continue">Tiếp tục</string>
+    <string name="gps_continue">Tôi đã hiểu</string>
     <string name="gps_no">Không</string>
     <string name="getting_location">Đang lấy vị trí...</string>
 
@@ -89,7 +89,7 @@
     <string name="booking_car_message">Đang đăng ký chuyến xe</string>
     <string name="booking_car_error">Đặt xe thất bại</string>
     <string name="booking_cancel_message">Bạn hãy nhập lý do hủy chuyến</string>
-    <string name="digit_message">Mã số đã đươc gửi vào số $s</string>
+    <string name="digit_message">Mã số đã đươc gửi vào số %1$s</string>
     <string name="digit_no_get_sms">Chưa nhận được SMS?</string>
     <string name="digit_re_send">Gửi lại</string>
     <string name="invalid_phone_number">Số điện thoại của bạn không khả dụng</string>

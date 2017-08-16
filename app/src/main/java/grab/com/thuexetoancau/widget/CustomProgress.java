@@ -22,7 +22,7 @@ import grab.com.thuexetoancau.R;
  * Created by DatNT on 8/8/2017.
  */
 
-public class CustomProgress extends LinearLayout {
+public class CustomProgress extends TextView {
 
     private final static int SHAPE_RECTANGLE = 0;
     private final static int SHAPE_ROUNDED_RECTANGLE = 1;
@@ -37,7 +37,7 @@ public class CustomProgress extends LinearLayout {
     private int progressColor;
     private int progressBackgroundColor;
     private int progressShape = SHAPE_ROUNDED_RECTANGLE;
-    private float maximumPercentage = .0f;
+    private float maximumPercentage = 1.0f;
     private float cornerRadius = 15.0f;
     private boolean showingPercentage = true;
     private int speed = 1;

@@ -16,42 +16,36 @@ import java.util.List;
 
 public class PermissionUtils {
 
-    /**
-     * Sistemas de permissão do Android 6.0
-     * <p/>
-     * http://developer.android.com/preview/features/runtime-permissions.html
-     *
-     * @param activity
-     * @param requestCode
-     * @param permissions
-     */
-    public static boolean validate(Activity activity, int requestCode, String... permissions) {
-        List<String> list = new ArrayList<String>();
-        for (String permission : permissions) {
-            if (!checkPermission(activity, permission)) {
-                list.add(permission);
-            }
-        }
-        if (list.isEmpty()) {
-            return true;
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+
+    public static boolean checkAndRequestPermissions(Activity mActivity) {
+        int phone = ContextCompat.checkSelfPermission(mActivity, Manifest.permission.CALL_PHONE);
+        int receiveSms = ContextCompat.checkSelfPermission(mActivity, Manifest.permission.RECEIVE_SMS);
+        int readSms = ContextCompat.checkSelfPermission(mActivity, Manifest.permission.READ_SMS);
+        int broadcastSms = ContextCompat.checkSelfPermission(mActivity, Manifest.permission.BROADCAST_SMS);
+        int loc = ContextCompat.checkSelfPermission(mActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        int loc2 = ContextCompat.checkSelfPermission(mActivity, android.Manifest.permission.ACCESS_FINE_LOCATION);
+        List<String> listPermissionsNeeded = new ArrayList<>();
+
+        if (readSms != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.READ_SMS);
         }
 
-        String[] newPermissions = new String[list.size()];
-        list.toArray(newPermissions);
-
-        ActivityCompat.requestPermissions(activity, newPermissions, 1);
-
-        return false;
-    }
-
-    public static boolean checkPermission(Context context, String permission) {
-        boolean ok = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
-        return ok;
-    }
-
-    public static boolean isGpsPermissionOk(Context context) {
-        boolean ok1 = checkPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-        boolean ok2 = checkPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
-        return ok1 && ok2;
+        if (phone != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.CALL_PHONE);
+        }
+        if (loc2 != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (loc != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
+        if (!listPermissionsNeeded.isEmpty())
+        {
+            ActivityCompat.requestPermissions(mActivity,listPermissionsNeeded.toArray
+                    (new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
+            return false;
+        }
+        return true;
     }
 }
