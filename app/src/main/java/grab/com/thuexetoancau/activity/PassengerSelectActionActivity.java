@@ -150,12 +150,25 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_select_action);
-        initComponents();
         mApi = new ApiUtilities(this);
+        if (getIntent().hasExtra(Defines.BUNDLE_USER))
+            user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
+
+        if (user == null){
+            mApi.checkTokenLogin(new ApiUtilities.ResponseLoginListener() {
+                @Override
+                public void onSuccess(Trip trip, User mUser) {
+                    user = mUser;
+                    initComponents();
+                }
+            });
+        }else
+            initComponents();
         listCar = mApi.getPostage();
         LocalBroadcastManager.getInstance(this).registerReceiver(tokenReceiver, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
+        LocalBroadcastManager.getInstance(this).registerReceiver(confirmTrip, new IntentFilter(Defines.BROADCAST_CONFFIRM_TRIP));
     }
 
     private void initComponents(){
@@ -186,9 +199,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        if (getIntent().hasExtra(Defines.BUNDLE_USER)) {
+        if (user != null) {
             //receive
-            user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
             txtName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_name);
             txtEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_email);
             ImageView imgAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar);
@@ -207,6 +219,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     .build();
             ImageLoader.getInstance().displayImage(user.getUrl(), imgAvatar, options, new SimpleImageLoadingListener());
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         if (getIntent().hasExtra(Defines.BUNDLE_TRIP)) {
             lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_TRIP);
             if (lastTrip.getDriverId() == 0){
@@ -215,6 +232,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             }else {
                 showCurrentTripAction();
             }
+        }
+
+        if (getIntent().hasExtra(Defines.BUNDLE_TRIP_ID)) {
+            final int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
+            showRatingDialog(bookingId);
         }
     }
 
@@ -905,6 +927,31 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
     };
 
+    BroadcastReceiver confirmTrip = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                int bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
+                showRatingDialog(bookingId);
+            } catch (IllegalStateException e) {
+            }
+        }
+    };
+
+    private void showRatingDialog(int bookingId){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        RatingFragment dialogRating = new RatingFragment();
+        dialogRating.setOnRatingCallBack(PassengerSelectActionActivity.this);
+        dialogRating.setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(Defines.BUNDLE_USER,user);
+        bundle.putInt(Defines.BUNDLE_TRIP,bookingId);
+        dialogRating.setArguments(bundle);
+        dialogRating.setCancelable(false);
+        dialogRating.setDialogTitle(getString(R.string.rating_title));
+        dialogRating.show(fragmentManager, "Input Dialog");
+    }
+
     BroadcastReceiver tripCancel = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -935,6 +982,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onRatingSuccess() {
+        Toast.makeText(this, getString(R.string.review_message),Toast.LENGTH_SHORT).show();
         toolbar.setVisibility(View.GONE);
         showLayoutSearchOrigin();
         layoutRoot.removeView(layoutDriveInfo);

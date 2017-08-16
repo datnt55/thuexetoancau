@@ -25,29 +25,31 @@ import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIB
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        responseForPassenger("Rất tiếc, chúng tôi không tìm thấy xe cho bạn");
         String function = remoteMessage.getData().get("function");
         if (function.equals(Defines.DRIVER_CANCEL_TRIP)) {
             String functionCase = remoteMessage.getData().get("case");
             if (functionCase.equals(Defines.SUCCESS)) {
-                if (!isAppInForeground(this)) {
-                    String driverName = remoteMessage.getData().get("driver_name");
-                    String driverPhone = remoteMessage.getData().get("driver_phone");
-                    responseForPassenger("Tài xế " + driverName + " đã hủy chuyến đi");
-                }else{
+                if (isAppInForeground(this)) {
                     Intent intent = new Intent(Defines.BROADCAST_CANCEL_TRIP);
                     LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
                     broadcastManager.sendBroadcast(intent);
+                }else{
+                    String driverName = remoteMessage.getData().get("driver_name");
+                    String driverPhone = remoteMessage.getData().get("driver_phone");
+                    responseForPassenger("Tài xế " + driverName + " đã hủy chuyến đi");
                 }
             }
         } else if (function.equals(Defines.BOOKING_GRAB)) {
             String bookingCase = remoteMessage.getData().get("case");
             if (bookingCase.equals(Defines.NOT_FOUND_DRIVER)) {
-                if (!isAppInForeground(this))
-                    responseForPassenger("Rất tiếc, chúng tôi không tìm thấy xe cho bạn");
-                else {
+                if (isAppInForeground(this)) {
                     Intent intent = new Intent(Defines.BROADCAST_NOT_FOUND_DRIVER);
                     LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
                     broadcastManager.sendBroadcast(intent);
+                }else {
+                    responseForPassenger("Rất tiếc, chúng tôi không tìm thấy xe cho bạn");
+
                 }
             }
         } else if (function.equals(Defines.RECEIVED_TRIP)) {
@@ -57,15 +59,30 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 String dPhone = remoteMessage.getData().get("driver_phone");
                 String bookingId = remoteMessage.getData().get("id_booking");
                 User user = new User(0, dName, dPhone, "", "");
-                if (!isAppInForeground(this)) {
-                    responseForPassenger("Tài xế " + dName + " đang trên đường đón bạn");
-                }else {
+                if (isAppInForeground(this)) {
                     final Intent intent = new Intent(Defines.BROADCAST_RECEIVED_TRIP);
                     // You can also include some extra data.
                     final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
                     intent.putExtra(Defines.BUNDLE_USER, user);
                     intent.putExtra(Defines.BUNDLE_TRIP, Integer.valueOf(bookingId));
                     broadcastManager.sendBroadcast(intent);
+                }else {
+                    responseForPassenger("Tài xế " + dName + " đang trên đường đón bạn");
+                }
+            }
+        } else if (function.equals(Defines.CONFIRM_TRIP)) {
+            String receiveCase = remoteMessage.getData().get("case");
+            if (receiveCase.equals(Defines.RATE_TRIP)) {
+                responseForPassenger("Hoàn thành chuyến đi");
+                String bookingId = remoteMessage.getData().get("id_booking");
+                if (isAppInForeground(this)) {
+                    final Intent intent = new Intent(Defines.BROADCAST_CONFFIRM_TRIP);
+                    // You can also include some extra data.
+                    final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+                    intent.putExtra(Defines.BUNDLE_TRIP, Integer.valueOf(bookingId));
+                    broadcastManager.sendBroadcast(intent);
+                }else {
+                    confrimTrip(Integer.valueOf(bookingId));
                 }
             }
         }
@@ -90,6 +107,24 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         manager.notify(0, builder.build());
     }
 
+    private void confrimTrip(int bookingId) {
+        Intent intent = new Intent(this, PassengerSelectActionActivity.class);
+        intent.putExtra(Defines.BUNDLE_TRIP_ID, bookingId);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setAutoCancel(true)
+                .setContentTitle("Thuê xe toàn cầu")
+                .setContentText("Bạn đã hoàn thành chuyến đi")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setContentIntent(pendingIntent)
+                .setVibrate(new long[]{1, 1, 1});
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        manager.notify(0, builder.build());
+    }
+
     private void responseForPassenger(String message) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setAutoCancel(true)
@@ -108,7 +143,6 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
             ActivityManager.RunningTaskInfo foregroundTaskInfo = am.getRunningTasks(1).get(0);
             String foregroundTaskPackageName = foregroundTaskInfo.topActivity.getPackageName();
-
             return foregroundTaskPackageName.toLowerCase().equals(context.getPackageName().toLowerCase());
         } else {
             ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();

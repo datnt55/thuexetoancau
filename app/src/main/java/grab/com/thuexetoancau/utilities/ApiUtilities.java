@@ -685,13 +685,20 @@ public class ApiUtilities {
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
                 // called when response HTTP status is "200 OK"
                 Log.i("JSON", new String(responseBody));
-                int id = Integer.valueOf(new String(responseBody));
-                if (id == idBooking){
-                    if (listener != null)
-                        listener.onSuccess();
-                }else{
-                    if (listener != null)
-                        listener.onFail();
+                try {
+                    JSONObject jsonObject = new JSONObject(new String(responseBody));
+                    String status = jsonObject.getString("status");
+                    if (status.equals("success")) {
+                        if (listener != null)
+                            listener.onSuccess();
+                    }
+                    else{
+                        if (listener != null)
+                            listener.onFail();
+                    }
+                    Toast.makeText(mContext,jsonObject.getString("message"),Toast.LENGTH_SHORT).show();
+                }catch (JSONException e){
+                    e.printStackTrace();
                 }
             }
 
@@ -730,13 +737,19 @@ public class ApiUtilities {
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
                 // called when response HTTP status is "200 OK"
                 Log.i("JSON", new String(responseBody));
-                int id = Integer.valueOf(new String(responseBody));
-                if (id == idBooking){
-                    if (listener != null)
-                        listener.onSuccess();
-                }else{
-                    if (listener != null)
-                        listener.onFail();
+                try {
+                    JSONObject jsonObject = new JSONObject(new String(responseBody));
+                    String status = jsonObject.getString("status");
+                    if (status.equals("success")) {
+                        if (listener != null)
+                            listener.onSuccess();
+                    }
+                    else{
+                        if (listener != null)
+                            listener.onFail();
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
                 }
             }
 
@@ -785,7 +798,7 @@ public class ApiUtilities {
                         ArrayList<Trip> arrayTrip = new ArrayList<Trip>();
                         JSONArray array = json.getJSONArray("data");
                         JSONObject data = array.getJSONObject(0);
-                        JSONArray bookingList = data.getJSONArray("bookinglist");
+                        JSONArray bookingList = data.getJSONArray("list");
                         for (int i = 0 ; i < bookingList.length(); i++) {
                             JSONObject booking = bookingList.getJSONObject(i);
                             Trip trip = parseBookingData(booking);
@@ -828,7 +841,7 @@ public class ApiUtilities {
         dialog.show();
         RequestParams params;
         params = new RequestParams();
-        params.put("user_id", 45);
+        params.put("user_id", userId);
         Log.e("TAG",params.toString());
         BaseService.getHttpClient().post(Defines.URL_GET_HISTORY_TRIP,params, new AsyncHttpResponseHandler() {
 

@@ -90,6 +90,8 @@
                             android:id="@+id/txt_source"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:lines="1"
+                            android:ellipsize="end"
                             android:text="TextView" />
 
                         <ImageView
@@ -102,6 +104,8 @@
                             android:id="@+id/txt_destination"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:lines="1"
+                            android:ellipsize="end"
                             android:text="TextView" />
 
                     </LinearLayout>

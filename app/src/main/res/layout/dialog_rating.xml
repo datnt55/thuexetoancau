@@ -34,21 +34,21 @@
         android:paddingTop="60dp">
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/textView8"
+            style="@style/text_direction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Tài xế" />
+
+        <TextView
+            android:id="@+id/txt_driver_name"
             style="@style/text_direction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="TextView"
             android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/textView8"
-            style="@style/text_direction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="TextView" />
 
         <RatingBar
             android:id="@+id/ratingBar"
@@ -59,7 +59,7 @@
             android:layout_marginTop="10dp" />
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/edt_review"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"

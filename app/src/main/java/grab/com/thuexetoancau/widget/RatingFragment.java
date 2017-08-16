@@ -47,10 +47,10 @@ import grab.com.thuexetoancau.utilities.Defines;
 
 public class RatingFragment extends DialogFragment implements View.OnClickListener {
     private String title;
-    private TextView btnOK;
+    private TextView btnOK, txtDriverName;
     private CheckBox cbFavorite;
     private User user;
-    private Trip trip;
+    private int bookingId;
     private RatingBar rating;
     private EditText edtReview;
 
@@ -76,6 +76,8 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         Bundle bundle = getArguments();
+        user = (User) bundle.getSerializable(Defines.BUNDLE_USER);
+        bookingId = bundle.getInt(Defines.BUNDLE_TRIP);
         View view = inflater.inflate(R.layout.dialog_rating, container);
         initComponents(view);
         getDialog().setTitle(title);
@@ -85,6 +87,10 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
     private void initComponents(View view) {
         btnOK = (TextView) view.findViewById(R.id.btn_ok);
         btnOK.setOnClickListener(this);
+        cbFavorite = (CheckBox) view.findViewById(R.id.cb_favorite);
+        txtDriverName = (TextView) view.findViewById(R.id.txt_driver_name);
+        rating = (RatingBar) view.findViewById(R.id.ratingBar);
+        edtReview = (EditText) view.findViewById(R.id.edt_review);
     }
 
     @Override
@@ -118,8 +124,6 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
             case R.id.btn_ok:
                 setCustomerRating();
                 this.dismiss();
-                if (listener != null)
-                    listener.onRatingSuccess();
                 break;
         }
     }
@@ -127,7 +131,7 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
     private void setCustomerRating() {
         final ApiUtilities mApi = new ApiUtilities(getActivity());
         if (cbFavorite.isChecked()){
-            mApi.likeTrip(user.getId(), trip.getId(), new ApiUtilities.ResponseRequestListener() {
+            mApi.likeTrip(user.getId(), bookingId, new ApiUtilities.ResponseRequestListener() {
                 @Override
                 public void onSuccess() {
                     ratingAction(mApi);
@@ -143,15 +147,16 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
     }
 
     private void ratingAction(ApiUtilities mApi) {
-        mApi.reviewTrip(user.getId(), trip.getId(), rating.getNumStars(), edtReview.getText().toString(), new ApiUtilities.ResponseRequestListener() {
+        mApi.reviewTrip(user.getId(),bookingId, rating.getNumStars(), edtReview.getText().toString(), new ApiUtilities.ResponseRequestListener() {
             @Override
             public void onSuccess() {
-                Toast.makeText(getActivity(), getString(R.string.review_message),Toast.LENGTH_SHORT).show();
+                if (listener != null)
+                    listener.onRatingSuccess();
             }
 
             @Override
             public void onFail() {
-                Toast.makeText(getActivity(), getString(R.string.review_message),Toast.LENGTH_SHORT).show();
+
             }
         });
     }
