@@ -222,7 +222,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             public void onSuccess(User mUser) {
                 user = mUser;
                 Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                intent.putExtra(Defines.BUNDLE_USER, user);
+                intent.putExtra(Defines.BUNDLE_LOGIN_USER, user);
                 startActivity(intent);
                 finish();
             }
@@ -241,9 +241,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             public void onSuccess(Trip trip, User mUser) {
                 user = mUser;
                 Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                intent.putExtra(Defines.BUNDLE_USER, user);
-                if (trip != null)
-                    intent.putExtra(Defines.BUNDLE_TRIP, trip);
+                intent.putExtra(Defines.BUNDLE_LOGIN_USER, user);
+                if (trip != null) {
+                    intent.putExtra(Defines.BUNDLE_LOGIN_TRIP, trip);
+                    if (trip.getDriverId() != 0)
+                        intent.putExtra(Defines.BUNDLE_LOGIN_DRIVER,true);
+                }
                 startActivity(intent);
                 Log.e("TOKEN",new SharePreference(mContext).getToken());
                 finish();

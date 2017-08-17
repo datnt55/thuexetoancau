@@ -1,6 +1,7 @@
 package grab.com.thuexetoancau.activity;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -43,7 +44,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
@@ -139,20 +139,21 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ArrayList<Car> listCar = new ArrayList<>();
     private Position mFrom, mEnd;
-    private int totalDistance = 0, typeTrip = 1, totalPrice = 0, carSize = 0;
+    private int totalDistance = 0, typeTrip = 1, totalPrice = 0, carSize = 0, bookingId;
     private ApiUtilities mApi;
     private ChangeTripInfo changeTrip;
     private Trip lastTrip;
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private TextView txtName, txtEmail;
+    private boolean showRatingDialog = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_select_action);
         mApi = new ApiUtilities(this);
-        if (getIntent().hasExtra(Defines.BUNDLE_USER))
-            user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
+        if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_USER))
+            user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_USER);
 
         if (user == null){
             mApi.checkTokenLogin(new ApiUtilities.ResponseLoginListener() {
@@ -160,17 +161,48 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 public void onSuccess(Trip trip, User mUser) {
                     user = mUser;
                     initComponents();
+                    getIntentFromFirebase();
                 }
             });
         }else
             initComponents();
         listCar = mApi.getPostage();
-        LocalBroadcastManager.getInstance(this).registerReceiver(tokenReceiver, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiveTrip, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
         LocalBroadcastManager.getInstance(this).registerReceiver(confirmTrip, new IntentFilter(Defines.BROADCAST_CONFFIRM_TRIP));
     }
 
+    private void getIntentFromFirebase(){
+        // Check customer have trip after login
+        if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_TRIP)) {
+            lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_TRIP);
+            if (lastTrip.getDriverId() == 0){
+                hideLayoutSearchOrigin();
+                showLayoutSearchingDriver(lastTrip.getId(), lastTrip);
+            }else {
+                showCurrentTripAction();
+            }
+        }
+
+        // Check customer finish trip status
+        if (getIntent().hasExtra(Defines.BUNDLE_CONFIRM_TRIP)) {
+            int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
+            String driverName = getIntent().getStringExtra(Defines.BUNDLE_DRIVER_NAME);
+            showRatingDialog(bookingId, driverName);
+        }
+
+        // Check customer found driver
+        if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
+            int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
+            User userDriver = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
+            int tripType = getIntent().getIntExtra(Defines.BUNDLE_TRIP_TYPE,0);
+            if (tripType == 1) {
+                foundDriverUI(userDriver, bookingId);
+                hideLayoutSearchOrigin();
+            }
+        }
+    }
     private void initComponents(){
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         btnBooking  = (Button)      findViewById(R.id.btn_booking);
@@ -218,25 +250,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     .bitmapConfig(Bitmap.Config.RGB_565)
                     .build();
             ImageLoader.getInstance().displayImage(user.getUrl(), imgAvatar, options, new SimpleImageLoadingListener());
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (getIntent().hasExtra(Defines.BUNDLE_TRIP)) {
-            lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_TRIP);
-            if (lastTrip.getDriverId() == 0){
-                hideLayoutSearchOrigin();
-                showLayoutSearchingDriver(lastTrip.getId(), lastTrip);
-            }else {
-                showCurrentTripAction();
-            }
-        }
-
-        if (getIntent().hasExtra(Defines.BUNDLE_TRIP_ID)) {
-            final int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
-            showRatingDialog(bookingId);
         }
     }
 
@@ -575,6 +588,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(Defines.NOTIFY_TAG, bookingId);
+    }
+
     //======================================== Google API implement ================================
 
     @Override
@@ -893,23 +913,28 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     }
 
-    BroadcastReceiver tokenReceiver = new BroadcastReceiver() {
+    private void foundDriverUI(User user, int bookingId){
+        if (layoutSeachingCar != null) {
+            AnimUtils.slideDown(layoutSeachingCar, Global.APP_SCREEN_HEIGHT);
+            layoutRoot.removeView(layoutSeachingCar);
+        }
+        toolbar.setVisibility(View.VISIBLE);
+        toolbar.setTitle(getString(R.string.in_trip));
+        hideLayoutDirection();
+        layoutDriveInfo = new DriverInformationLayout(mContext,user);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        layoutDriveInfo.setLayoutParams(params);
+        layoutRoot.addView(layoutDriveInfo);
+        AnimUtils.fadeIn(layoutFixGPS,300);
+    }
+    BroadcastReceiver receiveTrip = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                User user = (User) intent.getSerializableExtra(Defines.BUNDLE_USER);
-                int bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
-                AnimUtils.slideDown(layoutSeachingCar, Global.APP_SCREEN_HEIGHT);
-                toolbar.setVisibility(View.VISIBLE);
-                toolbar.setTitle(getString(R.string.in_trip));
-                hideLayoutDirection();
-                layoutRoot.removeView(layoutSeachingCar);
-                layoutDriveInfo = new DriverInformationLayout(mContext,user);
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                layoutDriveInfo.setLayoutParams(params);
-                layoutRoot.addView(layoutDriveInfo);
-                AnimUtils.fadeIn(layoutFixGPS,300);
+                User userDriver = (User) intent.getSerializableExtra(Defines.BUNDLE_USER);
+                bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
+                foundDriverUI(userDriver, bookingId);
                 Toast.makeText(mContext, "Chúng tôi đã tìm thấy tài xế cho bạn",Toast.LENGTH_SHORT).show();
             } catch (IllegalStateException e) {
             }
@@ -920,6 +945,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
+                bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
                 AnimUtils.slideDown(layoutSeachingCar, Global.APP_SCREEN_HEIGHT);
                 Toast.makeText(mContext,"Rất tiếc, Không có tài xế nào quanh bạn", Toast.LENGTH_LONG).show();
             } catch (IllegalStateException e) {
@@ -931,14 +957,16 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                int bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
-                showRatingDialog(bookingId);
+                bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
+                String driverName = intent.getStringExtra(Defines.BUNDLE_DRIVER_NAME);
+                showRatingDialog(bookingId, driverName);
+
             } catch (IllegalStateException e) {
             }
         }
     };
 
-    private void showRatingDialog(int bookingId){
+    private void showRatingDialog(int bookingId, String driverName){
         FragmentManager fragmentManager = getSupportFragmentManager();
         RatingFragment dialogRating = new RatingFragment();
         dialogRating.setOnRatingCallBack(PassengerSelectActionActivity.this);
@@ -946,60 +974,54 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         Bundle bundle = new Bundle();
         bundle.putSerializable(Defines.BUNDLE_USER,user);
         bundle.putInt(Defines.BUNDLE_TRIP,bookingId);
+        bundle.putString(Defines.BUNDLE_DRIVER_NAME,driverName);
         dialogRating.setArguments(bundle);
         dialogRating.setCancelable(false);
         dialogRating.setDialogTitle(getString(R.string.rating_title));
-        dialogRating.show(fragmentManager, "Input Dialog");
+        getSupportFragmentManager().beginTransaction().add(dialogRating, "tag")
+                .commitAllowingStateLoss();
     }
 
     BroadcastReceiver tripCancel = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                toolbar.setVisibility(View.GONE);
-                showLayoutSearchOrigin();
-                layoutRoot.removeView(layoutDriveInfo);
-                layoutSearch.setShowLastSearch(false);
-                layoutSearch.setFinishSearchBar(true);
-
-                // Remove layout direction and layout transport from main layout
-                if (layoutDirection != null) {
-                    layoutRoot.removeView(layoutDirection);
-                    layoutDirection = null;
-                }
-
-                if (layoutTransport != null) {
-                    layoutRoot.removeView(layoutTransport);
-                    layoutTransport = null;
-                }
-                listStopPoint.clear();
-                removeAllMarker();
-                getCurrentPosition();
+                Toast.makeText(mContext,"Tài xế đã hủy chuyến đi",Toast.LENGTH_SHORT).show();
+                finishTripAndUpdateView();
             } catch (IllegalStateException e) {
             }
         }
     };
 
+
     @Override
     public void onRatingSuccess() {
         Toast.makeText(this, getString(R.string.review_message),Toast.LENGTH_SHORT).show();
+        finishTripAndUpdateView();
+
+    }
+
+    private void finishTripAndUpdateView(){
         toolbar.setVisibility(View.GONE);
         showLayoutSearchOrigin();
-        layoutRoot.removeView(layoutDriveInfo);
+        if (layoutDriveInfo != null)
+            layoutRoot.removeView(layoutDriveInfo);
         layoutSearch.setShowLastSearch(false);
         layoutSearch.setFinishSearchBar(true);
 
         // Remove layout direction and layout transport from main layout
-        layoutRoot.removeView(layoutDirection);
-        layoutRoot.removeView(layoutTransport);
-        layoutDirection = null;
-        layoutTransport = null;
+        if (layoutDirection != null) {
+            layoutRoot.removeView(layoutDirection);
+            layoutDirection = null;
+        }
+        if (layoutTransport != null) {
+            layoutRoot.removeView(layoutTransport);
+            layoutTransport = null;
+        }
         listStopPoint.clear();
         removeAllMarker();
         getCurrentPosition();
-
     }
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){

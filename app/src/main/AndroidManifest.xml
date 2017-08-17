@@ -60,8 +60,9 @@
         <activity
             android:name=".activity.RegisterActivity"
             android:theme="@style/FullScreen" />
-        <activity android:name=".activity.FavoriteTripActivity"></activity>
-        <activity android:name=".activity.HistoryTripActivity"></activity>
+        <activity android:name=".activity.FavoriteTripActivity" />
+        <activity android:name=".activity.HistoryTripActivity" />
+        <activity android:name=".activity.ScheduleTripActivity"></activity>
     </application>
 
 </manifest>

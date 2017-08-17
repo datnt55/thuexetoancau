@@ -46,7 +46,7 @@ import grab.com.thuexetoancau.utilities.Defines;
  */
 
 public class RatingFragment extends DialogFragment implements View.OnClickListener {
-    private String title;
+    private String title, driverName;
     private TextView btnOK, txtDriverName;
     private CheckBox cbFavorite;
     private User user;
@@ -78,6 +78,7 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
         Bundle bundle = getArguments();
         user = (User) bundle.getSerializable(Defines.BUNDLE_USER);
         bookingId = bundle.getInt(Defines.BUNDLE_TRIP);
+        driverName = bundle.getString(Defines.BUNDLE_DRIVER_NAME);
         View view = inflater.inflate(R.layout.dialog_rating, container);
         initComponents(view);
         getDialog().setTitle(title);
@@ -91,6 +92,7 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
         txtDriverName = (TextView) view.findViewById(R.id.txt_driver_name);
         rating = (RatingBar) view.findViewById(R.id.ratingBar);
         edtReview = (EditText) view.findViewById(R.id.edt_review);
+        txtDriverName.setText(driverName);
     }
 
     @Override

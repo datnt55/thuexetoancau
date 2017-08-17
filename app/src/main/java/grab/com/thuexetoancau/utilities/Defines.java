@@ -66,12 +66,22 @@ public class Defines {
     public static final int DIRECTION_NEW_STOP_POINT = 3;
     public static final String TYPE_POINT = "type direction point";
     public static final String POSITION_POINT = "position direction point";
+    public static final String BUNDLE_LOGIN_USER = "bundle login user";
+    public static final String BUNDLE_LOGIN_TRIP = "bundle login trip";
+    public static final String BUNDLE_LOGIN_DRIVER = "bundle login driver";
     public static final String BUNDLE_USER = "bundle user";
     public static final String BUNDLE_TRIP = "bundle trip";
+    public static final String BUNDLE_TRIP_TYPE = "bundle trip type";
     public static final String BUNDLE_TRIP_ID = "bundle trip id";
     public static final String BUNDLE_DRIVER= "bundle driver";
-    public static final String BUNDLE_NOT_FOUND_DRIVER = "bundle not found driver";
+    public static final String BUNDLE_DRIVER_NAME= "bundle driver name";
+    public static final String BUNDLE_PRICE= "bundle price";
+
     // Main Screen Dimension, will be set when app startup
+
+    public static final String BUNDLE_CONFIRM_TRIP = "bundle confirm trip";
+    public static final String BUNDLE_FOUND_DRIVER = "bundle found driver";
+    public static final String BUNDLE_NOT_FOUND_DRIVER = "bundle not found driver";
 
     public static final String DRIVER_CANCEL_TRIP = "driverCancelTrip";
     public static final String SUCCESS= "success";
@@ -85,5 +95,7 @@ public class Defines {
     public static final String BROADCAST_CANCEL_TRIP= "broadcast cancel Trip";
     public static final String BROADCAST_CONFFIRM_TRIP = "confirm trip";
 
+    // Notification tag
+    public static final String NOTIFY_TAG = "notify tag";
 
 }
