@@ -882,18 +882,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onSearchCarCancel() {
-        showLayoutSearchOrigin();
-        layoutSearch.setShowLastSearch(false);
-        layoutSearch.setFinishSearchBar(true);
-
-        // Remove layout direction and layout transport from main layout
-        layoutRoot.removeView(layoutDirection);
-        layoutRoot.removeView(layoutTransport);
-        layoutTransport = null;
-        layoutDirection = null;
-        listStopPoint.clear();
-        removeAllMarker();
-        getCurrentPosition();
+        finishTripAndUpdateView();
     }
 
     @Override
@@ -901,7 +890,20 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
        mApi.bookingCar(trip, new ApiUtilities.BookingCarListener() {
            @Override
            public void onSuccess(int bookingId) {
-               showLayoutSearchingDriver(bookingId,trip);
+               if (trip.getDistance() > Defines.MAX_DISTANCE){
+                   DialogUtils.bookingLongTrip((Activity) mContext, new DialogUtils.YesNoListenter() {
+                       @Override
+                       public void onYes() {
+                           finishTripAndUpdateView();
+                       }
+
+                       @Override
+                       public void onNo() {
+
+                       }
+                   });
+               }else
+                    showLayoutSearchingDriver(bookingId,trip);
            }
 
            @Override
@@ -1067,6 +1069,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 Intent intentHisroty = new Intent(mContext, HistoryTripActivity.class);
                 intentHisroty.putExtra(Defines.BUNDLE_USER, user.getId());
                 startActivity(intentHisroty);
+                break;
+            case R.id.nav_schedule:
+                Intent intentSchedule = new Intent(mContext, ScheduleTripActivity.class);
+                intentSchedule.putExtra(Defines.BUNDLE_USER, user.getId());
+                startActivity(intentSchedule);
                 break;
 
         }

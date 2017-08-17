@@ -37,6 +37,23 @@ public class DialogUtils {
         alert.show();
     }
 
+    public static void bookingLongTrip(final Activity mActivity, final YesNoListenter listenter) {
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(mActivity);
+        alertDialogBuilder.setTitle(R.string.notice);  // GPS not found
+        alertDialogBuilder.setMessage(R.string.booking_long_trip_success)
+                .setCancelable(false)
+                .setPositiveButton(R.string.gps_continue,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                                if (listenter != null)
+                                    listenter.onYes();
+                            }
+                        });
+        android.app.AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
+
     public static void showDialogNetworkError(Context mContext, final TryAgain again){
         AlertDialog dialog = new AlertDialog.Builder(mContext)
                 .setTitle(mContext.getString(R.string.app_name))

@@ -59,18 +59,18 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 String carType = remoteMessage.getData().get("car_type");
 
                 User user = new User(0, dName, dPhone, "", "");
-                final Intent intent = new Intent(Defines.BROADCAST_RECEIVED_TRIP);
-                // You can also include some extra data.
-                final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-                intent.putExtra(Defines.BUNDLE_USER, user);
-                intent.putExtra(Defines.BUNDLE_TRIP, Integer.valueOf(bookingId));
-                intent.putExtra(Defines.BUNDLE_TRIP_TYPE, Integer.valueOf(carType));
-                broadcastManager.sendBroadcast(intent);
-                if (!isAppInForeground(this)) {
-                    if (Integer.valueOf(carType) == 1)
-                        foundDriver(user,Integer.valueOf(bookingId),Integer.valueOf(carType),"Tài xế " + dName + " đang trên đường đón bạn");
-                    else
-                        foundDriver(user,Integer.valueOf(bookingId),Integer.valueOf(carType),"Tài xế " + dName + " đã chấp nhận chuyến đi của bạn");
+                if (Integer.valueOf(carType) == 0) {
+                    foundDriver(user, Integer.valueOf(bookingId), Integer.valueOf(carType), "Tài xế " + dName + " đã chấp nhận chuyến đi của bạn");
+                }else {
+                    final Intent intent = new Intent(Defines.BROADCAST_RECEIVED_TRIP);
+                    final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+                    intent.putExtra(Defines.BUNDLE_USER, user);
+                    intent.putExtra(Defines.BUNDLE_TRIP, Integer.valueOf(bookingId));
+                    intent.putExtra(Defines.BUNDLE_TRIP_TYPE, Integer.valueOf(carType));
+                    broadcastManager.sendBroadcast(intent);
+                    if (!isAppInForeground(this)) {
+                        foundDriver(user, Integer.valueOf(bookingId), Integer.valueOf(carType), "Tài xế " + dName + " đang trên đường đón bạn");
+                    }
                 }
             }
         } else if (function.equals(Defines.CONFIRM_TRIP)) {

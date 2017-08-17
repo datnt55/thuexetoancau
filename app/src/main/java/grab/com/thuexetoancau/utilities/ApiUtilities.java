@@ -829,6 +829,69 @@ public class ApiUtilities {
         });
     }
 
+
+    public void getScheduleTrip(int userId, final ResponseTripListener listener){
+        if (!CommonUtilities.isOnline(mContext)) {
+            DialogUtils.showDialogNetworkError(mContext, null);
+            return ;
+        }
+        final ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setMessage("Đang tải dữ liệu");
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
+        RequestParams params;
+        params = new RequestParams();
+        params.put("user_id", userId);
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_SCHEDULE_TRIP,params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.getString("status").equals("success")){
+                        ArrayList<Trip> arrayTrip = new ArrayList<Trip>();
+                        JSONArray array = json.getJSONArray("data");
+                        JSONObject data = array.getJSONObject(0);
+                        JSONArray bookingList = data.getJSONArray("list");
+                        for (int i = 0 ; i < bookingList.length(); i++) {
+                            JSONObject booking = bookingList.getJSONObject(i);
+                            Trip trip = parseBookingData(booking);
+                            arrayTrip.add(trip);
+                        }
+                        if (listener != null)
+                            listener.onSuccess(arrayTrip);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    if (listener != null)
+                        listener.onSuccess(null);
+                }
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                Toast.makeText(mContext, mContext.getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public void getHistoryTrip(int userId, final ResponseTripListener listener){
         if (!CommonUtilities.isOnline(mContext)) {
             DialogUtils.showDialogNetworkError(mContext, null);

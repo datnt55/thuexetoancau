@@ -88,6 +88,7 @@
     <string name="rating_content">Hãy để lại đánh giá của bạn để chúng tôi có thể phát triển hơn. Xin cảm ơn</string>
     <string name="booking_car_message">Đang đăng ký chuyến xe</string>
     <string name="booking_car_error">Đặt xe thất bại</string>
+    <string name="booking_long_trip_success">Đặt xe thành công. Hãy đợi một tài xế nhận chuyến đi</string>
     <string name="booking_cancel_message">Bạn hãy nhập lý do hủy chuyến</string>
     <string name="digit_message">Mã số đã đươc gửi vào số %1$s</string>
     <string name="digit_no_get_sms">Chưa nhận được SMS?</string>
