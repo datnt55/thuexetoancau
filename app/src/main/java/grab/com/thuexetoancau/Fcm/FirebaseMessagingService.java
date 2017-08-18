@@ -57,14 +57,16 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 String dPhone = remoteMessage.getData().get("driver_phone");
                 String bookingId = remoteMessage.getData().get("id_booking");
                 String carType = remoteMessage.getData().get("car_type");
+                String carNumber = remoteMessage.getData().get("driver_car_number");
 
                 User user = new User(0, dName, dPhone, "", "");
+                user.setLicense(carNumber);
                 if (Integer.valueOf(carType) == 0) {
                     foundDriver(user, Integer.valueOf(bookingId), Integer.valueOf(carType), "Tài xế " + dName + " đã chấp nhận chuyến đi của bạn");
                 }else {
                     final Intent intent = new Intent(Defines.BROADCAST_RECEIVED_TRIP);
                     final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
-                    intent.putExtra(Defines.BUNDLE_USER, user);
+                    intent.putExtra(Defines.BUNDLE_DRIVER, user);
                     intent.putExtra(Defines.BUNDLE_TRIP, Integer.valueOf(bookingId));
                     intent.putExtra(Defines.BUNDLE_TRIP_TYPE, Integer.valueOf(carType));
                     broadcastManager.sendBroadcast(intent);
@@ -138,7 +140,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             intent = new Intent(this, ScheduleTripActivity.class);
         intent.putExtra(Defines.BUNDLE_FOUND_DRIVER, true);
         intent.putExtra(Defines.BUNDLE_TRIP_ID, bookingId);
-        intent.putExtra(Defines.BUNDLE_USER, user);
+        intent.putExtra(Defines.BUNDLE_DRIVER, user);
         intent.putExtra(Defines.BUNDLE_TRIP_TYPE, carType);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);

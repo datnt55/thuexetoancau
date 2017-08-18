@@ -32,6 +32,9 @@ public class Trip implements Serializable{
     private int carType;
     private int realDistance;
     private int realPrice;
+    private String driverName;
+    private String driverPhone;
+    private String driverCarNumber;
 
     public Trip() {
     }
@@ -255,5 +258,29 @@ public class Trip implements Serializable{
 
     public void setRealPrice(int realPrice) {
         this.realPrice = realPrice;
+    }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
+    public String getDriverPhone() {
+        return driverPhone;
+    }
+
+    public void setDriverPhone(String driverPhone) {
+        this.driverPhone = driverPhone;
+    }
+
+    public String getDriverCarNumber() {
+        return driverCarNumber;
+    }
+
+    public void setDriverCarNumber(String driverCarNumber) {
+        this.driverCarNumber = driverCarNumber;
     }
 }

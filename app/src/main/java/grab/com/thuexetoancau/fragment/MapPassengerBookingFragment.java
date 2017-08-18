@@ -162,10 +162,13 @@ public class MapPassengerBookingFragment extends Fragment implements OnMapReadyC
             double distance    = jsonobject.getDouble("D");
             DecimalFormat df = new DecimalFormat("#.#");
             String gap;
-            if ((int) distance == 0)
-                gap = df.format(mContext.getResources().getString(R.string.distance_meter,distance*1000));
-            else
-                gap =df.format(mContext.getResources().getString(R.string.distance_kilo_meter,distance));;
+            if ((int) distance == 0) {
+                String meter = df.format(distance * 1000);
+                gap = mContext.getResources().getString(R.string.distance_meter, meter);
+            }else {
+                String kilometer = df.format(distance);
+                gap = mContext.getResources().getString(R.string.distance_kilo_meter, kilometer);
+            }
             LatLng aroundLatLon = new LatLng(lat, lon);
             Marker marker = mMap.addMarker(new MarkerOptions().position(aroundLatLon).title(mContext.getResources().getString(R.string.distance_car,gap)));
             marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.car_icon));

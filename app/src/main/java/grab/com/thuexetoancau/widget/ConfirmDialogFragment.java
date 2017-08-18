@@ -30,6 +30,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -179,10 +183,27 @@ public class ConfirmDialogFragment extends DialogFragment {
                 }
                 if (totalDistance > Defines.MAX_DISTANCE) {
                     if (mTrip.getTripType() == 1) {
-                        mTrip.setStartTime(txtStartTime.getText().toString());
+                        if (txtStartTime.getText().toString().equals(getString(R.string.error_time_start))){
+                            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
+                            mTrip.setStartTime(dtf.print(new DateTime()));
+                        }else {
+                            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
+                            DateTime startTime = dtf.parseDateTime(txtStartTime.getText().toString());
+                            DateTimeFormatter dtfTrip = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
+                            mTrip.setStartTime(dtfTrip.print(startTime));
+                        }
                     } else {
-                        mTrip.setStartTime(txtStartTime.getText().toString());
-                        mTrip.setEndTime(txtBackTime.getText().toString());
+                        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
+                        DateTimeFormatter dtfTrip = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
+
+                        if (txtStartTime.getText().toString().equals(getString(R.string.error_time_start))){
+                            mTrip.setStartTime(dtf.print(new DateTime()));
+                        }else{
+                            DateTime startTime = dtf.parseDateTime(txtStartTime.getText().toString());
+                            mTrip.setStartTime(dtfTrip.print(startTime));
+                        }
+                        DateTime endTime = dtf.parseDateTime(txtBackTime.getText().toString());
+                        mTrip.setEndTime(dtfTrip.print(endTime));
                     }
                 }
                 if (callback != null)

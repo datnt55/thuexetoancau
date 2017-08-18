@@ -67,6 +67,10 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -195,7 +199,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         // Check customer found driver
         if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
             int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
-            User userDriver = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
+            User userDriver = (User) getIntent().getSerializableExtra(Defines.BUNDLE_DRIVER);
             int tripType = getIntent().getIntExtra(Defines.BUNDLE_TRIP_TYPE,0);
             if (tripType == 1) {
                 foundDriverUI(userDriver, bookingId);
@@ -887,32 +891,53 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onConfirmed(final Trip trip) {
-       mApi.bookingCar(trip, new ApiUtilities.BookingCarListener() {
-           @Override
-           public void onSuccess(int bookingId) {
-               if (trip.getDistance() > Defines.MAX_DISTANCE){
-                   DialogUtils.bookingLongTrip((Activity) mContext, new DialogUtils.YesNoListenter() {
-                       @Override
-                       public void onYes() {
-                           finishTripAndUpdateView();
-                       }
+        if (trip.getDistance() > Defines.MAX_DISTANCE) {
+            if (trip.getStartTime() != null) {
+                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
+                DateTime startTime = dtf.parseDateTime(trip.getStartTime());
+                final boolean isToday = CommonUtilities.isToday(startTime);
+                if (!isToday) {
+                    mApi.getScheduleTrip(user.getId(), new ApiUtilities.ResponseTripListener() {
+                        @Override
+                        public void onSuccess(ArrayList<Trip> arrayTrip) {
+                            if (arrayTrip.size() > 2)
+                                Toast.makeText(mContext, "Bạn đã đăng quá 3 chuyến đi sau", Toast.LENGTH_SHORT).show();
+                            else
+                                bookingImmediateTrip(trip,isToday);
+                        }
+                    });
+                }else
+                    bookingImmediateTrip(trip,isToday );
+            }
+        }else
+            bookingImmediateTrip(trip,false);
+    }
 
-                       @Override
-                       public void onNo() {
+    private void bookingImmediateTrip (final Trip trip, final boolean isToday){
+        mApi.bookingCar(trip, new ApiUtilities.BookingCarListener() {
+            @Override
+            public void onSuccess(int bookingId) {
+                if (trip.getDistance() > Defines.MAX_DISTANCE && !isToday) {
+                    DialogUtils.bookingLongTrip((Activity) mContext, new DialogUtils.YesNoListenter() {
+                        @Override
+                        public void onYes() {
+                            finishTripAndUpdateView();
+                        }
 
-                       }
-                   });
-               }else
-                    showLayoutSearchingDriver(bookingId,trip);
-           }
+                        @Override
+                        public void onNo() {
 
-           @Override
-           public void onFail() {
-                Toast.makeText(mContext,mContext.getString(R.string.booking_car_error),Toast.LENGTH_SHORT).show();
-           }
-       });
+                        }
+                    });
+                } else
+                    showLayoutSearchingDriver(bookingId, trip);
+            }
 
-
+            @Override
+            public void onFail() {
+                Toast.makeText(mContext, mContext.getString(R.string.booking_car_error), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void foundDriverUI(User user, int bookingId){
@@ -934,7 +959,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                User userDriver = (User) intent.getSerializableExtra(Defines.BUNDLE_USER);
+                User userDriver = (User) intent.getSerializableExtra(Defines.BUNDLE_DRIVER);
                 bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
                 foundDriverUI(userDriver, bookingId);
                 Toast.makeText(mContext, "Chúng tôi đã tìm thấy tài xế cho bạn",Toast.LENGTH_SHORT).show();

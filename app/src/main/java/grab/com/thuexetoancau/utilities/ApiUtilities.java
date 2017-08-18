@@ -321,6 +321,9 @@ public class ApiUtilities {
             String x = booking.getString("driver_id");
             if (!booking.getString("driver_id").equals("null"))
                 driverId = booking.getInt("driver_id");
+            String driverName = booking.getString("driver_name");
+            String driverPhone = booking.getString("driver_phone");
+            String driverCarNumber = booking.getString("driver_car_number");
             ArrayList<Position> listStopPoint = new ArrayList<Position>();
             Position from = new Position(startPointName,new LatLng(startPointLat,startPointLon));
             listStopPoint.add(from);
@@ -342,6 +345,9 @@ public class ApiUtilities {
             trip.setRealDistance(realDistance);
             trip.setRealPrice(realPrice);
             trip.setDriverId(driverId);
+            trip.setDriverName(driverName);
+            trip.setDriverPhone(driverPhone);
+            trip.setDriverCarNumber(driverCarNumber);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -513,7 +519,7 @@ public class ApiUtilities {
                 params.put("come_back_time", trip.getEndTime());
             }
         }else {
-            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-mm'T'hh:mm:ss.SSS");
+            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
             params.put("start_time", dtf.print(new DateTime()));
         }
         params.put("custom_note", trip.getNote());
@@ -696,7 +702,6 @@ public class ApiUtilities {
                         if (listener != null)
                             listener.onFail();
                     }
-                    Toast.makeText(mContext,jsonObject.getString("message"),Toast.LENGTH_SHORT).show();
                 }catch (JSONException e){
                     e.printStackTrace();
                 }

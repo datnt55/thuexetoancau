@@ -12,27 +12,41 @@ import java.util.ArrayList;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.FavoriteTripAdapter;
+import grab.com.thuexetoancau.adapter.ScheduleTripAdapter;
 import grab.com.thuexetoancau.model.Trip;
+import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
 
 public class ScheduleTripActivity extends AppCompatActivity {
     private RecyclerView listFavorite;
-    private FavoriteTripAdapter adapter;
+    private ScheduleTripAdapter adapter;
     private Context mContext;
     private int userId;
     private Toolbar toolbar;
+    private int bookingId, tripType;
+    private User driver;
+    private  ApiUtilities mApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_trip);
         mContext = this;
-        userId = getIntent().getIntExtra(Defines.BUNDLE_USER, 0);
+        if (getIntent().hasExtra(Defines.BUNDLE_USER))
+            userId = getIntent().getIntExtra(Defines.BUNDLE_USER, 0);
+
+        // Check customer found driver
+        if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
+            bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
+            driver  = (User) getIntent().getSerializableExtra(Defines.BUNDLE_DRIVER);
+            tripType = getIntent().getIntExtra(Defines.BUNDLE_TRIP_TYPE,0);
+        }
         initComponents();
     }
 
     private void initComponents() {
+        mApi = new ApiUtilities(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Lich trình chuyến đi");
@@ -43,14 +57,28 @@ public class ScheduleTripActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         listFavorite.setLayoutManager(layoutManager);
 
-        ApiUtilities mApi = new ApiUtilities(this);
-        mApi.getScheduleTrip(userId, new ApiUtilities.ResponseTripListener() {
-            @Override
-            public void onSuccess(ArrayList<Trip> arrayTrip) {
-                adapter = new FavoriteTripAdapter(mContext, arrayTrip);
-                listFavorite.setAdapter(adapter);
-            }
-        });
+        if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
+            mApi.checkTokenLogin(new ApiUtilities.ResponseLoginListener() {
+                @Override
+                public void onSuccess(Trip trip, User user) {
+                    mApi.getScheduleTrip(user.getId(), new ApiUtilities.ResponseTripListener() {
+                        @Override
+                        public void onSuccess(ArrayList<Trip> arrayTrip) {
+                            adapter = new ScheduleTripAdapter(mContext, arrayTrip);
+                            listFavorite.setAdapter(adapter);
+                        }
+                    });
+                }
+            });
+        }else {
+            mApi.getScheduleTrip(userId, new ApiUtilities.ResponseTripListener() {
+                @Override
+                public void onSuccess(ArrayList<Trip> arrayTrip) {
+                    adapter = new ScheduleTripAdapter(mContext, arrayTrip);
+                    listFavorite.setAdapter(adapter);
+                }
+            });
+        }
     }
 
     @Override

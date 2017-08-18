@@ -39,8 +39,8 @@
 
     <!-- Map Passdenger booking fragment-->
     <string name="loading_data"> Đang tải dữ liệu</string>
-    <string name="distance_meter"> %1$d m</string>
-    <string name="distance_kilo_meter"> %1$d km</string>
+    <string name="distance_meter"> %1$s m</string>
+    <string name="distance_kilo_meter"> %1$s km</string>
     <string name="distance_car"> Xe cách bạn %1$s</string>
 
     <!-- layout search bar -->
@@ -80,7 +80,7 @@
     <string name="log_out_error">Đăng xuất thất bại</string>
     <string name="name_of_customer">Tên hành khách</string>
     <string name="phone_of_customer">Số điện thoại hành khách</string>
-    <string name="error_time_start">Chọn thời gian khởi hành</string>
+    <string name="error_time_start">Đi ngay</string>
     <string name="error_time_back">Chọn thời gian khứ hồi</string>
     <string name="logout_content_dialog">Bạn chắc chắn muốn đăng xuất?</string>
     <string name="check_token_content_dialog">Ai đó đã đăng nhập vào tài khoản của bạn</string>

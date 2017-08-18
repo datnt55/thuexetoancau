@@ -311,4 +311,9 @@ public class CommonUtilities {
         }
         return "";
     }
+
+    public static boolean isToday(DateTime dateTime) {
+        return dateTime.withTimeAtStartOfDay().getMillis() ==
+                new DateTime().withTimeAtStartOfDay().getMillis();
+    }
 }

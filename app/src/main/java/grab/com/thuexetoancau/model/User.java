@@ -12,7 +12,7 @@ public class User implements Serializable{
     private String phone;
     private String email;
     private String url;
-
+    private String license;
     public User() {
     }
 
@@ -22,6 +22,12 @@ public class User implements Serializable{
         this.phone = phone;
         this.email = email;
         this.url = url;
+    }
+
+    public User(String name, String phone, String license) {
+        this.name = name;
+        this.phone = phone;
+        this.license = license;
     }
 
     public int getId() {
@@ -64,5 +70,11 @@ public class User implements Serializable{
         this.url = url;
     }
 
+    public String getLicense() {
+        return license;
+    }
 
+    public void setLicense(String license) {
+        this.license = license;
+    }
 }
