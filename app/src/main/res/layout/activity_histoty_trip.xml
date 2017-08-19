@@ -32,7 +32,7 @@
                     android:layout_centerInParent="true"
                     android:gravity="center"
                     android:layout_weight="1"
-                    android:text="Rất tiếc ! \n Bạn chưa thích chuyến đi nào" />
+                    android:text="Rất tiếc ! \n Bạn chưa đi chuyến đi nào" />
             </RelativeLayout>
 
             <android.support.v7.widget.RecyclerView

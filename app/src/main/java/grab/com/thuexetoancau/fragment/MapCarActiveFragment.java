@@ -14,7 +14,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -36,7 +35,7 @@ import grab.com.thuexetoancau.DirectionFinder.DirectionFinder;
 import grab.com.thuexetoancau.DirectionFinder.DirectionFinderListener;
 import grab.com.thuexetoancau.DirectionFinder.Route;
 import grab.com.thuexetoancau.R;
-import grab.com.thuexetoancau.activity.FormPassengerBookingActivity;
+import grab.com.thuexetoancau.activity.AuctionBookingActivity;
 import grab.com.thuexetoancau.model.Position;
 import grab.com.thuexetoancau.utilities.BaseService;
 import grab.com.thuexetoancau.utilities.Defines;
@@ -71,7 +70,7 @@ public class MapCarActiveFragment extends Fragment implements OnMapReadyCallback
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ((FormPassengerBookingActivity) getActivity()).updateMap(new FormPassengerBookingActivity.OnDataMap() {
+        ((AuctionBookingActivity) getActivity()).updateMap(new AuctionBookingActivity.OnDataMap() {
             @Override
             public void OnDataMap(String location, LatLng latLng) {
                 if(location.equals("from"))

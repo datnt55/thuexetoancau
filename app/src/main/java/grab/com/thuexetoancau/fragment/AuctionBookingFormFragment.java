@@ -55,7 +55,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import grab.com.thuexetoancau.R;
-import grab.com.thuexetoancau.activity.FormPassengerBookingActivity;
+import grab.com.thuexetoancau.activity.AuctionBookingActivity;
 import grab.com.thuexetoancau.adapter.PlaceArrayAdapter;
 import grab.com.thuexetoancau.utilities.BaseService;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
@@ -68,7 +68,7 @@ import grab.com.thuexetoancau.utilities.SharePreference;
  * Created by DatNT on 8/9/2017.
  */
 
-public class BookingFormFragment extends Fragment {
+public class AuctionBookingFormFragment extends Fragment {
     private AutoCompleteTextView autoPlaceFrom, autoPlaceTo;
     private GoogleApiClient mGoogleApiClient;
     private PlaceArrayAdapter mPlaceArrayFromAdapter , mPlaceToArrayAdapter;
@@ -101,7 +101,7 @@ public class BookingFormFragment extends Fragment {
         mContext = getActivity();
         preference = new SharePreference(mContext);
         //moveDrawerToTop();
-        ((FormPassengerBookingActivity) getActivity()).updateApi(new FormPassengerBookingActivity.OnConnected() {
+        ((AuctionBookingActivity) getActivity()).updateApi(new AuctionBookingActivity.OnConnected() {
             @Override
             public void onConnected(GoogleApiClient googleApiClient, PlaceArrayAdapter placeFrom, PlaceArrayAdapter placeTo) {
                 mPlaceArrayFromAdapter = placeFrom;

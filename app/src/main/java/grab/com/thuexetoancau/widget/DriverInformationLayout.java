@@ -57,7 +57,7 @@ public class DriverInformationLayout extends LinearLayout {
         customerCarType = (TextView) view.findViewById(R.id.txt_driver_car_type);
         customerLicense = (TextView) view.findViewById(R.id.txt_driver_car_license);
         btnCall = (ImageView) view.findViewById(R.id.img_call);
-
+        customerLicense.setText(driver.getLicense());
         customerName.setText(driver.getName());
         btnCall.setOnClickListener(new OnClickListener() {
             @Override

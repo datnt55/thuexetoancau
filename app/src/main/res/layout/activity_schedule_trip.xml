@@ -8,10 +8,39 @@
     tools:context="grab.com.thuexetoancau.activity.FavoriteTripActivity">
 
     <include layout="@layout/common_header" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list_schedule"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/layout_no_trip"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textStyle="italic"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:text="Không có chuyến đi nào được lên lịch" />
+            </RelativeLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list_schedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
 </LinearLayout>

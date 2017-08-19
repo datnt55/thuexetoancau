@@ -158,7 +158,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         mApi = new ApiUtilities(this);
         if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_USER))
             user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_USER);
-
         if (user == null){
             mApi.checkTokenLogin(new ApiUtilities.ResponseLoginListener() {
                 @Override
@@ -175,6 +174,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
         LocalBroadcastManager.getInstance(this).registerReceiver(confirmTrip, new IntentFilter(Defines.BROADCAST_CONFFIRM_TRIP));
+        if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_TRIP)) {
+            lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_TRIP);
+            if (lastTrip.getDriverId() == 0){
+                hideLayoutSearchOrigin();
+                showLayoutSearchingDriver(lastTrip.getId(), lastTrip);
+            }else {
+                showCurrentTripAction();
+            }
+        }
     }
 
     private void getIntentFromFirebase(){
@@ -253,7 +261,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     .considerExifParams(true)
                     .bitmapConfig(Bitmap.Config.RGB_565)
                     .build();
-            ImageLoader.getInstance().displayImage(user.getUrl(), imgAvatar, options, new SimpleImageLoadingListener());
+            ImageLoader.getInstance().displayImage("http://icongal.com/gallery/image/270615/admin_administrator_customer_user_person_face_admnistrator_support_custom.png", imgAvatar, options, new SimpleImageLoadingListener());
         }
     }
 
@@ -261,7 +269,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         toolbar.setVisibility(View.VISIBLE);
         toolbar.setTitle(getString(R.string.in_trip));
         hideLayoutSearchOrigin();
-        layoutDriveInfo = new DriverInformationLayout(this,new User());
+        layoutDriveInfo = new DriverInformationLayout(this,new User(lastTrip.getDriverName(),lastTrip.getDriverPhone(),lastTrip.getDriverCarNumber()));
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutDriveInfo.setLayoutParams(params);
@@ -348,6 +356,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             if (addresses.size() > 0) {
                 Address address = addresses.get(0);
                 int index = addresses.get(0).getMaxAddressLineIndex();
+                if (index == 0)
+                    return address.getAddressLine(0);
                 for (int i = 0 ; i < index ; i++)
                     if (address.getAddressLine(i) != null) {
                         result.append(address.getAddressLine(i));
@@ -546,7 +556,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_booking:
-                Intent intent = new Intent(PassengerSelectActionActivity.this, FormPassengerBookingActivity.class);
+                Intent intent = new Intent(PassengerSelectActionActivity.this, AuctionBookingActivity.class);
                 startActivity(intent);
                 break;
             case R.id.btn_infor:
@@ -1099,6 +1109,18 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 Intent intentSchedule = new Intent(mContext, ScheduleTripActivity.class);
                 intentSchedule.putExtra(Defines.BUNDLE_USER, user.getId());
                 startActivity(intentSchedule);
+                break;
+
+            case R.id.nav_notify:
+                Toast.makeText(mContext, "Chức năng đang dược cập nhật",Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.nav_invite:
+                Toast.makeText(mContext, "Chức năng đang dược cập nhật",Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.nav_support:
+                Toast.makeText(mContext, "Chức năng đang dược cập nhật",Toast.LENGTH_SHORT).show();
                 break;
 
         }

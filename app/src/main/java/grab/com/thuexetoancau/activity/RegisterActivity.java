@@ -43,6 +43,7 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.ApiUtilities;
+import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.SharePreference;
 import grab.com.thuexetoancau.widget.CustomProgress;
@@ -216,8 +217,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void registerCustomer() {
-        customerPhone = ccpPhone.getSelectedCountryCode() + edtCustomerPhone.getText().toString();
-        mApi.registerCustomer(customerPhone, edtCustomerEmail.getText().toString(), edtCustomerName.getText().toString(), new ApiUtilities.ResponseRegisterListener() {
+        String phone;
+        if ( edtCustomerPhone.getText().toString().startsWith("0"))
+            phone = edtCustomerPhone.getText().toString();
+        else
+            phone = "0" + edtCustomerPhone.getText().toString();
+        mApi.registerCustomer(phone, edtCustomerEmail.getText().toString(), edtCustomerName.getText().toString(), new ApiUtilities.ResponseRegisterListener() {
             @Override
             public void onSuccess(User mUser) {
                 user = mUser;
@@ -230,13 +235,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void loginCustomer() {
-        customerPhone = ccpPhone.getSelectedCountryCode() + edtCustomerPhone.getText().toString();
+
         if (edtCustomerPhone.getText().toString().equals("") || edtCustomerPhone.getText().toString() == null){
             textInputPhone.setError("Bạn chưa nhập số điện thoại");
             requestFocus(edtCustomerPhone);
             return;
         }
-        mApi.loginCustomer(customerPhone, edtCustomerEmail.getText().toString(), new ApiUtilities.ResponseLoginListener() {
+        String phone;
+        if ( edtCustomerPhone.getText().toString().startsWith("0"))
+            phone = edtCustomerPhone.getText().toString();
+        else
+            phone = "0" + edtCustomerPhone.getText().toString();
+        mApi.loginCustomer(phone, edtCustomerEmail.getText().toString(), new ApiUtilities.ResponseLoginListener() {
             @Override
             public void onSuccess(Trip trip, User mUser) {
                 user = mUser;
@@ -267,7 +277,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void accountKitCheck() {
-        customerPhone = ccpPhone.getSelectedCountryCode() + edtCustomerPhone.getText().toString();
+        customerPhone = ccpPhone.getSelectedCountryCode() + CommonUtilities.convertTelephone(edtCustomerPhone.getText().toString());
         layoutDigits.setVisibility(View.VISIBLE);
         txtTitleDigit.setText( String.format(getString(R.string.digit_message, customerPhone)));
         layoutRegister.setVisibility(View.GONE);

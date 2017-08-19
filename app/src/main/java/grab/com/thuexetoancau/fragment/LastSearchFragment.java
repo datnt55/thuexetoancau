@@ -93,10 +93,7 @@ public class LastSearchFragment extends Fragment {
     }
 
     public void setCharacter(String constraint){
-        if (constraint.equals(""))
-            txtLastSearch.setText(R.string.last_search);
-        else
-            txtLastSearch.setText(R.string.recommend_search);
+        txtLastSearch.setText(R.string.recommend_search);
     }
 
     public void setGoogleApiClient(GoogleApiClient mGoogleApiClient){

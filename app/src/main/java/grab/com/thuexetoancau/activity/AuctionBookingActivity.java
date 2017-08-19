@@ -8,16 +8,12 @@ import android.graphics.PorterDuff;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -27,19 +23,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.PlaceArrayAdapter;
 import grab.com.thuexetoancau.adapter.ViewPagerAdapter;
-import grab.com.thuexetoancau.fragment.BookingFormFragment;
+import grab.com.thuexetoancau.fragment.AuctionBookingFormFragment;
 import grab.com.thuexetoancau.fragment.MapCarActiveFragment;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.GPSTracker;
 
-public class FormPassengerBookingActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,BookingFormFragment.DataPassListener, BookingFormFragment.OnDataResult {
-    private static final String LOG_TAG = "FormPassengerBookingActivity";
+public class AuctionBookingActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,AuctionBookingFormFragment.DataPassListener, AuctionBookingFormFragment.OnDataResult {
+    private static final String LOG_TAG = "AuctionBookingActivity";
     private static final int GOOGLE_API_CLIENT_ID = 0;
     private GoogleApiClient mGoogleApiClient;
     private PlaceArrayAdapter mPlaceArrayFromAdapter , mPlaceToArrayAdapter;
@@ -78,7 +73,7 @@ public class FormPassengerBookingActivity extends AppCompatActivity implements G
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
         // init google api
-        mGoogleApiClient = new GoogleApiClient.Builder(FormPassengerBookingActivity.this)
+        mGoogleApiClient = new GoogleApiClient.Builder(AuctionBookingActivity.this)
                 .addApi(Places.GEO_DATA_API)
                 .enableAutoManage(this, GOOGLE_API_CLIENT_ID, this)
                 .addConnectionCallbacks(this)
@@ -122,7 +117,7 @@ public class FormPassengerBookingActivity extends AppCompatActivity implements G
     }
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        Fragment carList = new BookingFormFragment();
+        Fragment carList = new AuctionBookingFormFragment();
 
 
         adapter.addFrag(carList, "Danh sách");
@@ -247,10 +242,10 @@ public class FormPassengerBookingActivity extends AppCompatActivity implements G
 
     @Override
     public void onResult(ArrayList<String> result) {
-       /* Intent intent = new Intent(mContext, BookingResultActivity.class);
+        Intent intent = new Intent(mContext, AuctionBookingResultActivity.class);
         intent.putExtra("RESULT",result);
         startActivity(intent);
-        finish();*/
+        finish();
     }
 
     public interface OnConnected {

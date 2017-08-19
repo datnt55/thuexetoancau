@@ -24,10 +24,9 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.PlaceArrayAdapter;
 import grab.com.thuexetoancau.adapter.ViewPagerAdapter;
 import grab.com.thuexetoancau.fragment.ListPassengerBookingFragment;
-import grab.com.thuexetoancau.fragment.MapPassengerBookingFragment;
+import grab.com.thuexetoancau.fragment.MapAuctionrBookingFragment;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
-import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.GPSTracker;
 
 import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
@@ -134,7 +133,7 @@ public class ListPassengerBookingActivity extends AppCompatActivity implements L
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new ListPassengerBookingFragment(),getResources().getString(R.string.information));
-        adapter.addFrag(new MapPassengerBookingFragment(), getResources().getString(R.string.map));
+        adapter.addFrag(new MapAuctionrBookingFragment(), getResources().getString(R.string.map));
         viewPager.setAdapter(adapter);
     }
 

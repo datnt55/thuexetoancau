@@ -26,8 +26,8 @@
     <color name="md_grey_400">#bdbdbd</color>
     <color name="violet">#7f0184</color>2d587d
     <color name="header">#2d587d</color>
-    <color name="color_text">#009245</color>
-    <color name="color_text_dark">#00612e</color>
+    <color name="color_text">#4285f4</color>
+    <color name="color_text_dark">#1565c0</color>
     <color name="orange">#f9a02b</color>
     <color name="orange1">#ffddb1</color>
     <color name="md_grey_800">#424242</color>

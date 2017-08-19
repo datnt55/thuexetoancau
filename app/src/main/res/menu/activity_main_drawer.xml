@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group>
-        <item
-            android:id="@+id/nav_favorite"
-            android:icon="@drawable/ic_star_black_24dp"
-            android:title="Yêu thích"/>
-        <item
-            android:id="@+id/nav_history"
-            android:icon="@drawable/ic_history_black_24dp"
-            android:title="Lịch sử"/>
-        <item
-            android:id="@+id/nav_schedule"
-            android:icon="@drawable/ic_event_note_black_24dp"
-            android:title="Lịch trình"/>
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_notifications_none_black_24dp"
-            android:title="Thông báo"/>
-        <item
-            android:id="@+id/nav_gift"
-            android:icon="@drawable/ic_card_giftcard_black_24dp"
-            android:title="Mời bạn bè"/>
-        <item
-            android:id="@+id/nav_support"
-            android:icon="@drawable/ic_mail_outline_black_24dp"
-            android:title="Hỗ trợ"/>
-        <item
-            android:id="@+id/nav_log_out"
-            android:icon="@drawable/ic_mail_outline_black_24dp"
-            android:title="Đăng xuất"/>
-    </group>
+    <item
+        android:id="@+id/nav_favorite"
+        android:icon="@drawable/ic_star_black_24dp"
+        android:title="Yêu thích" />
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@drawable/ic_history_black_24dp"
+        android:title="Lịch sử" />
+    <item
+        android:id="@+id/nav_schedule"
+        android:icon="@drawable/ic_event_note_black_24dp"
+        android:title="Lịch trình" />
+    <item
+        android:id="@+id/nav_notify"
+        android:icon="@drawable/ic_notifications_none_black_24dp"
+        android:title="Thông báo" />
+    <item
+        android:id="@+id/nav_invite"
+        android:icon="@drawable/ic_card_giftcard_black_24dp"
+        android:title="Mời bạn bè" />
+    <item
+        android:id="@+id/nav_support"
+        android:icon="@drawable/ic_mail_outline_black_24dp"
+        android:title="Hỗ trợ" />
+    <item
+        android:id="@+id/nav_log_out"
+        android:icon="@drawable/ic_exit_to_app_black_24dp"
+        android:title="Đăng xuất" />
+
 </menu>

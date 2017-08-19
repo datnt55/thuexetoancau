@@ -51,7 +51,7 @@
             android:name=".activity.PassengerSelectActionActivity"
             android:theme="@style/TranslucentTheme"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activity.FormPassengerBookingActivity" />
+        <activity android:name=".activity.AuctionBookingActivity" />
         <activity android:name=".activity.ListPassengerBookingActivity" />
         <activity android:name=".activity.SelectMethodLoginActivity" />
         <activity
@@ -62,7 +62,8 @@
             android:theme="@style/FullScreen" />
         <activity android:name=".activity.FavoriteTripActivity" />
         <activity android:name=".activity.HistoryTripActivity" />
-        <activity android:name=".activity.ScheduleTripActivity"></activity>
+        <activity android:name=".activity.ScheduleTripActivity" />
+        <activity android:name=".activity.AuctionBookingResultActivity"></activity>
     </application>
 
 </manifest>

@@ -39,7 +39,7 @@ import grab.com.thuexetoancau.utilities.GPSTracker;
  * Created by DatNT on 7/15/2017.
  */
 
-public class MapPassengerBookingFragment extends Fragment implements OnMapReadyCallback {
+public class MapAuctionrBookingFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private Context mContext;
     private double longitude, latitude;

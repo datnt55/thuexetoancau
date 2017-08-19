@@ -777,11 +777,6 @@ public class ApiUtilities {
             DialogUtils.showDialogNetworkError(mContext, null);
             return ;
         }
-        final ProgressDialog dialog = new ProgressDialog(mContext);
-        dialog.setMessage("Đang tải dữ liệu");
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(false);
-        dialog.show();
         RequestParams params;
         params = new RequestParams();
         params.put("user_id", userId);
@@ -817,7 +812,6 @@ public class ApiUtilities {
                     if (listener != null)
                         listener.onSuccess(null);
                 }
-                dialog.dismiss();
             }
 
             @Override
@@ -840,11 +834,6 @@ public class ApiUtilities {
             DialogUtils.showDialogNetworkError(mContext, null);
             return ;
         }
-        final ProgressDialog dialog = new ProgressDialog(mContext);
-        dialog.setMessage("Đang tải dữ liệu");
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(false);
-        dialog.show();
         RequestParams params;
         params = new RequestParams();
         params.put("user_id", userId);
@@ -880,7 +869,6 @@ public class ApiUtilities {
                     if (listener != null)
                         listener.onSuccess(null);
                 }
-                dialog.dismiss();
             }
 
             @Override
@@ -902,11 +890,6 @@ public class ApiUtilities {
             DialogUtils.showDialogNetworkError(mContext, null);
             return ;
         }
-        final ProgressDialog dialog = new ProgressDialog(mContext);
-        dialog.setMessage("Đang tải dữ liệu");
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(false);
-        dialog.show();
         RequestParams params;
         params = new RequestParams();
         params.put("user_id", userId);
@@ -942,7 +925,6 @@ public class ApiUtilities {
                     if (listener != null)
                         listener.onSuccess(null);
                 }
-                dialog.dismiss();
             }
 
             @Override

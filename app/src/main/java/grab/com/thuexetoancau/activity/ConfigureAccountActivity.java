@@ -108,7 +108,11 @@ public class ConfigureAccountActivity extends AppCompatActivity implements View.
     }
 
     private void editCustomerInformation() {
-        final String customerPhone = countryCodePicker.getSelectedCountryCode() + mPhone.getText().toString();
+        final String customerPhone;
+        if ( mPhone.getText().toString().startsWith("0"))
+            customerPhone = mPhone.getText().toString();
+        else
+            customerPhone = "0" + mPhone.getText().toString();
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);

@@ -1,33 +1,36 @@
 package grab.com.thuexetoancau.activity;
 
 import android.content.Context;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 
 import grab.com.thuexetoancau.R;
-import grab.com.thuexetoancau.adapter.FavoriteTripAdapter;
 import grab.com.thuexetoancau.adapter.ScheduleTripAdapter;
 import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.model.User;
 import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
 
-public class ScheduleTripActivity extends AppCompatActivity {
-    private RecyclerView listFavorite;
+public class ScheduleTripActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
+    private RecyclerView listSchedule;
     private ScheduleTripAdapter adapter;
     private Context mContext;
     private int userId;
     private Toolbar toolbar;
     private int bookingId, tripType;
     private User driver;
-    private  ApiUtilities mApi;
-
+    private ApiUtilities mApi;
+    private SwipeRefreshLayout swipeToRefresh;
+    private RelativeLayout layoutNoTrip;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,35 +55,45 @@ public class ScheduleTripActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Lich trình chuyến đi");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        listFavorite = (RecyclerView) findViewById(R.id.list_schedule);
-        listFavorite.setHasFixedSize(true);
+        swipeToRefresh =(SwipeRefreshLayout) findViewById(R.id.swipe_view);
+        layoutNoTrip = (RelativeLayout) findViewById(R.id.layout_no_trip);
+        swipeToRefresh.setOnRefreshListener(this);
+        listSchedule = (RecyclerView) findViewById(R.id.list_schedule);
+        listSchedule.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        listFavorite.setLayoutManager(layoutManager);
+        listSchedule.setLayoutManager(layoutManager);
 
         if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
             mApi.checkTokenLogin(new ApiUtilities.ResponseLoginListener() {
                 @Override
                 public void onSuccess(Trip trip, User user) {
-                    mApi.getScheduleTrip(user.getId(), new ApiUtilities.ResponseTripListener() {
-                        @Override
-                        public void onSuccess(ArrayList<Trip> arrayTrip) {
-                            adapter = new ScheduleTripAdapter(mContext, arrayTrip);
-                            listFavorite.setAdapter(adapter);
-                        }
-                    });
+                    userId = user.getId();
+                    getScheduleTrip(userId);
                 }
             });
         }else {
-            mApi.getScheduleTrip(userId, new ApiUtilities.ResponseTripListener() {
-                @Override
-                public void onSuccess(ArrayList<Trip> arrayTrip) {
-                    adapter = new ScheduleTripAdapter(mContext, arrayTrip);
-                    listFavorite.setAdapter(adapter);
-                }
-            });
+            getScheduleTrip(userId);
         }
     }
 
+    private void getScheduleTrip(int userId){
+        mApi.getScheduleTrip(userId, new ApiUtilities.ResponseTripListener() {
+            @Override
+            public void onSuccess(ArrayList<Trip> arrayTrip) {
+                if (arrayTrip == null){
+                    layoutNoTrip.setVisibility(View.VISIBLE);
+                    listSchedule.setVisibility(View.GONE);
+                }else {
+                    layoutNoTrip.setVisibility(View.GONE);
+                    listSchedule.setVisibility(View.VISIBLE);
+                    adapter = new ScheduleTripAdapter(mContext, arrayTrip);
+                    listSchedule.setAdapter(adapter);
+                }
+                if (swipeToRefresh.isRefreshing())
+                    swipeToRefresh.setRefreshing(false);
+            }
+        });
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle arrow click here
@@ -89,5 +102,10 @@ public class ScheduleTripActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRefresh() {
+        getScheduleTrip(userId);
     }
 }

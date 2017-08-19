@@ -86,7 +86,9 @@ public class CommonUtilities {
     }
 
     public static String  convertTelephone(String phone){
-        return phone.substring(2);
+        if (phone.startsWith("0"))
+            return phone.substring(1);
+        return phone;
     }
     public static String convertTime(DateTime current){
         String dateFrom = current.getDayOfMonth()+"/"+current.getMonthOfYear();

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Thuê xe toàn cầu</string>
+    <string name="app_name">NoiCar</string>
     <string name="title_activity_register_driver">RegisterDriverActivity</string>
     <string-array name="move_array">
         <item>Thành phố đi sân bay</item>
@@ -54,7 +54,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Kết thúc</string>
 
     <string name="login_facebook">Đăng nhập qua Facebook</string>
     <string name="login_google">Đăng nhập qua Google</string>

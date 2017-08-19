@@ -124,6 +124,10 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_ok:
+                if (rating.getRating() == 0){
+                    Toast.makeText(getActivity(),"Bạn chưa cho tài xế sao",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 setCustomerRating();
                 this.dismiss();
                 break;
@@ -149,7 +153,7 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
     }
 
     private void ratingAction(ApiUtilities mApi) {
-        mApi.reviewTrip(user.getId(),bookingId, rating.getNumStars(), edtReview.getText().toString(), new ApiUtilities.ResponseRequestListener() {
+        mApi.reviewTrip(user.getId(),bookingId, (int) rating.getRating(), edtReview.getText().toString(), new ApiUtilities.ResponseRequestListener() {
             @Override
             public void onSuccess() {
                 if (listener != null)

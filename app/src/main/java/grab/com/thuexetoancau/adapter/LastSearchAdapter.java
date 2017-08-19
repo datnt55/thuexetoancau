@@ -43,7 +43,6 @@ public class LastSearchAdapter extends RecyclerView.Adapter<LastSearchAdapter.Vi
     private GoogleApiClient mGoogleApiClient;
     private AutocompleteFilter mPlaceFilter;
     private LatLngBounds mBounds;
-    private boolean showHistories = true;
 
     public LastSearchAdapter(Context context, LatLngBounds bounds, AutocompleteFilter filter) {
         mContext = context;
@@ -58,13 +57,6 @@ public class LastSearchAdapter extends RecyclerView.Adapter<LastSearchAdapter.Vi
         } else {
             mGoogleApiClient = googleApiClient;
         }
-    }
-
-    private void dummyData() {
-        arraySearch.clear();
-        arraySearch.add(new Position("1","Phạm Ngọc Thạch", "Đống Đa, Hà Nội"));
-        arraySearch.add(new Position("1","Tôn Thất Thuyết", "Cầu Giấy, Hà Nội"));
-        arraySearch.add(new Position("1","Bạch Mai", "Hai Bà Trưng, Hà Nội"));
     }
 
     private ArrayList<Position> getPredictions(CharSequence constraint) {
@@ -120,10 +112,7 @@ public class LastSearchAdapter extends RecyclerView.Adapter<LastSearchAdapter.Vi
                 }
             }
         });
-        if (showHistories)
-            holder.imgLocation.setImageResource(R.drawable.ic_access_time_black_24dp);
-        else
-            holder.imgLocation.setImageResource(R.drawable.ic_location_on_black_24dp);
+        holder.imgLocation.setImageResource(R.drawable.ic_location_on_black_24dp);
     }
 
 
@@ -139,21 +128,15 @@ public class LastSearchAdapter extends RecyclerView.Adapter<LastSearchAdapter.Vi
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults results = new FilterResults();
                 if (constraint != null) {
-                    if(constraint.equals("")){
-                        showHistories = true;
-                        dummyData();
-                    }else {
-                        if (showHistories) {
-                            arraySearch.clear();
-                            showHistories = false;
-                        }
+                    if(!constraint.equals("")){
                         // Query the autocomplete API for the entered constraint
                         arraySearch = getPredictions(constraint);
                         if (arraySearch != null) {
                             results.values = arraySearch;
                             results.count = arraySearch.size();
                         }
-                    }
+                    }else
+                        arraySearch.clear();
                 }
                 return results;
             }
