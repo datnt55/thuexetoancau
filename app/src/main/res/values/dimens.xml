@@ -10,7 +10,7 @@
     <!-- Splash activity -->
     <dimen name="splash_spinner_size">50dp</dimen>
     <dimen name="splash_notice_margin">15dp</dimen>
-    <dimen name="splash_spinner_margin">100dp</dimen>
+    <dimen name="splash_spinner_margin">50dp</dimen>
 
     <!-- passenger select action activity -->
     <dimen name="select_action_layout_padding">10dp</dimen>

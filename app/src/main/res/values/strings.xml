@@ -7,7 +7,7 @@
         <item>Khứ hồi</item>
 
     </string-array>
-    <string name="splash_text">Đang load dữ liệu. Đảm bảo bạn đang kết nối mạng</string>
+    <string name="splash_text">Đang tải dữ liệu</string>
     <string name="error_network">Bạn chưa kết nối mạng</string>
     <string name="try_again">Thử lại</string>
     <string name="exit">Thoát</string>
