@@ -128,12 +128,13 @@ public class ApiUtilities {
         final SharePreference preference = new SharePreference(mContext);
         RequestParams params;
         params = new RequestParams();
-        params.put("custom_phone", customerPhone);
+        if (customerPhone != null)
+            params.put("custom_phone", customerPhone);
         DateTime current = new DateTime();
         long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
         params.put("key", key);
-        /*if (user.getEmail() != null)
-            params.put("custom_email", customerEmail);*/
+        if (customerEmail != null)
+            params.put("custom_email", customerEmail);
         params.put("regId", preference.getRegId());
         params.put("os",1);
         Log.e("TAG",params.toString());
@@ -170,7 +171,9 @@ public class ApiUtilities {
                         User user = new User(useId, customerName,customerPhone,customerEmail,null);
                         if (listener != null)
                             listener.onSuccess(trip, user);
-                    }
+                    }else
+                    if (listener != null)
+                        listener.onFail();
                     Toast.makeText(mContext,json.getString("message"),Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -292,7 +295,7 @@ public class ApiUtilities {
             String listEndPoin = booking.getString("list_end_point");
             int isOneWay = booking.getInt("is_one_way");
             int isMineTrip = booking.getInt("is_mine_trip");
-            int price = booking.getInt("price");
+            long price = booking.getLong("price");
             int distance = booking.getInt("distance");
             String startTime = null ,backTime = null, note = null ;
             if (booking.getString("start_time")!= null)
@@ -957,6 +960,7 @@ public class ApiUtilities {
 
     public interface ResponseLoginListener {
         void onSuccess(Trip trip, User user);
+        void onFail();
     }
 
     public interface ResponseRegisterListener {

@@ -60,6 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:gravity="bottom"
+                android:visibility="gone"
                 android:orientation="vertical"
                 android:padding="@dimen/select_action_layout_padding">
 

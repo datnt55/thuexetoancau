@@ -84,11 +84,11 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     private void setCarPrice(int distance) {
         for (Car car : transports)
             if (totalDistance < Defines.MAX_DISTANCE)
-                car.setTotalPrice(car.getPrice11way()*distance/1000);
+                car.setTotalPrice(car.getPrice11way()*(distance/1000));
             else if (tripType == 1)
-                car.setTotalPrice(car.getPrice01way()*distance/1000);
+                car.setTotalPrice(car.getPrice01way()*(distance/1000));
             else {
-                car.setTotalPrice((car.getPrice02way()*distance +car.getPrice02way() * distance)/ 1000);
+                car.setTotalPrice((car.getPrice02way()+car.getPrice02way()) * (distance/ 1000));
             }
     }
 

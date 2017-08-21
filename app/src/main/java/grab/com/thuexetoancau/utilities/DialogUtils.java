@@ -54,6 +54,24 @@ public class DialogUtils {
         alert.show();
     }
 
+    public static void cancelTripFromDriver(final Activity mActivity, final YesNoListenter listenter) {
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(mActivity);
+        alertDialogBuilder.setTitle(R.string.notice);  // GPS not found
+        alertDialogBuilder.setMessage(R.string.driver_cancel)
+                .setCancelable(false)
+                .setPositiveButton(R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                if (listenter != null)
+                                    listenter.onYes();
+                                dialog.dismiss();
+                            }
+                        });
+        android.app.AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
+
+
     public static void showDialogNetworkError(Context mContext, final TryAgain again){
         AlertDialog dialog = new AlertDialog.Builder(mContext)
                 .setTitle(mContext.getString(R.string.app_name))

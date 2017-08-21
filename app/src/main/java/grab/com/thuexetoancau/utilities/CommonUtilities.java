@@ -126,9 +126,9 @@ public class CommonUtilities {
             dateFrom+="0"+current.getSecondOfMinute();
         return dateFrom;
     }
-    public static String convertCurrency(int currency){
-        int nature = currency / 1000;
-        int fractiona = currency - nature*1000;
+    public static String convertCurrency(long currency){
+        long nature = currency / 1000;
+        long fractiona = currency - nature*1000;
         if (fractiona > 500)
             currency = (nature+1)*1000;
         else
@@ -287,11 +287,11 @@ public class CommonUtilities {
             case 8:
                 return R.drawable.car_8_size;
             case 16:
-                return R.drawable.car_8_size;
+                return R.drawable.car_16_size;
             case 30:
-                return R.drawable.car_8_size;
+                return R.drawable.car_30_size;
             case 45:
-                return R.drawable.car_8_size;
+                return R.drawable.car_45_size;
         }
         return 0;
     }

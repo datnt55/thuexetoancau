@@ -93,7 +93,7 @@ public class OtpView extends LinearLayout {
      * @param otp Send the four digit otp
      */
     public void setOTP(String otp){
-        if(otp.length()!=4){
+        if(otp.length()!=6){
             Log.e("OTPView","Invalid otp param");
             return;
         }
@@ -102,12 +102,12 @@ public class OtpView extends LinearLayout {
             Log.e("OTPView","OTP doesn't match INPUT TYPE");
             return;
         }
-        mOtpOneField.setText(otp.charAt(0));
-        mOtpTwoField.setText(otp.charAt(1));
-        mOtpThreeField.setText(otp.charAt(2));
-        mOtpFourField.setText(otp.charAt(3));
-        mOtpFiveField.setText(otp.charAt(4));
-        mOtpSixField.setText(otp.charAt(5));
+        mOtpOneField.setText(otp.substring(0,1));
+        mOtpTwoField.setText(otp.substring(1,2));
+        mOtpThreeField.setText(otp.substring(2,3));
+        mOtpFourField.setText(otp.substring(3,4));
+        mOtpFiveField.setText(otp.substring(4,5));
+        mOtpSixField.setText(otp.substring(5,6));
     }
 
     private void styleEditTexts(TypedArray styles) {

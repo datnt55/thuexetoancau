@@ -115,7 +115,7 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
         return new Dialog(getActivity(), getTheme()){
             @Override
             public void onBackPressed() {
-                RatingFragment.this.dismiss();
+                return ;
             }
         };
     }

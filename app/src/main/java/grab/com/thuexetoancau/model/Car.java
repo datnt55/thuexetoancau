@@ -11,7 +11,7 @@ public class Car {
     private int price01way;
     private int price02way;
     private int price11way;
-    private int totalPrice;
+    private long totalPrice;
     private boolean selected;
 
     public Car(int size,String name, int image, int price01way, int price02way, int price11way) {
@@ -82,11 +82,11 @@ public class Car {
         this.selected = selected;
     }
 
-    public int getTotalPrice() {
+    public long getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(int totalPrice) {
+    public void setTotalPrice(long totalPrice) {
         this.totalPrice = totalPrice;
     }
 

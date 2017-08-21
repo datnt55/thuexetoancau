@@ -65,7 +65,7 @@ public class LastSearchAdapter extends RecyclerView.Adapter<LastSearchAdapter.Vi
             AutocompletePredictionBuffer autocompletePredictions = results.await(60, TimeUnit.SECONDS);
             final Status status = autocompletePredictions.getStatus();
             if (!status.isSuccess()) {
-                Toast.makeText(mContext, "Error: " + status.toString(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(mContext, "Error: " + status.toString(), Toast.LENGTH_SHORT).show();
                 autocompletePredictions.release();
                 return null;
             }

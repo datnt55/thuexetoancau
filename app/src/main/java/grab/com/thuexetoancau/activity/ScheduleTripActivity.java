@@ -70,6 +70,11 @@ public class ScheduleTripActivity extends AppCompatActivity implements SwipeRefr
                     userId = user.getId();
                     getScheduleTrip(userId);
                 }
+
+                @Override
+                public void onFail() {
+
+                }
             });
         }else {
             getScheduleTrip(userId);

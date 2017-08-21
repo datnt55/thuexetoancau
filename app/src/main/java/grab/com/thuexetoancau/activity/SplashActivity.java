@@ -146,6 +146,11 @@ public class SplashActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
+
+                @Override
+                public void onFail() {
+
+                }
             });
         }else{
             Intent i = new Intent(SplashActivity.this, SelectMethodLoginActivity.class);

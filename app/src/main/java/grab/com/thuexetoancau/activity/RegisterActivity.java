@@ -1,5 +1,6 @@
 package grab.com.thuexetoancau.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -8,6 +9,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsMessage;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
@@ -38,6 +40,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.model.Trip;
@@ -46,6 +50,7 @@ import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.SharePreference;
+import grab.com.thuexetoancau.utilities.SmsReceiver;
 import grab.com.thuexetoancau.widget.CustomProgress;
 import grab.com.thuexetoancau.widget.OtpView;
 
@@ -55,7 +60,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private TextInputLayout textInputName, textInputEmail, textInputPhone;
     private EditText edtCustomerName, edtCustomerEmail, edtCustomerPhone;
     private ImageView imgBack;
-    private String customerPhone;
+    private String customerPhone, smsCode;
     private CountryCodePicker ccpPhone;
     private Context mContext;
     private boolean isLogin = true;
@@ -67,12 +72,43 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private OtpView edtCode;
     private FirebaseAuth mAuth;
+    public static final String OTP_REGEX = "[0-9]{1,6}";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         mContext = this;
         initComponent();
+        SmsReceiver.bindListener(new SmsReceiver.SmsListener() {
+            @Override
+            public void messageReceived(String messageText) {
+
+                Log.e("Message",messageText);
+
+                Pattern pattern = Pattern.compile(OTP_REGEX);
+                Matcher matcher = pattern.matcher(messageText);
+                String otp = null;
+                while (matcher.find())
+                {
+                    otp = matcher.group();
+                }
+                Log.e("Message",otp);
+                smsCode = otp;
+                edtCode.setOTP(otp);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isLogin)
+                            loginCustomer();
+                        else
+                        if (checkValidData())
+                            registerCustomer();
+                    }
+                },1000);
+
+            }
+        });
 
     }
 
@@ -109,15 +145,38 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         contentRegister.setSpan(new ForegroundColorSpan(ContextCompat.getColor(this, R.color.blue_light)),  23, contentRegister.length(), 0);
         txtRegister.setText(contentRegister);
         txtRegister.setOnClickListener(this);
+        mApi = new ApiUtilities(this);
         if (getIntent().hasExtra(Defines.BUNDLE_USER)) {
             //receive
             user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
             edtCustomerName.setText(user.getName());
             edtCustomerEmail.setText(user.getEmail());
+            mApi.loginCustomer(null, user.getEmail(), new ApiUtilities.ResponseLoginListener() {
+                @Override
+                public void onSuccess(Trip trip, User mUser) {
+                    user = mUser;
+                    edtCustomerPhone.setText(user.getPhone());
+                    Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
+                    intent.putExtra(Defines.BUNDLE_LOGIN_USER, user);
+                    if (trip != null) {
+                        intent.putExtra(Defines.BUNDLE_LOGIN_TRIP, trip);
+                        if (trip.getDriverId() != 0)
+                            intent.putExtra(Defines.BUNDLE_LOGIN_DRIVER,true);
+                    }
+                    startActivity(intent);
+                    finish();
+                }
+
+                @Override
+                public void onFail() {
+                    showRegisterLayout();
+                    isLogin = false;
+                }
+            });
         }
         txtNext.setOnClickListener(this);
         imgBack.setOnClickListener(this);
-        mApi = new ApiUtilities(this);
+
     }
 
     @Override
@@ -125,10 +184,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch (v.getId()){
             case R.id.txt_next:
                 if (layoutDigits.isShown()){
-                    if (isLogin)
-                        loginCustomer();
-                    else
-                        registerCustomer();
+                    if (edtCode.getOTP().equals(smsCode)) {
+                        if (isLogin)
+                            loginCustomer();
+                        else
+                            registerCustomer();
+                    }else {
+                        Toast.makeText(mContext,"Mã nhập không đúng",Toast.LENGTH_SHORT).show();
+                    }
                 }else {
                     accountKitCheck();
                 }
@@ -261,6 +324,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 Log.e("TOKEN",new SharePreference(mContext).getToken());
                 finish();
             }
+
+            @Override
+            public void onFail() {
+
+            }
         });
     }
 
@@ -294,7 +362,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
         @Override
         public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
-            Toast.makeText(mContext,phoneAuthCredential.getSmsCode(),Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mContext,phoneAuthCredential.getSmsCode(),Toast.LENGTH_SHORT).show();
+           /* smsCode = phoneAuthCredential.getSmsCode();
             edtCode.setOTP(phoneAuthCredential.getSmsCode());
 
             new Handler().postDelayed(new Runnable() {
@@ -307,8 +376,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         registerCustomer();
                 }
             },1500);
-            mVerificationInProgress = false;
-            signInWithPhoneAuthCredential(phoneAuthCredential);
+            mVerificationInProgress = false;*/
+          //  signInWithPhoneAuthCredential(phoneAuthCredential);
         }
 
         @Override
@@ -334,7 +403,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             // now need to ask the user to enter the code and then construct a credential
             // by combining the code with a verification ID.
             Log.d("TAG", "onCodeSent:" + verificationId);
-            Toast.makeText(mContext,"onCodeSent:" + verificationId,Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mContext,"onCodeSent:" + verificationId,Toast.LENGTH_SHORT).show();
             // Save verification ID and resending token so we can use them later
             mVerificationId = verificationId;
             mResendToken = token;
@@ -344,7 +413,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
     };
 
-    // [START sign_in_with_phone]
+/*    // [START sign_in_with_phone]
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -360,5 +429,36 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         }
                     }
                 });
-    }
+    }*/
+   /* public static String GENERAL_OTP_TEMPLATE = "Your Firebase App verification code is (.*)";
+    public class SmsListener extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+
+            if(intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")){
+                Bundle bundle = intent.getExtras();           //---get the SMS message passed in---
+                SmsMessage[] msgs = null;
+                String msg_from;
+                if (bundle != null){
+                    //---retrieve the SMS message received---
+                    try{
+                        Object[] pdus = (Object[]) bundle.get("pdus");
+                        msgs = new SmsMessage[pdus.length];
+                        for(int i=0; i<msgs.length; i++){
+                            msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
+                        }
+                        Pattern generalOtpPattern = Pattern.compile(GENERAL_OTP_TEMPLATE);
+                        Matcher generalOtpMatcher = generalOtpPattern.matcher(msgs[0].getMessageBody().toString());
+
+                        if (generalOtpMatcher.find()) {
+                            smsCode = generalOtpMatcher.group(1);
+                        }
+                    }catch(Exception e){
+//                            Log.d("Exception caught",e.getMessage());
+                    }
+                }
+            }
+        }
+    }*/
 }

@@ -75,7 +75,7 @@ public class LastSearchFragment extends Fragment {
                     @Override
                     public void onResult(PlaceBuffer places) {
                         if(places.getCount()==1){
-                            Toast.makeText(getActivity(),String.valueOf(places.get(0).getLatLng()), Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getActivity(),String.valueOf(places.get(0).getLatLng()), Toast.LENGTH_SHORT).show();
                           /*  PassengerSelectActionActivity activity = (PassengerSelectActionActivity) getActivity();
                             activity.goToBookingCar(location,directionPosition);*/
                           location.setLatLng(places.get(0).getLatLng());

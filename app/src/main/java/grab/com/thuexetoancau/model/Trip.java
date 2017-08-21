@@ -14,7 +14,7 @@ public class Trip implements Serializable{
     private int carSize;
     private int tripType;
     private int distance;
-    private int price;
+    private long price;
     private String startTime;
     private String endTime;
     private int customerType;
@@ -31,7 +31,7 @@ public class Trip implements Serializable{
     private int driverId;
     private int carType;
     private int realDistance;
-    private int realPrice;
+    private long realPrice;
     private String driverName;
     private String driverPhone;
     private String driverCarNumber;
@@ -39,7 +39,7 @@ public class Trip implements Serializable{
     public Trip() {
     }
 
-    public Trip(int id, int userId, ArrayList<Position> listStopPoints, int carSize, int tripType, int distance, int price, String startTime, String endTime, int customerType, String customerName, String customerPhone, String guestName, String guestPhone, String note) {
+    public Trip(int id, int userId, ArrayList<Position> listStopPoints, int carSize, int tripType, int distance, long price, String startTime, String endTime, int customerType, String customerName, String customerPhone, String guestName, String guestPhone, String note) {
         this.id = id;
         this.userId = userId;
         this.listStopPoints = listStopPoints;
@@ -57,7 +57,7 @@ public class Trip implements Serializable{
         this.note = note;
     }
 
-    public Trip(int userId, String customerName, String customerPhone, ArrayList<Position> listStopPoints, int tripType, int distance, int carSize, int price) {
+    public Trip(int userId, String customerName, String customerPhone, ArrayList<Position> listStopPoints, int tripType, int distance, int carSize, long price) {
         this.userId = userId;
         this.customerName = customerName;
         this.customerPhone = customerPhone;
@@ -100,11 +100,11 @@ public class Trip implements Serializable{
         this.distance = distance;
     }
 
-    public int getPrice() {
+    public long getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(long price) {
         this.price = price;
     }
 
@@ -252,11 +252,11 @@ public class Trip implements Serializable{
         this.realDistance = realDistance;
     }
 
-    public int getRealPrice() {
+    public long getRealPrice() {
         return realPrice;
     }
 
-    public void setRealPrice(int realPrice) {
+    public void setRealPrice(long realPrice) {
         this.realPrice = realPrice;
     }
 

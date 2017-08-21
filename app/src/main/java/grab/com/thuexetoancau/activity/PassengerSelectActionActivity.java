@@ -1,6 +1,7 @@
 package grab.com.thuexetoancau.activity;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -143,7 +144,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ArrayList<Car> listCar = new ArrayList<>();
     private Position mFrom, mEnd;
-    private int totalDistance = 0, typeTrip = 1, totalPrice = 0, carSize = 0, bookingId;
+    private int totalDistance = 0, typeTrip = 1,carSize = 0, bookingId;
+    private long totalPrice = 0;
     private ApiUtilities mApi;
     private ChangeTripInfo changeTrip;
     private Trip lastTrip;
@@ -165,6 +167,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     user = mUser;
                     initComponents();
                     getIntentFromFirebase();
+                }
+
+                @Override
+                public void onFail() {
+
                 }
             });
         }else
@@ -417,12 +424,12 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         // Hide layout search
         AnimUtils.slideUp(layoutSearch,searchBarHeight);
         // Hide layout auction
-        AnimUtils.slideDown(layoutFindCar,measureView(layoutFindCar));
+       // AnimUtils.slideDown(layoutFindCar,measureView(layoutFindCar));
     }
 
     private void showLayoutSearchOrigin(){
         AnimUtils.slideDown(layoutSearch,0);
-        AnimUtils.slideUp(layoutFindCar,0);
+       // AnimUtils.slideUp(layoutFindCar,0);
     }
 
     private void sendRequestFindDirection() {
@@ -1023,8 +1030,17 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                Toast.makeText(mContext,"Tài xế đã hủy chuyến đi",Toast.LENGTH_SHORT).show();
-                finishTripAndUpdateView();
+                DialogUtils.cancelTripFromDriver((Activity) mContext, new DialogUtils.YesNoListenter() {
+                    @Override
+                    public void onYes() {
+                        finishTripAndUpdateView();
+                    }
+
+                    @Override
+                    public void onNo() {
+
+                    }
+                });
             } catch (IllegalStateException e) {
             }
         }
@@ -1112,15 +1128,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 break;
 
             case R.id.nav_notify:
-                Toast.makeText(mContext, "Chức năng đang dược cập nhật",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Chức năng đang được cập nhật",Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.nav_invite:
-                Toast.makeText(mContext, "Chức năng đang dược cập nhật",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Chức năng đang được cập nhật",Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.nav_support:
-                Toast.makeText(mContext, "Chức năng đang dược cập nhật",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Chức năng đang được cập nhật",Toast.LENGTH_SHORT).show();
                 break;
 
         }

@@ -60,7 +60,7 @@
     <string name="login_google">Đăng nhập qua Google</string>
     <string name="login_phone">Sử dụng số điện thoại</string>
 
-    <string name="facebook_app_id">154472745109695</string>
+    <string name="facebook_app_id">1590532131018359</string>
     <string name="fb_login_protocol_scheme">fb154472745109695</string>
 
     <string name="title_register">Vui lòng điền thông tin, Chỉ có tài xế đón bạn thấy thông tin của bạn</string>
@@ -98,5 +98,6 @@
     <string name="review_message">Cám ơn bạn đã để lại ý kiến của mình</string>
     <string name="in_trip">Đang trong chuyến đi</string>
     <string name="wait_driver">Đang đợi tài xế</string>
+    <string name="driver_cancel">Tài xế đã hủy chuyến đi</string>
 </resources>
 

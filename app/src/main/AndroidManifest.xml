@@ -12,7 +12,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:name=".UILApplication"
@@ -39,31 +41,54 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+        <receiver android:name=".utilities.SmsReceiver">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
 
-        <activity android:name=".activity.SplashActivity">
+        <activity
+            android:name=".activity.SplashActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.PassengerSelectActionActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/TranslucentTheme"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".activity.AuctionBookingActivity" />
-        <activity android:name=".activity.ListPassengerBookingActivity" />
-        <activity android:name=".activity.SelectMethodLoginActivity" />
+        <activity
+            android:name=".activity.AuctionBookingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ListPassengerBookingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.SelectMethodLoginActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.ConfigureAccountActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".activity.RegisterActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/FullScreen" />
-        <activity android:name=".activity.FavoriteTripActivity" />
-        <activity android:name=".activity.HistoryTripActivity" />
-        <activity android:name=".activity.ScheduleTripActivity" />
-        <activity android:name=".activity.AuctionBookingResultActivity"></activity>
+        <activity
+            android:name=".activity.FavoriteTripActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.HistoryTripActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ScheduleTripActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.AuctionBookingResultActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
