@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
@@ -67,6 +68,8 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         listTrans.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         listTrans.setLayoutManager(layoutManager);
+        if (totalDistance < Defines.MAX_DISTANCE)
+            filterCar();
         setCarPrice(totalDistance);
         adapter = new TransportationAdapter(mContext, transports);
         listTrans.setAdapter(adapter);
@@ -79,6 +82,15 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
                     listener.onSelectVehicle(carSelect);
             }
         });
+    }
+
+    private void filterCar() {
+        Iterator<Car> it = transports.iterator();
+        while( it.hasNext() ){
+            if (it.next().getSize() != 5 && it.next().getSize() != 8) {
+                it.remove();
+            }
+        }
     }
 
     private void setCarPrice(int distance) {

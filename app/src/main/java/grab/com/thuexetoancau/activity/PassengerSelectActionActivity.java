@@ -74,6 +74,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -86,6 +87,7 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.LastSearchAdapter;
 import grab.com.thuexetoancau.fragment.LastSearchFragment;
 import grab.com.thuexetoancau.listener.ChangeTripInfo;
+import grab.com.thuexetoancau.model.AroundCar;
 import grab.com.thuexetoancau.model.Car;
 import grab.com.thuexetoancau.model.Position;
 import grab.com.thuexetoancau.model.Trip;
@@ -140,12 +142,14 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private User user;
     private ArrayList<Position> listStopPoint = new ArrayList<>();
     private ArrayList<Marker> markerList = new ArrayList<>();
+    private ArrayList<Marker> aroundList = new ArrayList<>();
     private Marker currentLocation;
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ArrayList<Car> listCar = new ArrayList<>();
     private Position mFrom, mEnd;
-    private int totalDistance = 0, typeTrip = 1,carSize = 0, bookingId;
-    private long totalPrice = 0;
+    private int typeTrip = 1,bookingId;
+    private Car carSelectd;
+    private int totalDistance = 0;
     private ApiUtilities mApi;
     private ChangeTripInfo changeTrip;
     private Trip lastTrip;
@@ -490,6 +494,26 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             } else
                 showCurrentLocationToMap(gpsTracker.getLatitude(), gpsTracker.getLongitude());
         }
+        mApi.getCarAround(gpsTracker, new ApiUtilities.AroundCarListener() {
+            @Override
+            public void onSuccess(ArrayList<AroundCar> aroundCars) {
+                for (AroundCar car : aroundCars){
+                    DecimalFormat df = new DecimalFormat("#.#");
+                    String gap;
+                    if ((int) car.getDistance() == 0) {
+                        String meter = df.format( car.getDistance() * 1000);
+                        gap = mContext.getResources().getString(R.string.distance_meter, meter);
+                    }else {
+                        String kilometer = df.format( car.getDistance());
+                        gap = mContext.getResources().getString(R.string.distance_kilo_meter, kilometer);
+                    }
+                    LatLng aroundLatLon = new LatLng(car.getLatitude(), car.getLongitude());
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(aroundLatLon).title(mContext.getResources().getString(R.string.distance_car,gap)));
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.car));
+                    aroundList.add(marker);
+                }
+            }
+        });
     }
 
     private void showLayoutSearchingDriver(int bookingId, Trip trip) {
@@ -852,7 +876,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private final Interpolator interpolator = new LinearInterpolator();
     @Override
     public void onBookingClicked() {
-        Trip trip = new Trip(user.getId(), user.getName(), user.getPhone(),listStopPoint, typeTrip, totalDistance, carSize,totalPrice );
+        Trip trip = new Trip(user.getId(), user.getName(), user.getPhone(),listStopPoint, typeTrip, totalDistance, carSelectd.getSize(),carSelectd.getTotalPrice() );
+        trip.setCar(carSelectd.isCar());
         FragmentManager fragmentManager = getSupportFragmentManager();
         dialogConfirm = new ConfirmDialogFragment();
         dialogConfirm.setOnCallBack(this);
@@ -868,8 +893,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onSelectVehicle(Car car) {
-        totalPrice = car.getTotalPrice();
-        carSize = car.getSize();
+        carSelectd = car;
     }
 
     //====================================== Searching car implement================================

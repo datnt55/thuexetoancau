@@ -4,10 +4,15 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -19,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +33,7 @@ import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
 import grab.com.thuexetoancau.activity.SelectMethodLoginActivity;
 import grab.com.thuexetoancau.activity.SplashActivity;
+import grab.com.thuexetoancau.model.AroundCar;
 import grab.com.thuexetoancau.model.Car;
 import grab.com.thuexetoancau.model.Position;
 import grab.com.thuexetoancau.model.Trip;
@@ -390,7 +397,14 @@ public class ApiUtilities {
                             int price01way = car.getInt("price01way");
                             int price02way = car.getInt("price02way");
                             int price11way = car.getInt("price11way");
-                            arrayPrice.add(new Car(carSize,CommonUtilities.getCarName(carSize), CommonUtilities.getCarImage(carSize), price01way, price02way, price11way));
+                            int price01way2 = car.getInt("price01way2");
+                            int price02way2 = car.getInt("price02way2");
+                            int price11way2 = car.getInt("price11way2");
+                            if (carSize == 5 || carSize == 8) {
+                                arrayPrice.add(new Car(carSize,true, CommonUtilities.getCarName(carSize,true), CommonUtilities.getCarImage(carSize), price01way, price02way, price11way));
+                                arrayPrice.add(new Car(carSize,true, CommonUtilities.getCarName(carSize,false), CommonUtilities.getTaxiImage(carSize), price01way2, price02way2, price11way2));
+                            }else
+                                arrayPrice.add(new Car(carSize,true, CommonUtilities.getCarName(carSize,true), CommonUtilities.getCarImage(carSize), price01way, price02way, price11way));
                         }
 
                     }
@@ -526,6 +540,7 @@ public class ApiUtilities {
             params.put("start_time", dtf.print(new DateTime()));
         }
         params.put("custom_note", trip.getNote());
+        params.put("is_car", trip.isCar() ? 1 : 0);
         DateTime current = new DateTime();
         long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
         params.put("key", key);
@@ -944,6 +959,66 @@ public class ApiUtilities {
         });
     }
 
+    public void getCarAround(GPSTracker location, final AroundCarListener listener) {
+        RequestParams params;
+        params = new RequestParams();
+        params.put("lat", location.getLatitude());
+        params.put("lon", location.getLongitude());
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_GET_CAR_AROUND, params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                ArrayList<AroundCar> aroundCars = new ArrayList<AroundCar>();
+                try {
+                    JSONArray data = new JSONArray(new String(responseBody));
+                    for (int i = 0; i < data.length(); i++) {
+                        JSONObject jsonobject = data.getJSONObject(i);
+                        AroundCar aroundCar = parseJsonResult(jsonobject);
+                        aroundCars.add(aroundCar);
+                    }
+                    if (listener != null)
+                        listener.onSuccess(aroundCars);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+                //Toast.makeText(getContext(), getResources().getString(R.string.check_network), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+                //Toast.makeText(getContext(), getResources().getString(R.string.check_network), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private AroundCar parseJsonResult(JSONObject jsonobject) {
+       AroundCar aroundCars = null;
+        try {
+            double lon         = jsonobject.getDouble("lon");
+            double lat         = jsonobject.getDouble("lat");
+            double distance    = jsonobject.getDouble("D");
+            aroundCars = new AroundCar(lat,lon,distance);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return aroundCars;
+    }
+
     public interface ServerTimeListener{
         void onSuccess(long time);
     }
@@ -966,8 +1041,13 @@ public class ApiUtilities {
     public interface ResponseRegisterListener {
         void onSuccess(User user);
     }
+
     public interface ResponseTripListener {
         void onSuccess(ArrayList<Trip> arrayTrip);
+    }
+
+    public interface AroundCarListener {
+        void onSuccess(ArrayList<AroundCar> aroundCars);
     }
 
 }

@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -51,7 +52,7 @@ import grab.com.thuexetoancau.utilities.Defines;
 public class ConfirmDialogFragment extends DialogFragment {
     private String title;
     private Trip mTrip;
-    private TextView txtSource, txtDestination, txtTypeTrip, txtPrice, txtDistance,txtStartTime ,txtBackTime;
+    private TextView txtSource, txtDestination, txtTypeTrip, txtPrice, txtDistance,txtStartTime ,txtBackTime, txtCaution;
     private EditText edtCustomerName, edtCustomerPhone;
     private View mDividerStart, mDividerBack, viewDividerFriend;
     private LinearLayout layoutStart, layoutBack;
@@ -60,6 +61,7 @@ public class ConfirmDialogFragment extends DialogFragment {
     private Button btnConfirm;
     private int totalDistance;
     private ConfirmDialogListener callback;
+    private DateTime startTime, endTime;
     public interface ConfirmDialogListener {
         void onConfirmed(Trip mTrip);
     }
@@ -97,7 +99,7 @@ public class ConfirmDialogFragment extends DialogFragment {
         txtStartTime = (TextView) view.findViewById(R.id.start_time);
         txtBackTime = (TextView) view.findViewById(R.id.back_time);
         txtPrice = (TextView) view.findViewById(R.id.price);
-
+        txtCaution= (TextView) view.findViewById(R.id.txt_caution);
         edtCustomerName = (EditText) view.findViewById(R.id.edt_friend_name);
         edtCustomerPhone = (EditText) view.findViewById(R.id.edt_friend_phone);
 
@@ -122,6 +124,7 @@ public class ConfirmDialogFragment extends DialogFragment {
         txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
         mTrip.setCustomerType(1);
 
+
         if (totalDistance < Defines.MAX_DISTANCE) {
             layoutStart.setVisibility(View.GONE);
             layoutBack.setVisibility(View.GONE);
@@ -139,10 +142,14 @@ public class ConfirmDialogFragment extends DialogFragment {
             layoutBack.setVisibility(View.VISIBLE);
         }
 
+        startTime = new DateTime();
         txtStartTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDateTimeDialog(txtStartTime);
+                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
+                startTime = dtf.parseDateTime(txtStartTime.getText().toString());
+                checkLongTripExceed2day();
             }
         });
 
@@ -150,6 +157,9 @@ public class ConfirmDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 showDateTimeDialog(txtBackTime);
+                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
+                endTime = dtf.parseDateTime(txtBackTime.getText().toString());
+                checkLongTripExceed2day();
             }
         });
 
@@ -195,15 +205,19 @@ public class ConfirmDialogFragment extends DialogFragment {
                     } else {
                         DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
                         DateTimeFormatter dtfTrip = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
-
+                        DateTime startTime;
                         if (txtStartTime.getText().toString().equals(getString(R.string.error_time_start))){
+                            startTime = new DateTime();
                             mTrip.setStartTime(dtf.print(new DateTime()));
                         }else{
-                            DateTime startTime = dtf.parseDateTime(txtStartTime.getText().toString());
+                            startTime = dtf.parseDateTime(txtStartTime.getText().toString());
                             mTrip.setStartTime(dtfTrip.print(startTime));
                         }
                         DateTime endTime = dtf.parseDateTime(txtBackTime.getText().toString());
                         mTrip.setEndTime(dtfTrip.print(endTime));
+                        int days = Days.daysBetween(endTime.toLocalDate(), startTime.toLocalDate()).getDays();
+                        if (days > 2 )
+                            mTrip.setPrice(mTrip.getPrice()*days);
                     }
                 }
                 if (callback != null)
@@ -213,6 +227,20 @@ public class ConfirmDialogFragment extends DialogFragment {
         });
     }
 
+    private void checkLongTripExceed2day(){
+        if (endTime == null)
+            return;
+        if (startTime == null)
+            return;
+        int days = Days.daysBetween(endTime.toLocalDate(), startTime.toLocalDate()).getDays();
+        if (days > 2 ) {
+            txtCaution.setVisibility(View.VISIBLE);
+            txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice()*days)+ " vnđ");
+        }else {
+            txtCaution.setVisibility(View.GONE);
+            txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
+        }
+    }
     private void showDateTimeDialog(final TextView txtDate){
         final View dialogView = View.inflate(getActivity(), R.layout.date_time_picker, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();

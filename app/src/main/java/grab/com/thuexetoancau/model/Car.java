@@ -7,6 +7,7 @@ package grab.com.thuexetoancau.model;
 public class Car {
     private int size;
     private String  name;
+    private boolean isCar;
     private int image;
     private int price01way;
     private int price02way;
@@ -14,8 +15,9 @@ public class Car {
     private long totalPrice;
     private boolean selected;
 
-    public Car(int size,String name, int image, int price01way, int price02way, int price11way) {
+    public Car(int size,boolean isCar, String name, int image, int price01way, int price02way, int price11way) {
         this.size = size;
+        this.isCar = isCar;
         this.name = name;
         this.image = image;
         this.selected = false;
@@ -32,6 +34,14 @@ public class Car {
         this.price01way = car.price01way;
         this.price02way = car.price02way;
         this.price11way = car.price11way;
+    }
+
+    public boolean isCar() {
+        return isCar;
+    }
+
+    public void setCar(boolean car) {
+        isCar = car;
     }
 
     public int getSize() {

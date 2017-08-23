@@ -184,6 +184,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         switch (v.getId()){
             case R.id.txt_next:
                 if (layoutDigits.isShown()){
+                    loginCustomer();
                     if (edtCode.getOTP().equals(smsCode)) {
                         if (isLogin)
                             loginCustomer();

@@ -296,14 +296,30 @@ public class CommonUtilities {
         return 0;
     }
 
-    public static String getCarName(int size){
+    public static int getTaxiImage(int size){
+        switch (size){
+            case 5:
+                return R.drawable.taxi_5_size;
+            case 8:
+                return R.drawable.taxi_8_size;
+        }
+        return 0;
+    }
+
+    public static String getCarName(int size, boolean isCar){
         switch (size){
             case 4:
                 return "Taxi 4 chỗ";
             case 5:
-                return "Taxi 5 chỗ";
+                if (isCar)
+                    return "Noicar 5 chỗ";
+                else
+                    return "Noicar taxi 5 chỗ";
             case 8:
-                return "Taxi 8 chỗ";
+                if (isCar)
+                    return "Xe 8 chỗ";
+                else
+                    return "Taxi 8 chỗ";
             case 16:
                 return "Xe 16 chỗ";
             case 30:
