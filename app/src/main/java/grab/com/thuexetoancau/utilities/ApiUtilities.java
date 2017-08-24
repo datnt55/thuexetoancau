@@ -402,7 +402,7 @@ public class ApiUtilities {
                             int price11way2 = car.getInt("price11way2");
                             if (carSize == 5 || carSize == 8) {
                                 arrayPrice.add(new Car(carSize,true, CommonUtilities.getCarName(carSize,true), CommonUtilities.getCarImage(carSize), price01way, price02way, price11way));
-                                arrayPrice.add(new Car(carSize,true, CommonUtilities.getCarName(carSize,false), CommonUtilities.getTaxiImage(carSize), price01way2, price02way2, price11way2));
+                                arrayPrice.add(new Car(carSize,false, CommonUtilities.getCarName(carSize,false), CommonUtilities.getTaxiImage(carSize), price01way2, price02way2, price11way2));
                             }else
                                 arrayPrice.add(new Car(carSize,true, CommonUtilities.getCarName(carSize,true), CommonUtilities.getCarImage(carSize), price01way, price02way, price11way));
                         }
@@ -536,11 +536,12 @@ public class ApiUtilities {
                 params.put("come_back_time", trip.getEndTime());
             }
         }else {
-            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
+            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
             params.put("start_time", dtf.print(new DateTime()));
         }
         params.put("custom_note", trip.getNote());
-        params.put("is_car", trip.isCar() ? 1 : 0);
+        int isCar = trip.isCar() ? 1 : 0;
+        params.put("is_car", isCar);
         DateTime current = new DateTime();
         long key = (current.getMillis() + Global.serverTimeDiff)*13 + 27;
         params.put("key", key);

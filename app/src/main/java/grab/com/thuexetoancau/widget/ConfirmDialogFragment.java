@@ -147,9 +147,6 @@ public class ConfirmDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 showDateTimeDialog(txtStartTime);
-                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
-                startTime = dtf.parseDateTime(txtStartTime.getText().toString());
-                checkLongTripExceed2day();
             }
         });
 
@@ -157,9 +154,6 @@ public class ConfirmDialogFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 showDateTimeDialog(txtBackTime);
-                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
-                endTime = dtf.parseDateTime(txtBackTime.getText().toString());
-                checkLongTripExceed2day();
             }
         });
 
@@ -194,17 +188,17 @@ public class ConfirmDialogFragment extends DialogFragment {
                 if (totalDistance > Defines.MAX_DISTANCE) {
                     if (mTrip.getTripType() == 1) {
                         if (txtStartTime.getText().toString().equals(getString(R.string.error_time_start))){
-                            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
+                            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
                             mTrip.setStartTime(dtf.print(new DateTime()));
                         }else {
                             DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
                             DateTime startTime = dtf.parseDateTime(txtStartTime.getText().toString());
-                            DateTimeFormatter dtfTrip = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
+                            DateTimeFormatter dtfTrip = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
                             mTrip.setStartTime(dtfTrip.print(startTime));
                         }
                     } else {
                         DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
-                        DateTimeFormatter dtfTrip = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
+                        DateTimeFormatter dtfTrip = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
                         DateTime startTime;
                         if (txtStartTime.getText().toString().equals(getString(R.string.error_time_start))){
                             startTime = new DateTime();
@@ -232,8 +226,8 @@ public class ConfirmDialogFragment extends DialogFragment {
             return;
         if (startTime == null)
             return;
-        int days = Days.daysBetween(endTime.toLocalDate(), startTime.toLocalDate()).getDays();
-        if (days > 2 ) {
+        int days = Days.daysBetween(startTime.toLocalDate(), endTime.toLocalDate()).getDays();
+        if (days >= 2 ) {
             txtCaution.setVisibility(View.VISIBLE);
             txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice()*days)+ " vnđ");
         }else {
@@ -338,6 +332,12 @@ public class ConfirmDialogFragment extends DialogFragment {
                 String formatedDate = sdf.format(new Date(year-1900, month, day));
                 txtDate.setText(formatedDate + ' ' + time);
                 alertDialog.dismiss();
+                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
+                if (txtDate.getId() == R.id.back_time)
+                    endTime = dtf.parseDateTime(txtDate.getText().toString());
+                else  if (txtDate.getId() == R.id.start_time)
+                    startTime = dtf.parseDateTime(txtDate.getText().toString());
+                checkLongTripExceed2day();
 
             }
         });

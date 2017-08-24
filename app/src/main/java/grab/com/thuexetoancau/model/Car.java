@@ -34,6 +34,7 @@ public class Car {
         this.price01way = car.price01way;
         this.price02way = car.price02way;
         this.price11way = car.price11way;
+        this.isCar = car.isCar;
     }
 
     public boolean isCar() {

@@ -30,18 +30,19 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     private TransportationAdapter adapter;
     private Button btnBook;
     private OnTransportationListener listener;
+    private ArrayList<Car> transportsAvailable;
     private ArrayList<Car> transports;
     private int totalDistance;
     private int tripType = 1;
     private Car carSelect;
+    private   LinearLayoutManager layoutManager;
     public TransportationLayout(PassengerSelectActionActivity activity, ArrayList<Car> carPrice) {
         super(activity);
         this.mContext = activity;
         this.listener = activity;
         this.transports = carPrice;
-        transports.get(0).setSelected(true);
-        carSelect = transports.get(0);
         activity.setOnChangeTripListener(this);
+        transportsAvailable = new ArrayList<>();
         initLayout();
     }
 
@@ -66,12 +67,14 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         btnBook = (Button) view.findViewById(R.id.btn_booking);
         btnBook.setOnClickListener(this);
         listTrans.setHasFixedSize(true);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
+        layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         listTrans.setLayoutManager(layoutManager);
         if (totalDistance < Defines.MAX_DISTANCE)
             filterCar();
+        else
+            fullCar();
         setCarPrice(totalDistance);
-        adapter = new TransportationAdapter(mContext, transports);
+        adapter = new TransportationAdapter(mContext, transportsAvailable);
         listTrans.setAdapter(adapter);
 
         adapter.setOnClickListener(new TransportationAdapter.OnItemClickListener() {
@@ -85,12 +88,26 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     }
 
     private void filterCar() {
-        Iterator<Car> it = transports.iterator();
-        while( it.hasNext() ){
-            if (it.next().getSize() != 5 && it.next().getSize() != 8) {
-                it.remove();
-            }
+        transportsAvailable.clear();
+        for (int i = 0; i < transports.size(); i++){
+            Car car = transports.get(i);
+            car.setSelected(false);
+            if (car.getSize() == 5 || car.getSize() == 8)
+                transportsAvailable.add(car);
         }
+        carSelect = transportsAvailable.get(0);
+        transportsAvailable.get(0).setSelected(true);
+    }
+
+    private void fullCar() {
+        transportsAvailable.clear();
+        for (int i = 0; i < transports.size(); i++){
+            Car car = transports.get(i);
+            car.setSelected(false);
+            transportsAvailable.add(car);
+        }
+        carSelect = transportsAvailable.get(0);
+        transportsAvailable.get(0).setSelected(true);
     }
 
     private void setCarPrice(int distance) {
@@ -117,17 +134,27 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     @Override
     public void onChangeDistance(int distance) {
         this.totalDistance = distance;
+        if (totalDistance < Defines.MAX_DISTANCE)
+            filterCar();
+        else
+            fullCar();
         setCarPrice(distance);
         adapter.notifyDataSetChanged();
+        layoutManager.scrollToPosition(0);
         if (listener != null)
             listener.onSelectVehicle(carSelect);
     }
 
     @Override
     public void onChangeTrip(int tripType) {
+        if (totalDistance < Defines.MAX_DISTANCE)
+            filterCar();
+        else
+            fullCar();
         this.tripType = tripType;
         setCarPrice(totalDistance);
         adapter.notifyDataSetChanged();
+        layoutManager.scrollToPosition(0);
     }
 
     public interface OnTransportationListener{

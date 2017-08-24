@@ -183,7 +183,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.txt_next:
-                if (layoutDigits.isShown()){
+                /*if (layoutDigits.isShown()){
                     loginCustomer();
                     if (edtCode.getOTP().equals(smsCode)) {
                         if (isLogin)
@@ -195,7 +195,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     }
                 }else {
                     accountKitCheck();
-                }
+                }*/
+                if (isLogin)
+                    loginCustomer();
+                else
+                    registerCustomer();
                 break;
             case R.id.btn_back:
                 if (layoutDigits.isShown()){

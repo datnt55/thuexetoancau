@@ -934,17 +934,21 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     public void onConfirmed(final Trip trip) {
         if (trip.getDistance() > Defines.MAX_DISTANCE) {
             if (trip.getStartTime() != null) {
-                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-dd-MM'T'HH:mm:ss.SSS");
+                DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
                 DateTime startTime = dtf.parseDateTime(trip.getStartTime());
                 final boolean isToday = CommonUtilities.isToday(startTime);
                 if (!isToday) {
                     mApi.getScheduleTrip(user.getId(), new ApiUtilities.ResponseTripListener() {
                         @Override
                         public void onSuccess(ArrayList<Trip> arrayTrip) {
-                            if (arrayTrip.size() > 2)
-                                Toast.makeText(mContext, "Bạn đã đăng quá 3 chuyến đi sau", Toast.LENGTH_SHORT).show();
-                            else
+                            if (arrayTrip == null)
                                 bookingImmediateTrip(trip,isToday);
+                            else {
+                                if (arrayTrip.size() > 2)
+                                    Toast.makeText(mContext, "Bạn đã đăng quá 3 chuyến đi sau", Toast.LENGTH_SHORT).show();
+                                else
+                                    bookingImmediateTrip(trip, isToday);
+                            }
                         }
                     });
                 }else
