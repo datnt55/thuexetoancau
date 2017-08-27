@@ -314,18 +314,18 @@ public class CommonUtilities {
                 if (isCar)
                     return "Noicar 5 chỗ";
                 else
-                    return "Noicar taxi 5 chỗ";
+                    return "Taxi 5 chỗ";
             case 8:
                 if (isCar)
-                    return "Xe 8 chỗ";
+                    return "Noicar 8 chỗ";
                 else
                     return "Taxi 8 chỗ";
             case 16:
-                return "Xe 16 chỗ";
+                return "Noicar 16 chỗ";
             case 30:
-                return "Xe 30 chỗ";
+                return "Noicar 30 chỗ";
             case 45:
-                return "Xe 45 chỗ";
+                return "Noicar 45 chỗ";
         }
         return "";
     }

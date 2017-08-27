@@ -15,7 +15,27 @@
       },
       "oauth_client": [
         {
-          "client_id": "62619624645-r9bidugmp1apj4bjfpsd6lujphf1cib8.apps.googleusercontent.com",
+          "client_id": "62619624645-19uphsrka6mia0q0q0o0temhlodh35lj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "grab.com.thuexetoancau",
+            "certificate_hash": "c49e1553ecab95c3b795c446939e52aedc69708b"
+          }
+        },
+        {
+          "client_id": "62619624645-7dk3ru4bkctorb51hc9pjihntgnck2tt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "grab.com.thuexetoancau",
+            "certificate_hash": "6b8d317b144a20040b5b3fd6764b918282f2fd9e"
+          }
+        },
+        {
+          "client_id": "62619624645-1b7erhuebd796cid61c8hlqk0f77gu0i.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "62619624645-tr7qcitujdjgulk8pp65r09h53fas85q.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "grab.com.thuexetoancau",
@@ -23,23 +43,11 @@
           }
         },
         {
-          "client_id": "62619624645-6fi6hkb9d5if8ei4j67lkae5f8sddbd8.apps.googleusercontent.com",
+          "client_id": "62619624645-mgk6lesnehagc3e904mn8ni0pk25f0t8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "grab.com.thuexetoancau",
             "certificate_hash": "fe510d57b97a1f75abf023bfdfb7fb5ee033254a"
-          }
-        },
-        {
-          "client_id": "62619624645-47flq1d4c9udm9ibff1u3pqmcduv8de9.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "62619624645-772o9eud6fbtgovvbqs8vbuannr5e6t1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "grab.com.thuexetoancau",
-            "certificate_hash": "6b8d317b144a20040b5b3fd6764b918282f2fd9e"
           }
         }
       ],
@@ -56,7 +64,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "62619624645-47flq1d4c9udm9ibff1u3pqmcduv8de9.apps.googleusercontent.com",
+              "client_id": "62619624645-1b7erhuebd796cid61c8hlqk0f77gu0i.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -151,7 +151,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(pendingIntent)
-                .setVibrate(new long[]{1, 1, 1});
+                .setVibrate(new long[]{ 0, 100, 200, 300 });
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         manager.notify(Defines.NOTIFY_TAG, bookingId, builder.build());

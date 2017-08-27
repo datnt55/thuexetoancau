@@ -16,5 +16,6 @@ public class Global {
     public static int APP_SCREEN_HEIGHT = 0;
     public static int APP_SCREEN_WIDTH = 0;
     public static long serverTimeDiff;
+    public static boolean isOnTrip = false;
 
 }

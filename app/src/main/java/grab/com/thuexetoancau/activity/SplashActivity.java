@@ -1,6 +1,7 @@
 package grab.com.thuexetoancau.activity;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +38,7 @@ import grab.com.thuexetoancau.utilities.ApiUtilities;
 import grab.com.thuexetoancau.utilities.BaseService;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.DialogUtils;
+import grab.com.thuexetoancau.utilities.GPSTracker;
 import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.PermissionUtils;
@@ -111,11 +113,33 @@ public class SplashActivity extends AppCompatActivity {
                 if (preference.getRegId().equals("")) {
                     LocalBroadcastManager.getInstance(mContext).registerReceiver(tokenReceiver, new IntentFilter("tokenReceiver"));
                 }else {
-                    goToApplication();
+                    GPSTracker gpsTracker = new GPSTracker(mContext);
+                    if (gpsTracker.handlePermissionsAndGetLocation()) {
+                        if (!gpsTracker.canGetLocation()) {
+                            DialogUtils.settingRequestTurnOnLocation((Activity)mContext);
+                        } else
+                            goToApplication();
+                    }
+
+
                 }
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 1000:
+                GPSTracker gpsTracker = new GPSTracker(this);
+                if (gpsTracker.canGetLocation()) {
+                    goToApplication();
+                }
+                break;
+        }
+    }
+
     BroadcastReceiver tokenReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

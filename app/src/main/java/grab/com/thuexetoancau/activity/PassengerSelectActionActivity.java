@@ -80,6 +80,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.microedition.khronos.opengles.GL;
+
 import grab.com.thuexetoancau.DirectionFinder.DirectionFinder;
 import grab.com.thuexetoancau.DirectionFinder.DirectionFinderListener;
 import grab.com.thuexetoancau.DirectionFinder.Route;
@@ -156,7 +158,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private TextView txtName, txtEmail;
-    private boolean showRatingDialog = false;
+    private ProgressDialog dialogDirection;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,15 +187,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
         LocalBroadcastManager.getInstance(this).registerReceiver(confirmTrip, new IntentFilter(Defines.BROADCAST_CONFFIRM_TRIP));
-        if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_TRIP)) {
-            lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_TRIP);
-            if (lastTrip.getDriverId() == 0){
-                hideLayoutSearchOrigin();
-                showLayoutSearchingDriver(lastTrip.getId(), lastTrip);
-            }else {
-                showCurrentTripAction();
-            }
-        }
     }
 
     private void getIntentFromFirebase(){
@@ -210,6 +203,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
         // Check customer finish trip status
         if (getIntent().hasExtra(Defines.BUNDLE_CONFIRM_TRIP)) {
+            Global.isOnTrip = false;
             int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
             String driverName = getIntent().getStringExtra(Defines.BUNDLE_DRIVER_NAME);
             showRatingDialog(bookingId, driverName);
@@ -217,6 +211,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
         // Check customer found driver
         if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
+            Global.isOnTrip = true;
             int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
             User userDriver = (User) getIntent().getSerializableExtra(Defines.BUNDLE_DRIVER);
             int tripType = getIntent().getIntExtra(Defines.BUNDLE_TRIP_TYPE,0);
@@ -494,26 +489,28 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             } else
                 showCurrentLocationToMap(gpsTracker.getLatitude(), gpsTracker.getLongitude());
         }
-        mApi.getCarAround(gpsTracker, new ApiUtilities.AroundCarListener() {
-            @Override
-            public void onSuccess(ArrayList<AroundCar> aroundCars) {
-                for (AroundCar car : aroundCars){
-                    DecimalFormat df = new DecimalFormat("#.#");
-                    String gap;
-                    if ((int) car.getDistance() == 0) {
-                        String meter = df.format( car.getDistance() * 1000);
-                        gap = mContext.getResources().getString(R.string.distance_meter, meter);
-                    }else {
-                        String kilometer = df.format( car.getDistance());
-                        gap = mContext.getResources().getString(R.string.distance_kilo_meter, kilometer);
+        if (!Global.isOnTrip) {
+            mApi.getCarAround(gpsTracker, new ApiUtilities.AroundCarListener() {
+                @Override
+                public void onSuccess(ArrayList<AroundCar> aroundCars) {
+                    for (AroundCar car : aroundCars) {
+                        DecimalFormat df = new DecimalFormat("#.#");
+                        String gap;
+                        if ((int) car.getDistance() == 0) {
+                            String meter = df.format(car.getDistance() * 1000);
+                            gap = mContext.getResources().getString(R.string.distance_meter, meter);
+                        } else {
+                            String kilometer = df.format(car.getDistance());
+                            gap = mContext.getResources().getString(R.string.distance_kilo_meter, kilometer);
+                        }
+                        LatLng aroundLatLon = new LatLng(car.getLatitude(), car.getLongitude());
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(aroundLatLon).title(mContext.getResources().getString(R.string.distance_car, gap)));
+                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.car));
+                        aroundList.add(marker);
                     }
-                    LatLng aroundLatLon = new LatLng(car.getLatitude(), car.getLongitude());
-                    Marker marker = mMap.addMarker(new MarkerOptions().position(aroundLatLon).title(mContext.getResources().getString(R.string.distance_car,gap)));
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.car));
-                    aroundList.add(marker);
                 }
-            }
-        });
+            });
+        }
     }
 
     private void showLayoutSearchingDriver(int bookingId, Trip trip) {
@@ -660,7 +657,22 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_TRIP))
+            Global.isOnTrip = true;
         getCurrentPosition();
+        if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_TRIP)) {
+            Global.isOnTrip = true;
+            lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_TRIP);
+            if (lastTrip.getDriverId() == 0){
+                hideLayoutSearchOrigin();
+                showLayoutSearchingDriver(lastTrip.getId(), lastTrip);
+            }else {
+                showCurrentTripAction();
+                listStopPoint = lastTrip.getListStopPoints();
+                sendRequestFindDirection();
+            }
+        }else
+            Global.isOnTrip = false;
     }
 
     //======================================== Search bar implement ================================
@@ -811,7 +823,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     //======================================== Direction Finder implement ==========================
     @Override
     public void onDirectionFinderStart() {
-
+        dialogDirection = new ProgressDialog(this);
+        dialogDirection.setCancelable(false);
+        dialogDirection.setCanceledOnTouchOutside(false);
+        dialogDirection.setMessage(mContext.getString(R.string.prepare_data));
+        dialogDirection.show();
     }
 
     @Override
@@ -836,7 +852,23 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
         if (changeTrip != null)
             changeTrip.onChangeDistance(totalDistance);
-        updateMapCamera();
+        if (!Global.isOnTrip)
+            updateMapCamera();
+        else {
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (Marker marker : markerList) {
+                builder.include(marker.getPosition());
+            }
+            LatLngBounds bounds = builder.build();
+            int padding = (int)CommonUtilities.convertDpToPixel(40,mContext); // offset from edges of the map in pixels
+            mMap.setPadding(padding,measureView(layoutDriveInfo)+(int)CommonUtilities.convertDpToPixel(50,mContext),padding, measureView(layoutDriveInfo)+(int)CommonUtilities.convertDpToPixel(20,mContext));
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 0);
+            mMap.animateCamera(cu);
+        }
+        if (dialogDirection != null && dialogDirection.isShowing()){
+            dialogDirection.dismiss();
+            dialogDirection = null;
+        }
         //animateLocation();
     }
     //======================================== Select car type implement ===========================
@@ -986,6 +1018,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     private void foundDriverUI(User user, int bookingId){
+        // Remove marker around
+        for (Marker marker : aroundList)
+            marker.remove();
         if (layoutSeachingCar != null) {
             AnimUtils.slideDown(layoutSeachingCar, Global.APP_SCREEN_HEIGHT);
             layoutRoot.removeView(layoutSeachingCar);
@@ -1004,6 +1039,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
+                Global.isOnTrip = true;
                 User userDriver = (User) intent.getSerializableExtra(Defines.BUNDLE_DRIVER);
                 bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
                 foundDriverUI(userDriver, bookingId);
@@ -1029,6 +1065,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
+                Global.isOnTrip = false;
                 bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
                 String driverName = intent.getStringExtra(Defines.BUNDLE_DRIVER_NAME);
                 showRatingDialog(bookingId, driverName);
@@ -1057,6 +1094,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     BroadcastReceiver tripCancel = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if(((Activity) mContext).isFinishing())
+            {
+                finishTripAndUpdateView();
+                return;
+            }
             try {
                 DialogUtils.cancelTripFromDriver((Activity) mContext, new DialogUtils.YesNoListenter() {
                     @Override
@@ -1083,6 +1125,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     private void finishTripAndUpdateView(){
+        Global.isOnTrip = false;
         toolbar.setVisibility(View.GONE);
         showLayoutSearchOrigin();
         if (layoutDriveInfo != null)
