@@ -129,7 +129,7 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
                     return;
                 }
                 setCustomerRating();
-                this.dismiss();
+                this.dismissAllowingStateLoss();
                 break;
         }
     }

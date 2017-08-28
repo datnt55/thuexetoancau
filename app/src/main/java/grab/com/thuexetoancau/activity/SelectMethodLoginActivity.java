@@ -106,6 +106,7 @@ public class SelectMethodLoginActivity extends AppCompatActivity implements Goog
             public void onClick(View v) {
                 Intent intent = new Intent(SelectMethodLoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
     }
@@ -124,6 +125,7 @@ public class SelectMethodLoginActivity extends AppCompatActivity implements Goog
             Intent intent = new Intent(SelectMethodLoginActivity.this, RegisterActivity.class);
             intent.putExtra(Defines.BUNDLE_USER, user);
             startActivity(intent);
+            finish();
         }
     }
 
@@ -138,6 +140,7 @@ public class SelectMethodLoginActivity extends AppCompatActivity implements Goog
                 Intent intent = new Intent(SelectMethodLoginActivity.this, RegisterActivity.class);
                 intent.putExtra(Defines.BUNDLE_USER, user);
                 startActivity(intent);
+                finish();
             }
         });
 

@@ -212,8 +212,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     if (!isLogin) {
                         showLoginLayout();
                         isLogin = true;
-                    } else
+                    } else {
+                        Intent intent = new Intent(RegisterActivity.this, SelectMethodLoginActivity.class);
+                        startActivity(intent);
                         finish();
+                    }
                 }
                 break;
             case R.id.text_register:

@@ -116,6 +116,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         app:ccp_divider_color="@color/green"
+                        app:ccp_defaultPhoneCode="84"
                         app:ccp_textColor="@color/white" />
                 </FrameLayout>
 

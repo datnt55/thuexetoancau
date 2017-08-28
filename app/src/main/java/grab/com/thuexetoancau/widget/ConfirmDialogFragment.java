@@ -29,6 +29,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -185,6 +186,7 @@ public class ConfirmDialogFragment extends DialogFragment {
                 }else if (rOwne.isChecked()){
                     mTrip.setCustomerType(1);
                 }
+
                 if (totalDistance > Defines.MAX_DISTANCE) {
                     if (mTrip.getTripType() == 1) {
                         if (txtStartTime.getText().toString().equals(getString(R.string.error_time_start))){
@@ -197,21 +199,26 @@ public class ConfirmDialogFragment extends DialogFragment {
                             mTrip.setStartTime(dtfTrip.print(startTime));
                         }
                     } else {
-                        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
-                        DateTimeFormatter dtfTrip = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-                        DateTime startTime;
-                        if (txtStartTime.getText().toString().equals(getString(R.string.error_time_start))){
-                            startTime = new DateTime();
-                            mTrip.setStartTime(dtf.print(new DateTime()));
-                        }else{
-                            startTime = dtf.parseDateTime(txtStartTime.getText().toString());
-                            mTrip.setStartTime(dtfTrip.print(startTime));
+                        if (txtBackTime.getText().toString().equals("Chọn thời gian khứ hồi")){
+                            Toast.makeText(getActivity(), "Bạn chưa nhập thời gian khứ hồi",Toast.LENGTH_SHORT).show();
+                            return;
+                        }else {
+                            DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
+                            DateTimeFormatter dtfTrip = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                            DateTime startTime;
+                            if (txtStartTime.getText().toString().equals(getString(R.string.error_time_start))) {
+                                startTime = new DateTime();
+                                mTrip.setStartTime(dtfTrip.print(new DateTime()));
+                            } else {
+                                startTime = dtf.parseDateTime(txtStartTime.getText().toString());
+                                mTrip.setStartTime(dtfTrip.print(startTime));
+                            }
+                            DateTime endTime = dtf.parseDateTime(txtBackTime.getText().toString());
+                            mTrip.setEndTime(dtfTrip.print(endTime));
+                            int days = Days.daysBetween(endTime.toLocalDate(), startTime.toLocalDate()).getDays();
+                            if (days > 2)
+                                mTrip.setPrice(mTrip.getPrice() * days);
                         }
-                        DateTime endTime = dtf.parseDateTime(txtBackTime.getText().toString());
-                        mTrip.setEndTime(dtfTrip.print(endTime));
-                        int days = Days.daysBetween(endTime.toLocalDate(), startTime.toLocalDate()).getDays();
-                        if (days > 2 )
-                            mTrip.setPrice(mTrip.getPrice()*days);
                     }
                 }
                 if (callback != null)

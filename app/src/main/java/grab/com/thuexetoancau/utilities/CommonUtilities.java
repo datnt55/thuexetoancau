@@ -283,7 +283,7 @@ public class CommonUtilities {
             case 4:
                 return R.drawable.car_4_size;
             case 5:
-                return R.drawable.car_5_size;
+                return R.drawable.car_4_size;
             case 8:
                 return R.drawable.car_8_size;
             case 16:
