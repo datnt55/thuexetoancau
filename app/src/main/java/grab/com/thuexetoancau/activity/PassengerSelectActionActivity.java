@@ -226,12 +226,12 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         btnBooking  = (Button)      findViewById(R.id.btn_booking);
         btnInfor    = (Button)      findViewById(R.id.btn_infor);
         layoutRoot  = (RelativeLayout) findViewById(R.id.root);
-        layoutSearch = (SearchBarLayout) findViewById(R.id.layout_search);
+        layoutDirection = (DirectionLayout) findViewById(R.id.layout_direction);
+        layoutDirection.setOnCallBackDirection(this);
         layoutPredict = (FrameLayout) findViewById(R.id.fragment_last_search);
         layoutFindCar = (LinearLayout) findViewById(R.id.layout_find_car);
         layoutOverLay = (FrameLayout) findViewById(R.id.layout_overlay);
         layoutFixGPS = (FrameLayout) findViewById(R.id.layout_fix_gps);
-        layoutSearch.setCallback(this);
         btnBooking.setOnClickListener(this);
         layoutFixGPS.setOnClickListener(this);
         btnInfor.setOnClickListener(this);
@@ -344,6 +344,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             currentLocation.remove();
         Position lFrom = new Position(getAddress(latitude, longitude),new LatLng(latitude,longitude));
         listStopPoint.add(lFrom);
+        listStopPoint.add(null);
         currentLocation = mMap.addMarker(new MarkerOptions().position(lFrom.getLatLng()).title("Vị trí của bạn").icon(BitmapDescriptorFactory.fromResource(R.drawable.current)));
         markerList.add(currentLocation);
         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -385,6 +386,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         layoutSearch.removeSearchText();
         // Hide layout list propose location
         hideLastSearchFragment();
+        showLayoutDirection();
+        hideLayoutSearchOrigin();
+        if (listStopPoint.get(1) == null) {
+            showLayoutDirection();
+            hideLayoutSearchOrigin();
+            return;
+        }
         // Initial and show layout select and booking car
         if (layoutTransport == null) {
             ArrayList<Car> transports = new ArrayList<>();
@@ -401,8 +409,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
         showLayoutDirection();
         hideLayoutSearchOrigin();
-        // Start event receive action from layout direction
-        layoutDirection.setOnCallBackDirection(this);
     }
 
     private void hideLayoutDirection(){
@@ -683,11 +689,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     public void onBackButtonClicked() {
         hideLastSearchFragment();
-        // Check layout search show from direction layout
-        if (!layoutSearch.isFinishSearchBar()){
-            AnimUtils.slideUp(layoutSearch,measureView(layoutSearch));
-            showLayoutDirection();
-        }
+        AnimUtils.slideUp(layoutSearch,measureView(layoutSearch));
+        showLayoutDirection();
         layoutSearch.setShowLastSearch(false);
     }
 
@@ -722,33 +725,21 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     //======================================== Direction implement =================================
-
-    /**
-     *  Event back button of direction layout clicked
-     */
-    @Override
-    public void onBackDirectionClicked() {
-        showLayoutSearchOrigin();
-        hideLayoutDirection();
-
-        layoutSearch.setShowLastSearch(false);
-        layoutSearch.setFinishSearchBar(true);
-
-        // Remove layout direction and layout transport from main layout
-        layoutDirection = null;
-        layoutRoot.removeView(layoutDirection);
-        layoutTransport = null;
-        layoutRoot.removeView(layoutTransport);
-        listStopPoint.clear();
-        removeAllMarker();
-        getCurrentPosition();
-    }
-
     /**
      *  Event click to change location
      */
     @Override
     public void onDirectionTextClicked(int position) {
+        if (layoutSearch == null){
+            layoutSearch = new SearchBarLayout(this);
+            layoutSearch.setCallback(this);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+            layoutSearch.setLayoutParams(params);
+            layoutRoot.addView(layoutSearch);
+            int height = measureView(layoutSearch);
+            layoutSearch.setTranslationY(-height);
+        }
         AnimUtils.slideDown(layoutSearch,0);
         hideLayoutDirection();
         layoutSearch.setShowLastSearch(true);
@@ -791,33 +782,23 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onNewDirection(Position location) {
-        layoutSearch.setFinishSearchBar(false);
         String sLocation = location.getPrimaryText() +", "+location.getSecondText();
-        if (layoutDirection == null) {
-            layoutDirection = new DirectionLayout(this, sLocation);
-            layoutDirection.setOnCallBackDirection(this);
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-            layoutDirection.setLayoutParams(params);
-            layoutRoot.addView(layoutDirection);
-            int height = measureView(layoutDirection);
-            layoutDirection.setTranslationY(-height);
-            listStopPoint.add(location);
-        }else{
-            layoutDirection.updateLocation(sLocation,-1);
-            listStopPoint.add(listStopPoint.size(),location);
-        }
+        layoutDirection.updateLocation(sLocation,-1);
+        listStopPoint.add(listStopPoint.size(),location);
         changeUIWhenChangedDirecition();
         sendRequestFindDirection();
     }
 
     @Override
     public void onChangeLocation(Position location, int position) {
-        changeUIWhenChangedDirecition();
         String sLocation = location.getPrimaryText() +", "+location.getSecondText();
         layoutDirection.updateLocation(sLocation,position);
         listStopPoint.set(position, location);
-        sendRequestFindDirection();
+        changeUIWhenChangedDirecition();
+        if (listStopPoint.get(1) != null){
+            sendRequestFindDirection();
+        }
+
     }
 
     //======================================== Direction Finder implement ==========================
@@ -1127,16 +1108,14 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private void finishTripAndUpdateView(){
         Global.isOnTrip = false;
         toolbar.setVisibility(View.GONE);
-        showLayoutSearchOrigin();
+        AnimUtils.slideDown(layoutDirection,0);
         if (layoutDriveInfo != null)
             layoutRoot.removeView(layoutDriveInfo);
-        layoutSearch.setShowLastSearch(false);
-        layoutSearch.setFinishSearchBar(true);
 
         // Remove layout direction and layout transport from main layout
-        if (layoutDirection != null) {
-            layoutRoot.removeView(layoutDirection);
-            layoutDirection = null;
+        if (layoutSearch != null) {
+            layoutRoot.removeView(layoutSearch);
+            layoutSearch = null;
         }
         if (layoutTransport != null) {
             layoutRoot.removeView(layoutTransport);
@@ -1145,6 +1124,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         listStopPoint.clear();
         removeAllMarker();
         getCurrentPosition();
+        layoutDirection.resetListStopPoint();
     }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {

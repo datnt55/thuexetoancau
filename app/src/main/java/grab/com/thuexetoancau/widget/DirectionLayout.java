@@ -28,7 +28,6 @@ import grab.com.thuexetoancau.utilities.GPSTracker;
 
 public class DirectionLayout extends LinearLayout implements View.OnClickListener, DirectionAdapter.ItemClickListener, OnStartDragListener {
     private Context mContext;
-    public ImageView imgBack;
     private DirectionCallback mCallback;
     private LinearLayout layoutOneWay, layoutRoundTrip;
     private TextView txtOneWay, txtRoundTrip;
@@ -40,13 +39,13 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     private ItemTouchHelper mItemTouchHelper;
     private SimpleItemTouchHelperCallback callback;
 
-    public DirectionLayout(Context context, String endLocation) {
+    public DirectionLayout(Context context) {
         super(context);
         this.mContext = context;
         routes = new ArrayList<>();
         GPSTracker gpsTracker = new GPSTracker(mContext);
         routes.add("Vị trí của bạn");
-        routes.add(endLocation);
+        routes.add("Bạn muốn đi đâu");
         initLayout();
     }
 
@@ -55,14 +54,13 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         this.mContext = context;
         routes = new ArrayList<>();
         routes.add("Vị trí của bạn");
+        routes.add("Bạn muốn đi đâu?");
         initLayout();
     }
 
     private void initLayout() {
         LayoutInflater mInflater = LayoutInflater.from(mContext);
         View view = mInflater.inflate(R.layout.control_direction_layout, this, true);
-        imgBack = (ImageView) view.findViewById(R.id.img_back);
-        imgBack.setOnClickListener(this);
         layoutOneWay = (LinearLayout) view.findViewById(R.id.layout_one_way);
         layoutRoundTrip = (LinearLayout) view.findViewById(R.id.layout_round_trip);
         txtOneWay = (TextView) view.findViewById(R.id.txt_one_way);
@@ -105,8 +103,13 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
             if (routes.size() > 2)
                 callback.setItemSwipe(true);
         }else {
-            routes.set(position, location);
-            adapter.notifyItemChanged(position);
+            if (routes.size() == 2 && routes.get(1).equals("Bạn muốn đi đâu?")) {
+                routes.set(position, location);
+                adapter.notifyDataSetChanged();
+            }else {
+                routes.set(position, location);
+                adapter.notifyItemChanged(position);
+            }
         }
         listDirection.scrollToPosition(routes.size()-1);
     }
@@ -128,13 +131,20 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         return view.getMeasuredHeight();
     }
 
+    public void resetListStopPoint(){
+        routes.clear();
+        routes.add("Vị trí của bạn");
+        routes.add("Bạn muốn đi đâu?");
+        adapter.notifyDataSetChanged();
+        checkSizeOfRecyclerView(listDirection);
+        if (routes.size()<= 2){
+            callback.setItemSwipe(false);
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.img_back:
-                if (mCallback != null)
-                    mCallback.onBackDirectionClicked();
-                break;
             case R.id.layout_one_way:
                 layoutOneWay.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_select_shape));
                 txtOneWay.setTextColor(ContextCompat.getColor(mContext,R.color.blue));
@@ -194,7 +204,6 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     }
 
     public interface DirectionCallback {
-        void onBackDirectionClicked();
         void onDirectionTextClicked(int position);
         void onNewStopPoint();
         void onRemoveStopPoint(int position);

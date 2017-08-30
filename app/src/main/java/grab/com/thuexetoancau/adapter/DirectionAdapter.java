@@ -97,21 +97,39 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
             holder.imgRole.setImageResource(R.drawable.ic_radio_button_checked_black_24dp);
             holder.layoutRouteDow.setVisibility(View.VISIBLE);
             holder.layoutRouteUp.setVisibility(View.INVISIBLE);
-            holder.btnFunction.setImageResource(R.drawable.ic_autorenew_black_24dp);
+            if (arrayDirection.size() == 2 && !arrayDirection.get(1).equals("Bạn muốn đi đâu?")) {
+                holder.btnFunction.setVisibility(View.VISIBLE);
+                holder.btnFunction.setImageResource(R.drawable.ic_autorenew_black_24dp);
+                holder.btnFunction.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Collections.swap(arrayDirection, 0, 1);
+                        notifyDataSetChanged();
+                        if(listener != null)
+                            listener.onSwapLocation(0,1);
+                    }
+                });
+            }else
+                holder.btnFunction.setVisibility(View.INVISIBLE);
         }else if (position == arrayDirection.size()-1) {
             holder.imgRole.setVisibility(View.VISIBLE);
             holder.imgRole.setColorFilter(ContextCompat.getColor(mContext,R.color.white));
             holder.imgRole.setImageResource(R.drawable.ic_location_on_black_24dp);
             holder.layoutRouteDow.setVisibility(View.INVISIBLE);
             holder.layoutRouteUp.setVisibility(View.VISIBLE);
-            holder.btnFunction.setImageResource(R.drawable.ic_add_black_24dp);
-            holder.btnFunction.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(listener != null)
-                        listener.onNewStopPoint();
-                }
-            });
+            if (arrayDirection.get(position).equals("Bạn muốn đi đâu?")){
+                holder.btnFunction.setVisibility(View.INVISIBLE);
+            }else {
+                holder.btnFunction.setVisibility(View.VISIBLE);
+                holder.btnFunction.setImageResource(R.drawable.ic_add_black_24dp);
+                holder.btnFunction.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (listener != null)
+                            listener.onNewStopPoint();
+                    }
+                });
+            }
         }else{
             holder.imgRole.setVisibility(View.VISIBLE);
             holder.layoutRouteDow.setVisibility(View.VISIBLE);

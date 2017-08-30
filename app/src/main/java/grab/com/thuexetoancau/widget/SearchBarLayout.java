@@ -31,7 +31,6 @@ public class SearchBarLayout extends LinearLayout implements View.OnClickListene
     private ImageView imgMenu;
     private Callback mCallback;
     private boolean showLastSearch =false;
-    private boolean isEndSearchBar = true;
     public SearchBarLayout(Context context) {
         super(context);
         mContext = context;
@@ -104,14 +103,6 @@ public class SearchBarLayout extends LinearLayout implements View.OnClickListene
         Activity activity = (Activity) mContext;
         activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
     }
-    public void setFinishSearchBar(boolean finish){
-        this.isEndSearchBar = finish;
-    }
-
-    public boolean isFinishSearchBar(){
-        return isEndSearchBar;
-    }
-
 
     public void removeSearchText() {
         edtSearch.setText("");

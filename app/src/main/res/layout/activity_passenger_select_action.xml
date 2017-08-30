@@ -35,11 +35,11 @@
                 android:visibility="gone">
 
             </FrameLayout>
-            <grab.com.thuexetoancau.widget.SearchBarLayout
-                android:id="@+id/layout_search"
+            <grab.com.thuexetoancau.widget.DirectionLayout
+                android:id="@+id/layout_direction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-            </grab.com.thuexetoancau.widget.SearchBarLayout>
+            </grab.com.thuexetoancau.widget.DirectionLayout>
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"

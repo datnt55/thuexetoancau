@@ -17,6 +17,10 @@ public class Position implements Serializable{
     private double latitude;
     private double longitude;
     private String fullPlace;
+
+    public Position() {
+    }
+
     public Position(String placeId, String primaryText, String secondText) {
         this.placeId = placeId;
         this.primaryText = primaryText;
