@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.os.Build;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 
@@ -37,6 +38,13 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                     String driverName = remoteMessage.getData().get("driver_name");
                     String driverPhone = remoteMessage.getData().get("driver_phone");
                     responseCancelTripHandle(Integer.valueOf(bookingId), "Tài xế " + driverName + " đã hủy chuyến đi");
+                }else {
+                    if (!isScreenOn()){
+                        String bookingId = remoteMessage.getData().get("id_booking");
+                        String driverName = remoteMessage.getData().get("driver_name");
+                        String driverPhone = remoteMessage.getData().get("driver_phone");
+                        responseCancelTripHandle(Integer.valueOf(bookingId), "Tài xế " + driverName + " đã hủy chuyến đi");
+                    }
                 }
             }
         } else if (function.equals(Defines.BOOKING_GRAB)) {
@@ -48,6 +56,11 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 if (!isAppInForeground(this)) {
                     String bookingId = remoteMessage.getData().get("id_booking");
                     notFoundDriverNotify(Integer.valueOf(bookingId), "Rất tiếc, chúng tôi không tìm thấy xe cho bạn");
+                }else {
+                    if (!isScreenOn()){
+                        String bookingId = remoteMessage.getData().get("id_booking");
+                        notFoundDriverNotify(Integer.valueOf(bookingId), "Rất tiếc, chúng tôi không tìm thấy xe cho bạn");
+                    }
                 }
             }
         } else if (function.equals(Defines.RECEIVED_TRIP)) {
@@ -72,6 +85,9 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                     broadcastManager.sendBroadcast(intent);
                     if (!isAppInForeground(this)) {
                         foundDriver(user, Integer.valueOf(bookingId), Integer.valueOf(carType), "Tài xế " + dName + " đang trên đường đón bạn");
+                    }else {
+                        if (!isScreenOn())
+                            foundDriver(user, Integer.valueOf(bookingId), Integer.valueOf(carType), "Tài xế " + dName + " đang trên đường đón bạn");
                     }
                 }
             }
@@ -89,12 +105,16 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 broadcastManager.sendBroadcast(intent);
                 if (!isAppInForeground(this)) {
                     confrimTrip(Integer.valueOf(bookingId),driverName);
+                }else {
+                    if (!isScreenOn())
+                        confrimTrip(Integer.valueOf(bookingId),driverName);
                 }
             }
         }
     }
 
     private void responseCancelTripHandle(int bookingId, String message) {
+        turnOnScreen();
         Intent intent = new Intent(this, PassengerSelectActionActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -113,6 +133,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     }
 
     private void confrimTrip(int bookingId, String driverName) {
+        turnOnScreen();
         Intent intent = new Intent(this, PassengerSelectActionActivity.class);
         intent.putExtra(Defines.BUNDLE_CONFIRM_TRIP, true);
         intent.putExtra(Defines.BUNDLE_TRIP_ID, bookingId);
@@ -133,6 +154,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     }
 
     private void foundDriver(User user, int bookingId,int carType, String message) {
+        turnOnScreen();
         Intent intent;
         if (carType == 1 )
             intent = new Intent(this, PassengerSelectActionActivity.class);
@@ -158,6 +180,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     }
 
     private void notFoundDriverNotify(int bookingId, String message) {
+        turnOnScreen();
         Intent intent = new Intent(this, PassengerSelectActionActivity.class);
         intent.putExtra(Defines.BUNDLE_NOT_FOUND_DRIVER, true);
         intent.putExtra(Defines.BUNDLE_TRIP_ID, bookingId);
@@ -192,5 +215,27 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
             // App is foreground, but screen is locked, so show notification
             return km.inKeyguardRestrictedInputMode();
         }
+    }
+
+    private boolean isScreenOn(){
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        boolean isScreenOn = pm.isScreenOn();
+        if (!isScreenOn)
+            return false;
+        return true;
+    }
+
+    private void turnOnScreen(){
+        //Turn on screen
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        boolean isScreenOn = pm.isScreenOn();
+        if (isScreenOn == false) {
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "MyLock");
+            wl.acquire(10000);
+            PowerManager.WakeLock wl_cpu = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyCpuLock");
+            wl_cpu.acquire(10000);
+
+        }
+
     }
 }

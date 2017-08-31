@@ -274,7 +274,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private void showCurrentTripAction() {
         toolbar.setVisibility(View.VISIBLE);
         toolbar.setTitle(getString(R.string.in_trip));
-        hideLayoutSearchOrigin();
+        hideLayoutDirection();
         layoutDriveInfo = new DriverInformationLayout(this,new User(lastTrip.getDriverName(),lastTrip.getDriverPhone(),lastTrip.getDriverCarNumber()));
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -670,7 +670,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             Global.isOnTrip = true;
             lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_TRIP);
             if (lastTrip.getDriverId() == 0){
-                hideLayoutSearchOrigin();
+                hideLayoutDirection();
                 showLayoutSearchingDriver(lastTrip.getId(), lastTrip);
             }else {
                 showCurrentTripAction();
@@ -725,6 +725,12 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     //======================================== Direction implement =================================
+
+    @Override
+    public void onMenuClicked() {
+        drawerLayout.openDrawer(GravityCompat.START);
+    }
+
     /**
      *  Event click to change location
      */

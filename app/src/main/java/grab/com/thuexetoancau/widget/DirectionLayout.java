@@ -31,7 +31,7 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     private DirectionCallback mCallback;
     private LinearLayout layoutOneWay, layoutRoundTrip;
     private TextView txtOneWay, txtRoundTrip;
-    private ImageView imgRoundTrip, imgOneWay;
+    private ImageView imgRoundTrip, imgOneWay, imgMenu;
     private RecyclerView listDirection;
     private ArrayList<String> routes;
     private DirectionAdapter adapter;
@@ -61,6 +61,8 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     private void initLayout() {
         LayoutInflater mInflater = LayoutInflater.from(mContext);
         View view = mInflater.inflate(R.layout.control_direction_layout, this, true);
+        imgMenu = (ImageView) view.findViewById(R.id.img_menu);
+        imgMenu.setOnClickListener(this);
         layoutOneWay = (LinearLayout) view.findViewById(R.id.layout_one_way);
         layoutRoundTrip = (LinearLayout) view.findViewById(R.id.layout_round_trip);
         txtOneWay = (TextView) view.findViewById(R.id.txt_one_way);
@@ -145,6 +147,10 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+            case R.id.img_menu:
+                if (mCallback != null)
+                    mCallback.onMenuClicked();
+                break;
             case R.id.layout_one_way:
                 layoutOneWay.setBackground(ContextCompat.getDrawable(mContext,R.drawable.direction_type_select_shape));
                 txtOneWay.setTextColor(ContextCompat.getColor(mContext,R.color.blue));
@@ -204,6 +210,7 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
     }
 
     public interface DirectionCallback {
+        void onMenuClicked();
         void onDirectionTextClicked(int position);
         void onNewStopPoint();
         void onRemoveStopPoint(int position);

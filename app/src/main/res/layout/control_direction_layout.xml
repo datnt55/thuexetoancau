@@ -7,16 +7,32 @@
     android:background="@color/blue_light"
     android:fitsSystemWindows="true"
     android:orientation="horizontal"
-    android:paddingRight="4dp"
-    android:paddingLeft="4dp"
     android:paddingBottom="4dp"
+    android:paddingLeft="4dp"
+    android:paddingRight="4dp"
     android:paddingTop="25dp"
     android:visibility="visible">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <FrameLayout
+        android:layout_width="@dimen/spacing_0"
         android:layout_height="match_parent"
-        android:layout_marginLeft="20dp"
+        android:layout_weight="1">
+
+        <ImageView
+            android:id="@+id/img_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:paddingBottom="10dp"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/ic_menu_black_24dp" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="@dimen/spacing_0"
+        android:layout_height="match_parent"
+        android:layout_weight="8"
         android:orientation="vertical">
 
 
@@ -28,8 +44,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <LinearLayout
