@@ -128,7 +128,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private Button btnBooking, btnInfor;
     private RelativeLayout layoutRoot;
     private SearchBarLayout layoutSearch;
-    private FrameLayout layoutPredict, layoutFixGPS,layoutOverLay;
+    private FrameLayout layoutPredict, layoutFixGPS, layoutOverLay;
     private int searchBarHeight;
     private DirectionLayout layoutDirection;
     private GoogleApiClient mGoogleApiClient;       // google place api
@@ -137,7 +137,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private LinearLayout layoutFindCar, layoutTransport;
     private DriverInformationLayout layoutDriveInfo;
     private SearchingCarLayout layoutSeachingCar;
-    private  ConfirmDialogFragment dialogConfirm;
+    private ConfirmDialogFragment dialogConfirm;
     private GoogleMap mMap;
     private Context mContext;
     private GPSTracker gpsTracker;
@@ -149,7 +149,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ArrayList<Car> listCar = new ArrayList<>();
     private Position mFrom, mEnd;
-    private int typeTrip = 1,bookingId;
+    private int typeTrip = 1, bookingId;
     private Car carSelectd;
     private int totalDistance = 0;
     private ApiUtilities mApi;
@@ -159,6 +159,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     private TextView txtName, txtEmail;
     private ProgressDialog dialogDirection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,7 +167,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         mApi = new ApiUtilities(this);
         if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_USER))
             user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_USER);
-        if (user == null){
+        if (user == null) {
             mApi.checkTokenLogin(new ApiUtilities.ResponseLoginListener() {
                 @Override
                 public void onSuccess(Trip trip, User mUser) {
@@ -180,7 +181,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
                 }
             });
-        }else
+        } else
             initComponents();
         listCar = mApi.getPostage();
         LocalBroadcastManager.getInstance(this).registerReceiver(receiveTrip, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
@@ -189,14 +190,14 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         LocalBroadcastManager.getInstance(this).registerReceiver(confirmTrip, new IntentFilter(Defines.BROADCAST_CONFFIRM_TRIP));
     }
 
-    private void getIntentFromFirebase(){
+    private void getIntentFromFirebase() {
         // Check customer have trip after login
         if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_TRIP)) {
             lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_TRIP);
-            if (lastTrip.getDriverId() == 0){
-                hideLayoutSearchOrigin();
+            if (lastTrip.getDriverId() == 0) {
+                hideLayoutDirection();
                 showLayoutSearchingDriver(lastTrip.getId(), lastTrip);
-            }else {
+            } else {
                 showCurrentTripAction();
             }
         }
@@ -204,28 +205,29 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         // Check customer finish trip status
         if (getIntent().hasExtra(Defines.BUNDLE_CONFIRM_TRIP)) {
             Global.isOnTrip = false;
-            int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
+            int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID, 0);
             String driverName = getIntent().getStringExtra(Defines.BUNDLE_DRIVER_NAME);
             showRatingDialog(bookingId, driverName);
         }
 
-        // Check customer found driver
+       /* // Check customer found driver
         if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
             Global.isOnTrip = true;
-            int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID,0);
+            int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID, 0);
             User userDriver = (User) getIntent().getSerializableExtra(Defines.BUNDLE_DRIVER);
-            int tripType = getIntent().getIntExtra(Defines.BUNDLE_TRIP_TYPE,0);
+            int tripType = getIntent().getIntExtra(Defines.BUNDLE_TRIP_TYPE, 0);
             if (tripType == 1) {
                 foundDriverUI(userDriver, bookingId);
-                hideLayoutSearchOrigin();
+                hideLayoutDirection();
             }
-        }
+        }*/
     }
-    private void initComponents(){
+
+    private void initComponents() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        btnBooking  = (Button)      findViewById(R.id.btn_booking);
-        btnInfor    = (Button)      findViewById(R.id.btn_infor);
-        layoutRoot  = (RelativeLayout) findViewById(R.id.root);
+        btnBooking = (Button) findViewById(R.id.btn_booking);
+        btnInfor = (Button) findViewById(R.id.btn_infor);
+        layoutRoot = (RelativeLayout) findViewById(R.id.root);
         layoutDirection = (DirectionLayout) findViewById(R.id.layout_direction);
         layoutDirection.setOnCallBackDirection(this);
         layoutPredict = (FrameLayout) findViewById(R.id.fragment_last_search);
@@ -241,6 +243,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         mContext = this;
         setupActionBarDrawerToogle();
     }
+
     private void setupActionBarDrawerToogle() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -254,7 +257,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             txtName = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_name);
             txtEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.txt_email);
             ImageView imgAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar);
-            ImageView imgEdit= (ImageView) navigationView.getHeaderView(0).findViewById(R.id.img_edit);
+            ImageView imgEdit = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.img_edit);
             imgEdit.setOnClickListener(this);
             txtEmail.setText(user.getEmail());
             txtName.setText(user.getName());
@@ -275,7 +278,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         toolbar.setVisibility(View.VISIBLE);
         toolbar.setTitle(getString(R.string.in_trip));
         hideLayoutDirection();
-        layoutDriveInfo = new DriverInformationLayout(this,new User(lastTrip.getDriverName(),lastTrip.getDriverPhone(),lastTrip.getDriverCarNumber()));
+        layoutDriveInfo = new DriverInformationLayout(this, new User(lastTrip.getDriverName(), lastTrip.getDriverPhone(), lastTrip.getDriverCarNumber()));
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutDriveInfo.setLayoutParams(params);
@@ -283,7 +286,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     // Init google api
-    private void setupGoogleApi(){
+    private void setupGoogleApi() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Places.GEO_DATA_API)
                 .enableAutoManage(this, Defines.GOOGLE_API_CLIENT_ID, this)
@@ -300,35 +303,35 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         mPredictFragment = new LastSearchFragment();
         Bundle bundle = new Bundle();
         if (changeLocation)
-            bundle.putInt(Defines.POSITION_POINT,position );
+            bundle.putInt(Defines.POSITION_POINT, position);
         mPredictFragment.setArguments(bundle);
 
         // Add predict fragment to layout
-        FragmentTransaction fragmentManager =  getSupportFragmentManager().beginTransaction();
+        FragmentTransaction fragmentManager = getSupportFragmentManager().beginTransaction();
         fragmentManager.replace(R.id.fragment_last_search, mPredictFragment).commit();
         int height = Global.APP_SCREEN_HEIGHT - searchBarHeight;
 
-        AnimUtils.translate(layoutPredict,0,height);
+        AnimUtils.translate(layoutPredict, 0, height);
         mPredictFragment.setGoogleApiClient(mGoogleApiClient);
-        AnimUtils.fadeIn(layoutOverLay,300);
-        AnimUtils.fadeOut(layoutFixGPS,300);
+        AnimUtils.fadeIn(layoutOverLay, 300);
+        AnimUtils.fadeOut(layoutFixGPS, 300);
     }
 
     /**
-     *  Hide layout location predict
+     * Hide layout location predict
      */
     private void hideLastSearchFragment() {
         // Remove focus and hide soft keyboard
         View view = this.getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
         // Animation hide layout location predict
-        int height = Global.APP_SCREEN_HEIGHT - searchBarHeight - (int)CommonUtilities.convertDpToPixel(20, this);
-        AnimUtils.translate(layoutPredict,height,0);
-        AnimUtils.fadeOut(layoutOverLay,300);
-        AnimUtils.fadeIn(layoutFixGPS,300);
+        int height = Global.APP_SCREEN_HEIGHT - searchBarHeight - (int) CommonUtilities.convertDpToPixel(20, this);
+        AnimUtils.translate(layoutPredict, height, 0);
+        AnimUtils.fadeOut(layoutOverLay, 300);
+        AnimUtils.fadeIn(layoutFixGPS, 300);
     }
 
 
@@ -338,11 +341,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
 
-
-    private void showCurrentLocationToMap(double latitude, double longitude){
+    private void showCurrentLocationToMap(double latitude, double longitude) {
         if (currentLocation != null)
             currentLocation.remove();
-        Position lFrom = new Position(getAddress(latitude, longitude),new LatLng(latitude,longitude));
+        Position lFrom = new Position(getAddress(latitude, longitude), new LatLng(latitude, longitude));
         listStopPoint.add(lFrom);
         listStopPoint.add(null);
         currentLocation = mMap.addMarker(new MarkerOptions().position(lFrom.getLatLng()).title("Vị trí của bạn").icon(BitmapDescriptorFactory.fromResource(R.drawable.current)));
@@ -365,10 +367,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 int index = addresses.get(0).getMaxAddressLineIndex();
                 if (index == 0)
                     return address.getAddressLine(0);
-                for (int i = 0 ; i < index ; i++)
+                for (int i = 0; i < index; i++)
                     if (address.getAddressLine(i) != null) {
                         result.append(address.getAddressLine(i));
-                        if (i < index-1)
+                        if (i < index - 1)
                             result.append(", ");
                     }
             }
@@ -382,12 +384,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     /**
      * Update layout when click to item of list predict location
      */
-    private void changeUIWhenChangedDirecition(){
+    private void changeUIWhenChangedDirecition() {
         layoutSearch.removeSearchText();
         // Hide layout list propose location
         hideLastSearchFragment();
-        showLayoutDirection();
-        hideLayoutSearchOrigin();
         if (listStopPoint.get(1) == null) {
             showLayoutDirection();
             hideLayoutSearchOrigin();
@@ -396,7 +396,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         // Initial and show layout select and booking car
         if (layoutTransport == null) {
             ArrayList<Car> transports = new ArrayList<>();
-            for (int i = 0 ; i < listCar.size() ; i++) {
+            for (int i = 0; i < listCar.size(); i++) {
                 Car car = new Car(listCar.get(i));
                 transports.add(car);
             }
@@ -411,50 +411,58 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         hideLayoutSearchOrigin();
     }
 
-    private void hideLayoutDirection(){
+    private void hideLayoutDirection() {
         if (layoutDirection != null)
-            AnimUtils.slideUp(layoutDirection,measureView(layoutDirection));
+            AnimUtils.slideUp(layoutDirection, measureView(layoutDirection));
         if (layoutTransport != null)
-            AnimUtils.slideDown(layoutTransport,measureView(layoutTransport));
+            AnimUtils.slideDown(layoutTransport, measureView(layoutTransport));
     }
 
-    private void showLayoutDirection(){
+    private void showLayoutDirection() {
         if (layoutDirection != null)
-            AnimUtils.slideDown(layoutDirection,0);
+            AnimUtils.slideDown(layoutDirection, 0);
         if (layoutTransport != null)
-            AnimUtils.slideUp(layoutTransport,0);
+            AnimUtils.slideUp(layoutTransport, 0);
     }
 
-    private void hideLayoutSearchOrigin(){
+    private void hideLayoutSearchOrigin() {
         // Hide layout search
-        AnimUtils.slideUp(layoutSearch,searchBarHeight);
+        AnimUtils.slideUp(layoutSearch, searchBarHeight);
         // Hide layout auction
-       // AnimUtils.slideDown(layoutFindCar,measureView(layoutFindCar));
+        // AnimUtils.slideDown(layoutFindCar,measureView(layoutFindCar));
     }
 
-    private void showLayoutSearchOrigin(){
-        AnimUtils.slideDown(layoutSearch,0);
-       // AnimUtils.slideUp(layoutFindCar,0);
+    private void showLayoutSearchOrigin() {
+        AnimUtils.slideDown(layoutSearch, 0);
+        // AnimUtils.slideUp(layoutFindCar,0);
     }
 
     private void sendRequestFindDirection() {
         removeAllMarker();
         mFrom = listStopPoint.get(0);
-        mEnd = listStopPoint.get(listStopPoint.size()-1);
+        mEnd = listStopPoint.get(listStopPoint.size() - 1);
         try {
             for (Position location : listStopPoint) {
-                if (CommonUtilities.distanceInMeter(location.getLatLng(), currentLocation.getPosition()) < Defines.MIN_CURRENT_DISTANCE ){
-                    markerList.add(mMap.addMarker(new MarkerOptions()
-                            //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
-                            .title(currentLocation.getTitle())
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.current))
-                            .position(currentLocation.getPosition())));
-                }else {
+                if (currentLocation != null) {
+                    if (CommonUtilities.distanceInMeter(location.getLatLng(), currentLocation.getPosition()) < Defines.MIN_CURRENT_DISTANCE) {
+                        markerList.add(mMap.addMarker(new MarkerOptions()
+                                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                                .title(currentLocation.getTitle())
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.current))
+                                .position(currentLocation.getPosition())));
+                    } else {
+                        markerList.add(mMap.addMarker(new MarkerOptions()
+                                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
+                                .title(location.getPrimaryText())
+                                .position(location.getLatLng())));
+                    }
+                } else {
                     markerList.add(mMap.addMarker(new MarkerOptions()
                             //.icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
                             .title(location.getPrimaryText())
                             .position(location.getLatLng())));
                 }
+
             }
             new DirectionFinder(this, listStopPoint).execute();
         } catch (UnsupportedEncodingException e) {
@@ -462,7 +470,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
     }
 
-    private void removeAllMarker(){
+    private void removeAllMarker() {
         totalDistance = 0;
         if (polylinePaths != null) {
             for (Polyline polyline : polylinePaths) {
@@ -475,19 +483,22 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         markerList.clear();
     }
 
-    private void updateMapCamera(){
+    private void updateMapCamera() {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (Marker marker : markerList) {
             builder.include(marker.getPosition());
         }
         LatLngBounds bounds = builder.build();
-        int padding = (int)CommonUtilities.convertDpToPixel(40,mContext); // offset from edges of the map in pixels
-        mMap.setPadding(padding,measureView(layoutDirection)+(int)CommonUtilities.convertDpToPixel(50,mContext),padding, measureView(layoutTransport)+(int)CommonUtilities.convertDpToPixel(20,mContext));
+        int padding = (int) CommonUtilities.convertDpToPixel(40, mContext); // offset from edges of the map in pixels
+        if (Global.isOnTrip) {
+            mMap.setPadding(padding, measureView(toolbar) + (int) CommonUtilities.convertDpToPixel(50, mContext), padding, measureView(layoutDriveInfo) + (int) CommonUtilities.convertDpToPixel(20, mContext));
+        } else
+            mMap.setPadding(padding, measureView(layoutDirection) + (int) CommonUtilities.convertDpToPixel(50, mContext), padding, measureView(layoutTransport) + (int) CommonUtilities.convertDpToPixel(20, mContext));
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 0);
         mMap.animateCamera(cu);
     }
 
-    private void getCurrentPosition(){
+    private void getCurrentPosition() {
         gpsTracker = new GPSTracker(this);
         if (gpsTracker.handlePermissionsAndGetLocation()) {
             if (!gpsTracker.canGetLocation()) {
@@ -520,16 +531,16 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     private void showLayoutSearchingDriver(int bookingId, Trip trip) {
-        AnimUtils.fadeOut(layoutFixGPS,300);
-        layoutSeachingCar = new SearchingCarLayout(this,this,bookingId , trip);
+        AnimUtils.fadeOut(layoutFixGPS, 300);
+        layoutSeachingCar = new SearchingCarLayout(this, this, bookingId, trip);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         layoutSeachingCar.setLayoutParams(params);
         layoutRoot.addView(layoutSeachingCar);
         layoutSeachingCar.setTranslationY(Global.APP_SCREEN_HEIGHT);
-        AnimUtils.slideUp(layoutSeachingCar,0);
+        AnimUtils.slideUp(layoutSeachingCar, 0);
     }
 
-    public void setOnChangeTripListener (ChangeTripInfo changeTrip){
+    public void setOnChangeTripListener(ChangeTripInfo changeTrip) {
         this.changeTrip = changeTrip;
     }
 
@@ -558,7 +569,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                         gpsTracker.getLocationCoodinate(new GPSTracker.LocateListener() {
                             @Override
                             public void onLocate(double mlongitude, double mlatitude) {
-                                showCurrentLocationToMap(mlatitude,mlongitude);
+                                showCurrentLocationToMap(mlatitude, mlongitude);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -568,7 +579,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                             }
                         });
                     } else {
-                        showCurrentLocationToMap(gpsTracker.getLatitude(),gpsTracker.getLongitude());
+                        showCurrentLocationToMap(gpsTracker.getLatitude(), gpsTracker.getLongitude());
                         dialog.dismiss();
                     }
                 }
@@ -588,7 +599,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.btn_booking:
                 Intent intent = new Intent(PassengerSelectActionActivity.this, AuctionBookingActivity.class);
                 startActivity(intent);
@@ -598,7 +609,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 startActivity(intentInfo);
                 break;
             case R.id.img_edit:
-                Intent intentEdit= new Intent(PassengerSelectActionActivity.this, ConfigureAccountActivity.class);
+                Intent intentEdit = new Intent(PassengerSelectActionActivity.this, ConfigureAccountActivity.class);
                 intentEdit.putExtra(Defines.BUNDLE_USER, user);
                 startActivityForResult(intentEdit, Defines.CONFIGURE_CODE);
                 break;
@@ -607,9 +618,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 if (gpsTracker.handlePermissionsAndGetLocation()) {
                     if (!gpsTracker.canGetLocation()) {
                         DialogUtils.settingRequestTurnOnLocation(PassengerSelectActionActivity.this);
-                    } else{
+                    } else {
                         for (Marker marker : markerList)
-                            if (marker.getTitle().equals("Vị trí của bạn")){
+                            if (marker.getTitle().equals("Vị trí của bạn")) {
                                 CameraPosition cameraPosition = new CameraPosition.Builder()
                                         .target(currentLocation.getPosition())// Sets the center of the map to current location
                                         .zoom(16)                   // Sets the zoom
@@ -639,7 +650,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(Defines.NOTIFY_TAG, bookingId);
     }
 
@@ -669,27 +680,46 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_TRIP)) {
             Global.isOnTrip = true;
             lastTrip = (Trip) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_TRIP);
-            if (lastTrip.getDriverId() == 0){
+            if (lastTrip.getDriverId() == 0) {
                 hideLayoutDirection();
                 showLayoutSearchingDriver(lastTrip.getId(), lastTrip);
-            }else {
+            } else {
                 showCurrentTripAction();
                 listStopPoint = lastTrip.getListStopPoints();
                 sendRequestFindDirection();
             }
-        }else
+        } else
             Global.isOnTrip = false;
+
+        if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
+            Global.isOnTrip = true;
+            final int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID, 0);
+            final User userDriver = (User) getIntent().getSerializableExtra(Defines.BUNDLE_DRIVER);
+            int tripType = getIntent().getIntExtra(Defines.BUNDLE_TRIP_TYPE, 0);
+            if (tripType == 1) {
+                mApi.getTripInfo(bookingId, new ApiUtilities.TripInformationListener() {
+                    @Override
+                    public void onSuccess(Trip trip) {
+                        foundDriverUI(userDriver, bookingId);
+                        hideLayoutDirection();
+                        lastTrip = trip;
+                        listStopPoint = lastTrip.getListStopPoints();
+                        sendRequestFindDirection();
+                    }
+                });
+            }
+        }
     }
 
     //======================================== Search bar implement ================================
 
     /**
-     *  Event back button of search bar clicked
+     * Event back button of search bar clicked
      */
     @Override
     public void onBackButtonClicked() {
         hideLastSearchFragment();
-        AnimUtils.slideUp(layoutSearch,measureView(layoutSearch));
+        AnimUtils.slideUp(layoutSearch, measureView(layoutSearch));
         showLayoutDirection();
         layoutSearch.setShowLastSearch(false);
     }
@@ -700,11 +730,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     /**
-     *  Event click to search bar
+     * Event click to search bar
      */
     @Override
     public void onSearchViewClicked() {
-        showLastSearchFragment(false,0);
+        showLastSearchFragment(false, 0);
     }
 
     @Override
@@ -713,7 +743,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onChangeTextSearch(CharSequence s,AutoCompleteTextView edtSearch) {
+    public void onChangeTextSearch(CharSequence s, AutoCompleteTextView edtSearch) {
         mPlaceArrayAdapter.getFilter().filter(s.toString());
         mPredictFragment.setAdapter(mPlaceArrayAdapter);
         mPredictFragment.setCharacter(s.toString());
@@ -732,11 +762,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     /**
-     *  Event click to change location
+     * Event click to change location
      */
     @Override
     public void onDirectionTextClicked(int position) {
-        if (layoutSearch == null){
+        if (layoutSearch == null) {
             layoutSearch = new SearchBarLayout(this);
             layoutSearch.setCallback(this);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -746,7 +776,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             int height = measureView(layoutSearch);
             layoutSearch.setTranslationY(-height);
         }
-        AnimUtils.slideDown(layoutSearch,0);
+        AnimUtils.slideDown(layoutSearch, 0);
         hideLayoutDirection();
         layoutSearch.setShowLastSearch(true);
         layoutSearch.requestForcus();
@@ -754,15 +784,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     /**
-     *  Event click to new stop point
+     * Event click to new stop point
      */
     @Override
     public void onNewStopPoint() {
-        AnimUtils.slideDown(layoutSearch,0);
+        AnimUtils.slideDown(layoutSearch, 0);
         hideLayoutDirection();
         layoutSearch.setShowLastSearch(true);
         layoutSearch.requestForcus();
-        showLastSearchFragment(false,0);
+        showLastSearchFragment(false, 0);
     }
 
     @Override
@@ -788,20 +818,20 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onNewDirection(Position location) {
-        String sLocation = location.getPrimaryText() +", "+location.getSecondText();
-        layoutDirection.updateLocation(sLocation,-1);
-        listStopPoint.add(listStopPoint.size(),location);
+        String sLocation = location.getPrimaryText() + ", " + location.getSecondText();
+        layoutDirection.updateLocation(sLocation, -1);
+        listStopPoint.add(listStopPoint.size(), location);
         changeUIWhenChangedDirecition();
         sendRequestFindDirection();
     }
 
     @Override
     public void onChangeLocation(Position location, int position) {
-        String sLocation = location.getPrimaryText() +", "+location.getSecondText();
-        layoutDirection.updateLocation(sLocation,position);
+        String sLocation = location.getPrimaryText() + ", " + location.getSecondText();
+        layoutDirection.updateLocation(sLocation, position);
         listStopPoint.set(position, location);
         changeUIWhenChangedDirecition();
-        if (listStopPoint.get(1) != null){
+        if (listStopPoint.get(1) != null) {
             sendRequestFindDirection();
         }
 
@@ -826,7 +856,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     width(12);
             PolylineOptions polylineOptions1 = new PolylineOptions().
                     geodesic(true).
-                    color(ContextCompat.getColor(mContext,R.color.blue_light)).
+                    color(ContextCompat.getColor(mContext, R.color.blue_light)).
                     width(8);
             for (int i = 0; i < route.points.size(); i++) {
                 polylineOptions.add(route.points.get(i));
@@ -835,7 +865,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
             polylinePaths.add(mMap.addPolyline(polylineOptions));
             polylinePaths.add(mMap.addPolyline(polylineOptions1));
-            totalDistance+= route.distance.value;
+            totalDistance += route.distance.value;
         }
         if (changeTrip != null)
             changeTrip.onChangeDistance(totalDistance);
@@ -847,12 +877,12 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 builder.include(marker.getPosition());
             }
             LatLngBounds bounds = builder.build();
-            int padding = (int)CommonUtilities.convertDpToPixel(40,mContext); // offset from edges of the map in pixels
-            mMap.setPadding(padding,measureView(layoutDriveInfo)+(int)CommonUtilities.convertDpToPixel(50,mContext),padding, measureView(layoutDriveInfo)+(int)CommonUtilities.convertDpToPixel(20,mContext));
+            int padding = (int) CommonUtilities.convertDpToPixel(40, mContext); // offset from edges of the map in pixels
+            mMap.setPadding(padding, measureView(layoutDriveInfo) + (int) CommonUtilities.convertDpToPixel(50, mContext), padding, measureView(layoutDriveInfo) + (int) CommonUtilities.convertDpToPixel(20, mContext));
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 0);
             mMap.animateCamera(cu);
         }
-        if (dialogDirection != null && dialogDirection.isShowing()){
+        if (dialogDirection != null && dialogDirection.isShowing()) {
             dialogDirection.dismiss();
             dialogDirection = null;
         }
@@ -860,7 +890,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
     //======================================== Select car type implement ===========================
 
-    private void animateLocation(){
+    private void animateLocation() {
         final Marker markerMove = mMap.addMarker(new MarkerOptions().position(mFrom.getLatLng()).title("Vị trí của bạn"));
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
@@ -889,19 +919,21 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             }
         });
     }
+
     private static final int ANIMATE_SPEEED = 1500;
     private static final int ANIMATE_SPEEED_TURN = 1000;
     private static final int BEARING_OFFSET = 20;
     private final Interpolator interpolator = new LinearInterpolator();
+
     @Override
     public void onBookingClicked() {
-        Trip trip = new Trip(user.getId(), user.getName(), user.getPhone(),listStopPoint, typeTrip, totalDistance, carSelectd.getSize(),carSelectd.getTotalPrice() );
+        Trip trip = new Trip(user.getId(), user.getName(), user.getPhone(), listStopPoint, typeTrip, totalDistance, carSelectd.getSize(), carSelectd.getTotalPrice());
         trip.setCar(carSelectd.isCar());
         FragmentManager fragmentManager = getSupportFragmentManager();
         dialogConfirm = new ConfirmDialogFragment();
         dialogConfirm.setOnCallBack(this);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(Defines.DIALOG_CONFIRM_TRIP,trip);
+        bundle.putSerializable(Defines.DIALOG_CONFIRM_TRIP, trip);
         dialogConfirm.setArguments(bundle);
         dialogConfirm.setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog);
         dialogConfirm.setCancelable(false);
@@ -961,7 +993,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                         @Override
                         public void onSuccess(ArrayList<Trip> arrayTrip) {
                             if (arrayTrip == null)
-                                bookingImmediateTrip(trip,isToday);
+                                bookingImmediateTrip(trip, isToday);
                             else {
                                 if (arrayTrip.size() > 2)
                                     Toast.makeText(mContext, "Bạn đã đăng quá 3 chuyến đi sau", Toast.LENGTH_SHORT).show();
@@ -970,14 +1002,14 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                             }
                         }
                     });
-                }else
-                    bookingImmediateTrip(trip,isToday );
+                } else
+                    bookingImmediateTrip(trip, isToday);
             }
-        }else
-            bookingImmediateTrip(trip,false);
+        } else
+            bookingImmediateTrip(trip, false);
     }
 
-    private void bookingImmediateTrip (final Trip trip, final boolean isToday){
+    private void bookingImmediateTrip(final Trip trip, final boolean isToday) {
         mApi.bookingCar(trip, new ApiUtilities.BookingCarListener() {
             @Override
             public void onSuccess(int bookingId) {
@@ -1004,7 +1036,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         });
     }
 
-    private void foundDriverUI(User user, int bookingId){
+    private void foundDriverUI(User user, int bookingId) {
         // Remove marker around
         for (Marker marker : aroundList)
             marker.remove();
@@ -1015,22 +1047,23 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         toolbar.setVisibility(View.VISIBLE);
         toolbar.setTitle(getString(R.string.in_trip));
         hideLayoutDirection();
-        layoutDriveInfo = new DriverInformationLayout(mContext,user);
+        layoutDriveInfo = new DriverInformationLayout(mContext, user);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutDriveInfo.setLayoutParams(params);
         layoutRoot.addView(layoutDriveInfo);
-        AnimUtils.fadeIn(layoutFixGPS,300);
+        AnimUtils.fadeIn(layoutFixGPS, 300);
     }
+
     BroadcastReceiver receiveTrip = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
                 Global.isOnTrip = true;
                 User userDriver = (User) intent.getSerializableExtra(Defines.BUNDLE_DRIVER);
-                bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
+                bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP, 0);
                 foundDriverUI(userDriver, bookingId);
-                Toast.makeText(mContext, "Chúng tôi đã tìm thấy tài xế cho bạn",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Chúng tôi đã tìm thấy tài xế cho bạn", Toast.LENGTH_SHORT).show();
             } catch (IllegalStateException e) {
             }
         }
@@ -1040,9 +1073,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-                bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
+                bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP, 0);
                 AnimUtils.slideDown(layoutSeachingCar, Global.APP_SCREEN_HEIGHT);
-                Toast.makeText(mContext,"Rất tiếc, Không có tài xế nào quanh bạn", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "Rất tiếc, Không có tài xế nào quanh bạn", Toast.LENGTH_LONG).show();
             } catch (IllegalStateException e) {
             }
         }
@@ -1053,7 +1086,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         public void onReceive(Context context, Intent intent) {
             try {
                 Global.isOnTrip = false;
-                bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP,0);
+                bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP, 0);
                 String driverName = intent.getStringExtra(Defines.BUNDLE_DRIVER_NAME);
                 showRatingDialog(bookingId, driverName);
 
@@ -1062,15 +1095,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         }
     };
 
-    private void showRatingDialog(int bookingId, String driverName){
+    private void showRatingDialog(int bookingId, String driverName) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         RatingFragment dialogRating = new RatingFragment();
         dialogRating.setOnRatingCallBack(PassengerSelectActionActivity.this);
         dialogRating.setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(Defines.BUNDLE_USER,user);
-        bundle.putInt(Defines.BUNDLE_TRIP,bookingId);
-        bundle.putString(Defines.BUNDLE_DRIVER_NAME,driverName);
+        bundle.putSerializable(Defines.BUNDLE_USER, user);
+        bundle.putInt(Defines.BUNDLE_TRIP, bookingId);
+        bundle.putString(Defines.BUNDLE_DRIVER_NAME, driverName);
         dialogRating.setArguments(bundle);
         dialogRating.setCancelable(false);
         dialogRating.setDialogTitle(getString(R.string.rating_title));
@@ -1081,8 +1114,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     BroadcastReceiver tripCancel = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(((Activity) mContext).isFinishing())
-            {
+            if (((Activity) mContext).isFinishing()) {
                 finishTripAndUpdateView();
                 return;
             }
@@ -1106,15 +1138,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     @Override
     public void onRatingSuccess() {
-        Toast.makeText(this, getString(R.string.review_message),Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.review_message), Toast.LENGTH_SHORT).show();
         finishTripAndUpdateView();
 
     }
 
-    private void finishTripAndUpdateView(){
+    private void finishTripAndUpdateView() {
         Global.isOnTrip = false;
         toolbar.setVisibility(View.GONE);
-        AnimUtils.slideDown(layoutDirection,0);
+        AnimUtils.slideDown(layoutDirection, 0);
         if (layoutDriveInfo != null)
             layoutRoot.removeView(layoutDriveInfo);
 
@@ -1132,9 +1164,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         getCurrentPosition();
         layoutDirection.resetListStopPoint();
     }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.nav_log_out:
                 DialogUtils.showLoginDialog((Activity) mContext, new DialogUtils.YesNoListenter() {
                     @Override
@@ -1150,7 +1183,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                                 preference.clearToken();
                                 Intent intent = new Intent(mContext, SplashActivity.class);
                                 mContext.startActivity(intent);
-                                ((Activity)mContext).finish();
+                                ((Activity) mContext).finish();
                             }
 
                             @Override
@@ -1185,15 +1218,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 break;
 
             case R.id.nav_notify:
-                Toast.makeText(mContext, "Chức năng đang được cập nhật",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Chức năng đang được cập nhật", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.nav_invite:
-                Toast.makeText(mContext, "Chức năng đang được cập nhật",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Chức năng đang được cập nhật", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.nav_support:
-                Toast.makeText(mContext, "Chức năng đang được cập nhật",Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Chức năng đang được cập nhật", Toast.LENGTH_SHORT).show();
                 break;
 
         }

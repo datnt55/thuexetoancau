@@ -41,6 +41,8 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         this.mContext = activity;
         this.listener = activity;
         this.transports = carPrice;
+        carSelect = transports.get(0);
+        transports.get(0).setSelected(true);
         activity.setOnChangeTripListener(this);
         transportsAvailable = new ArrayList<>();
         initLayout();
@@ -69,12 +71,12 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         listTrans.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         listTrans.setLayoutManager(layoutManager);
-        if (totalDistance < Defines.MAX_DISTANCE)
+       /* if (totalDistance < Defines.MAX_DISTANCE)
             filterCar();
         else
-            fullCar();
+            fullCar();*/
         setCarPrice(totalDistance);
-        adapter = new TransportationAdapter(mContext, transportsAvailable);
+        adapter = new TransportationAdapter(mContext, transports);
         listTrans.setAdapter(adapter);
 
         adapter.setOnClickListener(new TransportationAdapter.OnItemClickListener() {
@@ -110,6 +112,15 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         transportsAvailable.get(0).setSelected(true);
     }
 
+    private void resetCar() {
+        for (int i = 0; i < transports.size(); i++){
+            Car car = transports.get(i);
+            car.setSelected(false);
+        }
+        carSelect = transports.get(0);
+        transports.get(0).setSelected(true);
+    }
+
     private void setCarPrice(int distance) {
         for (Car car : transports)
             if (totalDistance < Defines.MAX_DISTANCE)
@@ -134,10 +145,10 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     @Override
     public void onChangeDistance(int distance) {
         this.totalDistance = distance;
-        if (totalDistance < Defines.MAX_DISTANCE)
+       /* if (totalDistance < Defines.MAX_DISTANCE)
             filterCar();
         else
-            fullCar();
+            fullCar();*/
         setCarPrice(distance);
         adapter.notifyDataSetChanged();
         layoutManager.scrollToPosition(0);
@@ -147,10 +158,10 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
 
     @Override
     public void onChangeTrip(int tripType) {
-        if (totalDistance < Defines.MAX_DISTANCE)
+       /* if (totalDistance < Defines.MAX_DISTANCE)
             filterCar();
         else
-            fullCar();
+            fullCar();*/
         this.tripType = tripType;
         setCarPrice(totalDistance);
         adapter.notifyDataSetChanged();

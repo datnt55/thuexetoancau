@@ -26,6 +26,7 @@ public class Defines {
     public static  final String URL_REVIEW_TRIP                 = HOSTNAME + "api2/reviewTrip";
     public static  final String URL_LIKE_TRIP                   = HOSTNAME + "api2/likeTrip";
     public static  final String URL_SCHEDULE_TRIP               = HOSTNAME + "api2/getTripSchedule";
+    public static  final String URL_TRIP_INFO                   = HOSTNAME + "api2/getTripInfo";
     public static  final String     URL_NOTICE                  = HOSTNAME + "api/getNotice";
     public static  final String URL_GET_LONLAT_AIRPORT      = HOSTNAME + "api/getLonLatAirport";
     public static  final String URL_GET_WHO_HIRE            = HOSTNAME + "api/getCarWhoHire ";

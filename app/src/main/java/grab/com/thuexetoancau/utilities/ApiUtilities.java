@@ -1006,6 +1006,57 @@ public class ApiUtilities {
         });
     }
 
+    public void getTripInfo(int bookingId, final TripInformationListener listener) {
+        final ProgressDialog dialog = new ProgressDialog(mContext);
+        dialog.setMessage("Đang tải dữ liệu");
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
+        dialog.show();
+        RequestParams params;
+        params = new RequestParams();
+        params.put("id_booking", bookingId);
+        Log.e("params deleteDelivery", params.toString());
+        BaseService.getHttpClient().post(Defines.URL_TRIP_INFO, params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.getString("status").equals("success")) {
+                        JSONArray array = json.getJSONArray("data");
+                        JSONObject data = array.getJSONObject(0);
+                        JSONObject listTrip = data.getJSONObject("list");
+                        Trip trip = parseBookingData(listTrip);
+                        if (listener != null)
+                            listener.onSuccess(trip);
+                    }
+                    //Toast.makeText(mContext, json.getString("message"), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                dialog.dismiss();
+            }
+        });
+    }
+
     private AroundCar parseJsonResult(JSONObject jsonobject) {
        AroundCar aroundCars = null;
         try {
@@ -1051,4 +1102,7 @@ public class ApiUtilities {
         void onSuccess(ArrayList<AroundCar> aroundCars);
     }
 
+    public interface TripInformationListener {
+        void onSuccess(Trip trip);
+    }
 }
