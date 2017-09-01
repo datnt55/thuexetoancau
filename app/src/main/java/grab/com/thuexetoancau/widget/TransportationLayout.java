@@ -35,7 +35,8 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     private int totalDistance;
     private int tripType = 1;
     private Car carSelect;
-    private   LinearLayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
+
     public TransportationLayout(PassengerSelectActionActivity activity, ArrayList<Car> carPrice) {
         super(activity);
         this.mContext = activity;
@@ -115,6 +116,7 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     private void resetCar() {
         for (int i = 0; i < transports.size(); i++){
             Car car = transports.get(i);
+            car.setTotalPrice(0);
             car.setSelected(false);
         }
         carSelect = transports.get(0);
@@ -136,8 +138,13 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_booking:
-                if (listener != null)
-                    listener.onBookingClicked();
+                if (btnBook.getText().equals("Đặt xe")) {
+                    if (listener != null)
+                        listener.onBookingClicked();
+                }else if (btnBook.getText().equals("Chọn địa điểm đến")) {
+                    if (listener != null)
+                        listener.onSelectDestination();
+                }
                 break;
         }
     }
@@ -154,6 +161,8 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         layoutManager.scrollToPosition(0);
         if (listener != null)
             listener.onSelectVehicle(carSelect);
+
+        btnBook.setText("Đặt xe");
     }
 
     @Override
@@ -168,8 +177,16 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
         layoutManager.scrollToPosition(0);
     }
 
+    @Override
+    public void onResetTrip() {
+        resetCar();
+        adapter.notifyDataSetChanged();
+        btnBook.setText("Chọn địa điểm đến");
+    }
+
     public interface OnTransportationListener{
         void onBookingClicked();
         void onSelectVehicle(Car car);
+        void onSelectDestination();
     }
 }

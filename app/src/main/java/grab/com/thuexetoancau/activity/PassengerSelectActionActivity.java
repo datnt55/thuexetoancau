@@ -183,7 +183,27 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             });
         } else
             initComponents();
-        listCar = mApi.getPostage();
+        listCar = mApi.getPostage(new ApiUtilities.ResponseRequestListener() {
+            @Override
+            public void onSuccess() {
+                ArrayList<Car> transports = new ArrayList<>();
+                for (int i = 0; i < listCar.size(); i++) {
+                    Car car = new Car(listCar.get(i));
+                    transports.add(car);
+                }
+                layoutTransport = new TransportationLayout(PassengerSelectActionActivity.this, transports);
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                layoutTransport.setLayoutParams(params);
+                layoutRoot.addView(layoutTransport);
+              //  layoutTransport.setTranslationY(-measureView(layoutTransport));
+            }
+
+            @Override
+            public void onFail() {
+
+            }
+        });
         LocalBroadcastManager.getInstance(this).registerReceiver(receiveTrip, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
@@ -392,20 +412,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             showLayoutDirection();
             hideLayoutSearchOrigin();
             return;
-        }
-        // Initial and show layout select and booking car
-        if (layoutTransport == null) {
-            ArrayList<Car> transports = new ArrayList<>();
-            for (int i = 0; i < listCar.size(); i++) {
-                Car car = new Car(listCar.get(i));
-                transports.add(car);
-            }
-            layoutTransport = new TransportationLayout(this, transports);
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-            layoutTransport.setLayoutParams(params);
-            layoutRoot.addView(layoutTransport);
-            layoutTransport.setTranslationY(-measureView(layoutTransport));
         }
         showLayoutDirection();
         hideLayoutSearchOrigin();
@@ -947,6 +953,25 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         carSelectd = car;
     }
 
+    @Override
+    public void onSelectDestination() {
+        if (layoutSearch == null) {
+            layoutSearch = new SearchBarLayout(this);
+            layoutSearch.setCallback(this);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+            layoutSearch.setLayoutParams(params);
+            layoutRoot.addView(layoutSearch);
+            int height = measureView(layoutSearch);
+            layoutSearch.setTranslationY(-height);
+        }
+        AnimUtils.slideDown(layoutSearch, 0);
+        hideLayoutDirection();
+        layoutSearch.setShowLastSearch(true);
+        layoutSearch.requestForcus();
+        showLastSearchFragment(true, 1);
+    }
+
     //====================================== Searching car implement================================
 
     @Override
@@ -1146,7 +1171,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private void finishTripAndUpdateView() {
         Global.isOnTrip = false;
         toolbar.setVisibility(View.GONE);
-        AnimUtils.slideDown(layoutDirection, 0);
+        showLayoutDirection();
+        if (changeTrip != null)
+            changeTrip.onResetTrip();
         if (layoutDriveInfo != null)
             layoutRoot.removeView(layoutDriveInfo);
 
@@ -1154,10 +1181,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         if (layoutSearch != null) {
             layoutRoot.removeView(layoutSearch);
             layoutSearch = null;
-        }
-        if (layoutTransport != null) {
-            layoutRoot.removeView(layoutTransport);
-            layoutTransport = null;
         }
         listStopPoint.clear();
         removeAllMarker();

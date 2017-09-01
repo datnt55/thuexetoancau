@@ -7,4 +7,5 @@ package grab.com.thuexetoancau.listener;
 public interface ChangeTripInfo {
     void onChangeDistance(int distance);
     void onChangeTrip(int tripType);
+    void onResetTrip();
 }

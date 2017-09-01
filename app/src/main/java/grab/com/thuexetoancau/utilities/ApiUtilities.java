@@ -363,7 +363,7 @@ public class ApiUtilities {
         }
         return trip;
     }
-    public ArrayList<Car> getPostage(){
+    public ArrayList<Car> getPostage(final ResponseRequestListener listener){
         if (!CommonUtilities.isOnline(mContext)) {
             DialogUtils.showDialogNetworkError(mContext, null);
             return null;
@@ -406,8 +406,12 @@ public class ApiUtilities {
                             }else
                                 arrayPrice.add(new Car(carSize,true, CommonUtilities.getCarName(carSize,true), CommonUtilities.getCarImage(carSize), price01way, price02way, price11way));
                         }
+                        if (listener != null)
+                            listener.onSuccess();
 
-                    }
+                    }else
+                    if (listener != null)
+                        listener.onFail();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
