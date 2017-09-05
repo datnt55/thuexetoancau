@@ -1,12 +1,15 @@
 package grab.com.thuexetoancau.widget;
 
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +17,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import grab.com.thuexetoancau.R;
 import grab.com.thuexetoancau.adapter.DirectionAdapter;
@@ -44,18 +50,44 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         this.mContext = context;
         routes = new ArrayList<>();
         GPSTracker gpsTracker = new GPSTracker(mContext);
-        routes.add("Vị trí của bạn");
+        routes.add(getAddress(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
         routes.add("Bạn muốn đi đâu");
         initLayout();
     }
+
 
     public DirectionLayout(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
         routes = new ArrayList<>();
-        routes.add("Vị trí của bạn");
+        GPSTracker gpsTracker = new GPSTracker(mContext);
+        routes.add(getAddress(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
         routes.add("Bạn muốn đi đâu?");
         initLayout();
+    }
+
+    private String getAddress(double latitude, double longitude) {
+        StringBuilder result = new StringBuilder();
+        try {
+            Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses.size() > 0) {
+                Address address = addresses.get(0);
+                int index = addresses.get(0).getMaxAddressLineIndex();
+                if (index == 0)
+                    return address.getAddressLine(0);
+                for (int i = 0; i < index; i++)
+                    if (address.getAddressLine(i) != null) {
+                        result.append(address.getAddressLine(i));
+                        if (i < index - 1)
+                            result.append(", ");
+                    }
+            }
+        } catch (IOException e) {
+            Log.e("tag", e.getMessage());
+        }
+
+        return result.toString();
     }
 
     private void initLayout() {
@@ -135,7 +167,8 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
 
     public void resetListStopPoint(){
         routes.clear();
-        routes.add("Vị trí của bạn");
+        GPSTracker gpsTracker = new GPSTracker(mContext);
+        routes.add(getAddress(gpsTracker.getLatitude(), gpsTracker.getLongitude()));
         routes.add("Bạn muốn đi đâu?");
         adapter.notifyDataSetChanged();
         checkSizeOfRecyclerView(listDirection);

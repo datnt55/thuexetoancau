@@ -176,6 +176,8 @@ public class DirectionAdapter extends RecyclerView.Adapter<DirectionAdapter.View
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
+        if (arrayDirection.size() == 2 && arrayDirection.get(1).equals("Bạn muốn đi đâu?"))
+            return;
         Collections.swap(arrayDirection, fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
         if (fromPosition == 0 || fromPosition == arrayDirection.size()-1 || toPosition == 0 || toPosition == arrayDirection.size()-1)
