@@ -183,27 +183,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             });
         } else
             initComponents();
-        listCar = mApi.getPostage(new ApiUtilities.ResponseRequestListener() {
-            @Override
-            public void onSuccess() {
-                ArrayList<Car> transports = new ArrayList<>();
-                for (int i = 0; i < listCar.size(); i++) {
-                    Car car = new Car(listCar.get(i));
-                    transports.add(car);
-                }
-                layoutTransport = new TransportationLayout(PassengerSelectActionActivity.this, transports);
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                layoutTransport.setLayoutParams(params);
-                layoutRoot.addView(layoutTransport);
-              //  layoutTransport.setTranslationY(-measureView(layoutTransport));
-            }
-
-            @Override
-            public void onFail() {
-
-            }
-        });
         LocalBroadcastManager.getInstance(this).registerReceiver(receiveTrip, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
@@ -696,6 +675,30 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             }
         } else
             Global.isOnTrip = false;
+
+        listCar = mApi.getPostage(new ApiUtilities.ResponseRequestListener() {
+            @Override
+            public void onSuccess() {
+                ArrayList<Car> transports = new ArrayList<>();
+                for (int i = 0; i < listCar.size(); i++) {
+                    Car car = new Car(listCar.get(i));
+                    transports.add(car);
+                }
+                layoutTransport = new TransportationLayout(PassengerSelectActionActivity.this, transports);
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                layoutTransport.setLayoutParams(params);
+                layoutRoot.addView(layoutTransport);
+                if (Global.isOnTrip)
+                    AnimUtils.slideDown(layoutTransport, measureView(layoutTransport));
+                //layoutTransport.setTranslationY(-measureView(layoutTransport));
+            }
+
+            @Override
+            public void onFail() {
+
+            }
+        });
 
         if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
             Global.isOnTrip = true;
