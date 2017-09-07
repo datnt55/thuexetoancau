@@ -183,27 +183,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             });
         } else
             initComponents();
-        listCar = mApi.getPostage(new ApiUtilities.ResponseRequestListener() {
-            @Override
-            public void onSuccess() {
-                ArrayList<Car> transports = new ArrayList<>();
-                for (int i = 0; i < listCar.size(); i++) {
-                    Car car = new Car(listCar.get(i));
-                    transports.add(car);
-                }
-                layoutTransport = new TransportationLayout(PassengerSelectActionActivity.this, transports);
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                layoutTransport.setLayoutParams(params);
-                layoutRoot.addView(layoutTransport);
-              //  layoutTransport.setTranslationY(-measureView(layoutTransport));
-            }
-
-            @Override
-            public void onFail() {
-
-            }
-        });
         LocalBroadcastManager.getInstance(this).registerReceiver(receiveTrip, new IntentFilter(Defines.BROADCAST_RECEIVED_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
@@ -290,7 +269,8 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     .considerExifParams(true)
                     .bitmapConfig(Bitmap.Config.RGB_565)
                     .build();
-            ImageLoader.getInstance().displayImage("http://icongal.com/gallery/image/270615/admin_administrator_customer_user_person_face_admnistrator_support_custom.png", imgAvatar, options, new SimpleImageLoadingListener());
+            //ImageLoader.getInstance().displayImage("https://maxcdn.icons8.com/Share/icon/Transport//passenger1600.png", imgAvatar, options, new SimpleImageLoadingListener());
+            imgAvatar.setImageResource(R.drawable.passenger);
         }
     }
 
@@ -444,6 +424,11 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     }
 
     private void sendRequestFindDirection() {
+        dialogDirection = new ProgressDialog(this);
+        dialogDirection.setCancelable(false);
+        dialogDirection.setCanceledOnTouchOutside(false);
+        dialogDirection.setMessage(mContext.getString(R.string.prepare_data));
+        dialogDirection.show();
         removeAllMarker();
         mFrom = listStopPoint.get(0);
         mEnd = listStopPoint.get(listStopPoint.size() - 1);
@@ -715,6 +700,29 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 });
             }
         }
+        listCar = mApi.getPostage(new ApiUtilities.ResponseRequestListener() {
+            @Override
+            public void onSuccess() {
+                ArrayList<Car> transports = new ArrayList<>();
+                for (int i = 0; i < listCar.size(); i++) {
+                    Car car = new Car(listCar.get(i));
+                    transports.add(car);
+                }
+                layoutTransport = new TransportationLayout(PassengerSelectActionActivity.this, transports);
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                layoutTransport.setLayoutParams(params);
+                layoutRoot.addView(layoutTransport);
+                if (Global.isOnTrip)
+                    AnimUtils.slideDown(layoutTransport, measureView(layoutTransport));
+                //  layoutTransport.setTranslationY(-measureView(layoutTransport));
+            }
+
+            @Override
+            public void onFail() {
+
+            }
+        });
     }
 
     //======================================== Search bar implement ================================
@@ -846,11 +854,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     //======================================== Direction Finder implement ==========================
     @Override
     public void onDirectionFinderStart() {
-        dialogDirection = new ProgressDialog(this);
-        dialogDirection.setCancelable(false);
-        dialogDirection.setCanceledOnTouchOutside(false);
-        dialogDirection.setMessage(mContext.getString(R.string.prepare_data));
-        dialogDirection.show();
+
     }
 
     @Override

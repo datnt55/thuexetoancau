@@ -134,7 +134,18 @@ public class SplashActivity extends AppCompatActivity {
             case 1000:
                 GPSTracker gpsTracker = new GPSTracker(this);
                 if (gpsTracker.canGetLocation()) {
-                    goToApplication();
+                    if (gpsTracker.getLongitude() == 0 && gpsTracker.getLatitude() == 0) {
+                        gpsTracker.getLocationCoodinate(new GPSTracker.LocateListener() {
+                            @Override
+                            public void onLocate(double mlongitude, double mlatitude) {
+                                goToApplication();
+                            }
+                        });
+                    } else {
+                        goToApplication();
+                    }
+                }else {
+                    DialogUtils.settingRequestTurnOnLocation((Activity)mContext);
                 }
                 break;
         }

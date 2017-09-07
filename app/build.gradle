@@ -6,7 +6,7 @@ android {
         applicationId "grab.com.thuexetoancau"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 29
+        versionCode 32
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

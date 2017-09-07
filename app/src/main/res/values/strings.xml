@@ -45,7 +45,7 @@
 
     <!-- layout search bar -->
     <string name="last_search">CÁC TÌM KIẾM TRƯỚC</string>
-    <string name="recommend_search">ĐỊA ĐIỂM GỢI Ý</string>
+    <string name="recommend_search">CHỌN ĐIỂM ĐÓN</string>
 
     <!-- layout direction -->
     <string name="current_location">Vị trí của bạn</string>
