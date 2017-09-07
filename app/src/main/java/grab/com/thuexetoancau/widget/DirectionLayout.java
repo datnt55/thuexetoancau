@@ -86,7 +86,8 @@ public class DirectionLayout extends LinearLayout implements View.OnClickListene
         } catch (IOException e) {
             Log.e("tag", e.getMessage());
         }
-
+        if (result.toString().equals(""))
+            return "Vị trí của bạn";
         return result.toString();
     }
 
