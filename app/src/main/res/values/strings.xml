@@ -45,8 +45,8 @@
 
     <!-- layout search bar -->
     <string name="last_search">CÁC TÌM KIẾM TRƯỚC</string>
-    <string name="recommend_search">CHỌN ĐIỂM ĐÓN</string>
-
+    <string name="recommend_search_from">CHỌN ĐIỂM ĐÓN</string>
+    <string name="recommend_search_to">CHỌN ĐIỂM ĐẾN</string>
     <!-- layout direction -->
     <string name="current_location">Vị trí của bạn</string>
     <string name="title_activity_main">MainActivity</string>
@@ -60,7 +60,9 @@
     <string name="login_google">Đăng nhập qua Google</string>
     <string name="login_phone">Sử dụng số điện thoại</string>
 
-    <string name="facebook_app_id">1590532131018359</string>
+    <!--<string name="facebook_app_id">1590532131018359</string>-->
+    <string name="facebook_app_id">964234977027033</string>
+    <string name="client_token">799de49b357b77afede08488ced2f721</string>
     <string name="fb_login_protocol_scheme">fb154472745109695</string>
 
     <string name="title_register">Vui lòng điền thông tin, Chỉ có tài xế đón bạn thấy thông tin của bạn</string>

@@ -964,6 +964,55 @@ public class ApiUtilities {
         });
     }
 
+    public void getUserPoint(int userId, final UserPointListener listener){
+        if (!CommonUtilities.isOnline(mContext)) {
+            DialogUtils.showDialogNetworkError(mContext, null);
+            return ;
+        }
+        RequestParams params;
+        params = new RequestParams();
+        params.put("user_id", userId);
+        Log.e("TAG",params.toString());
+        BaseService.getHttpClient().post(Defines.URL_POINT_FOR_USER,params, new AsyncHttpResponseHandler() {
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                // called when response HTTP status is "200 OK"
+                Log.i("JSON", new String(responseBody));
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.getString("status").equals("success")){
+                        ArrayList<Trip> arrayTrip = new ArrayList<Trip>();
+                        JSONArray array = json.getJSONArray("data");
+                        JSONObject data = array.getJSONObject(0);
+                        String point = data.getString("total_point");
+                        if (listener != null)
+                            listener.onSuccess(point);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    if (listener != null)
+                        listener.onSuccess(null);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+            }
+
+            @Override
+            public void onRetry(int retryNo) {
+                // called when request is retried
+            }
+        });
+    }
+
     public void getCarAround(GPSTracker location, final AroundCarListener listener) {
         RequestParams params;
         params = new RequestParams();
@@ -1108,5 +1157,9 @@ public class ApiUtilities {
 
     public interface TripInformationListener {
         void onSuccess(Trip trip);
+    }
+
+    public interface UserPointListener {
+        void onSuccess(String point);
     }
 }

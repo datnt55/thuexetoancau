@@ -61,6 +61,11 @@ public class LastSearchFragment extends Fragment {
         listLastSearch.setLayoutManager(llm);
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(getActivity(), LinearLayout.VERTICAL);
         listLastSearch.addItemDecoration(mDividerItemDecoration);
+
+        if (directionPosition != 0)
+            txtLastSearch.setText(getString(R.string.recommend_search_to));
+        else
+            txtLastSearch.setText(getString(R.string.recommend_search_from));
     }
 
     public void setAdapter(LastSearchAdapter mAdapter){
@@ -92,9 +97,6 @@ public class LastSearchFragment extends Fragment {
         });
     }
 
-    public void setCharacter(String constraint){
-        txtLastSearch.setText(R.string.recommend_search);
-    }
 
     public void setGoogleApiClient(GoogleApiClient mGoogleApiClient){
         this.mGoogleApiClient = mGoogleApiClient;

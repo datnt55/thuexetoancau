@@ -32,7 +32,14 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
+        <meta-data
+            android:name="com.facebook.accountkit.ApplicationName"
+            android:value="@string/app_name"
+            />
+        <meta-data
+            android:name="com.facebook.accountkit.ClientToken"
+            android:value="@string/client_token"
+            />
         <service android:name=".Fcm.FirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -91,6 +98,10 @@
         <activity
             android:name=".activity.AuctionBookingResultActivity"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name="com.facebook.accountkit.ui.AccountKitActivity"
+            android:theme="@style/AppLoginTheme.Bicycle"
+            tools:replace="android:theme" />
     </application>
 
 </manifest>

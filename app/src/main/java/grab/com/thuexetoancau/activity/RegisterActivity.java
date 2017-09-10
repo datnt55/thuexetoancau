@@ -149,30 +149,57 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         if (getIntent().hasExtra(Defines.BUNDLE_USER)) {
             //receive
             user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_USER);
-            edtCustomerName.setText(user.getName());
-            edtCustomerEmail.setText(user.getEmail());
-            mApi.loginCustomer(null, user.getEmail(), new ApiUtilities.ResponseLoginListener() {
-                @Override
-                public void onSuccess(Trip trip, User mUser) {
-                    user = mUser;
-                    edtCustomerPhone.setText(user.getPhone());
-                    Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
-                    intent.putExtra(Defines.BUNDLE_LOGIN_USER, user);
-                    if (trip != null) {
-                        intent.putExtra(Defines.BUNDLE_LOGIN_TRIP, trip);
-                        if (trip.getDriverId() != 0)
-                            intent.putExtra(Defines.BUNDLE_LOGIN_DRIVER,true);
+            if (user.getName()!= null)
+                edtCustomerName.setText(user.getName());
+            if (user.getEmail()!= null) {
+                edtCustomerEmail.setText(user.getEmail());
+                mApi.loginCustomer(null, user.getEmail(), new ApiUtilities.ResponseLoginListener() {
+                    @Override
+                    public void onSuccess(Trip trip, User mUser) {
+                        user = mUser;
+                        edtCustomerPhone.setText(user.getPhone());
+                        Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
+                        intent.putExtra(Defines.BUNDLE_LOGIN_USER, user);
+                        if (trip != null) {
+                            intent.putExtra(Defines.BUNDLE_LOGIN_TRIP, trip);
+                            if (trip.getDriverId() != 0)
+                                intent.putExtra(Defines.BUNDLE_LOGIN_DRIVER,true);
+                        }
+                        startActivity(intent);
+                        finish();
                     }
-                    startActivity(intent);
-                    finish();
-                }
 
-                @Override
-                public void onFail() {
-                    showRegisterLayout();
-                    isLogin = false;
-                }
-            });
+                    @Override
+                    public void onFail() {
+                        showRegisterLayout();
+                        isLogin = false;
+                    }
+                });
+            }
+            if (user.getPhone()!= null) {
+                edtCustomerPhone.setText(user.getPhone());
+                mApi.loginCustomer( user.getPhone(),null, new ApiUtilities.ResponseLoginListener() {
+                    @Override
+                    public void onSuccess(Trip trip, User mUser) {
+                        user = mUser;
+                        Intent intent = new Intent(mContext, PassengerSelectActionActivity.class);
+                        intent.putExtra(Defines.BUNDLE_LOGIN_USER, user);
+                        if (trip != null) {
+                            intent.putExtra(Defines.BUNDLE_LOGIN_TRIP, trip);
+                            if (trip.getDriverId() != 0)
+                                intent.putExtra(Defines.BUNDLE_LOGIN_DRIVER,true);
+                        }
+                        startActivity(intent);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFail() {
+                        showRegisterLayout();
+                        isLogin = false;
+                    }
+                });
+            }
         }
         txtNext.setOnClickListener(this);
         imgBack.setOnClickListener(this);

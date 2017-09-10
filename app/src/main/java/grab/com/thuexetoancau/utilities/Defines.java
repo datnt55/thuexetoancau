@@ -27,6 +27,7 @@ public class Defines {
     public static  final String URL_LIKE_TRIP                   = HOSTNAME + "api2/likeTrip";
     public static  final String URL_SCHEDULE_TRIP               = HOSTNAME + "api2/getTripSchedule";
     public static  final String URL_TRIP_INFO                   = HOSTNAME + "api2/getTripInfo";
+    public static  final String URL_POINT_FOR_USER              = HOSTNAME + "api2/getPointForUser";
     public static  final String     URL_NOTICE                  = HOSTNAME + "api/getNotice";
     public static  final String URL_GET_LONLAT_AIRPORT      = HOSTNAME + "api/getLonLatAirport";
     public static  final String URL_GET_WHO_HIRE            = HOSTNAME + "api/getCarWhoHire ";
@@ -53,7 +54,6 @@ public class Defines {
 
 
     public static  final String DIALOG_CONFIRM_TRIP              = "trip";
-
     public static int MAX_DISTANCE                              = 50000;
     public static int MIN_CURRENT_DISTANCE                      = 20;
     public static final int REQUEST_CODE_PICKER                 = 100;

@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -56,6 +57,17 @@ public class HistoryTripActivity extends AppCompatActivity implements SwipeRefre
 
         mApi = new ApiUtilities(this);
         getHistoryTrip();
+        getUerPoint();
+    }
+
+    private void getUerPoint() {
+        mApi.getUserPoint(userId, new ApiUtilities.UserPointListener() {
+            @Override
+            public void onSuccess(String point) {
+                TextView txtPoint = (TextView) findViewById(R.id.txt_point);
+                txtPoint.setText(point + " điểm");
+            }
+        });
     }
 
     private void getHistoryTrip(){
@@ -92,4 +104,6 @@ public class HistoryTripActivity extends AppCompatActivity implements SwipeRefre
     public void onRefresh() {
         getHistoryTrip();
     }
+
+
 }

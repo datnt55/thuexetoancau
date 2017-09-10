@@ -759,7 +759,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     public void onChangeTextSearch(CharSequence s, AutoCompleteTextView edtSearch) {
         mPlaceArrayAdapter.getFilter().filter(s.toString());
         mPredictFragment.setAdapter(mPlaceArrayAdapter);
-        mPredictFragment.setCharacter(s.toString());
+       // mPredictFragment.setCharacter(s.toString());
     }
 
     @Override

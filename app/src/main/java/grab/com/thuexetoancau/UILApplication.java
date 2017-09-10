@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.Context;
 import android.os.Build;
+import android.os.StrictMode;
 
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -24,6 +25,12 @@ public class UILApplication extends Application {
 		}*/
 		super.onCreate();
 		initImageLoader(getApplicationContext());
+
+		/*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Kitkat and lower has a bug that can cause in correct strict mode
+			// warnings about expected activity counts
+			enableStrictMode();
+		}*/
 	}
 
 	public static void initImageLoader(Context context) {
@@ -41,6 +48,19 @@ public class UILApplication extends Application {
 
 		// Initialize ImageLoader with configuration.
 		ImageLoader.getInstance().init(config.build());
+	}
+
+	public void enableStrictMode() {
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+				.detectAll()
+				.penaltyLog()
+				.penaltyDeath()
+				.build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+				.detectAll()
+				.penaltyLog()
+				.penaltyDeath()
+				.build());
 	}
 
 }
