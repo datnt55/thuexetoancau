@@ -1,7 +1,10 @@
 package grab.com.thuexetoancau.widget;
 
 import android.app.Dialog;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.LayerDrawable;
 import android.media.Rating;
 import android.os.Build;
 import android.os.Bundle;
@@ -91,6 +94,10 @@ public class RatingFragment extends DialogFragment implements View.OnClickListen
         cbFavorite = (CheckBox) view.findViewById(R.id.cb_favorite);
         txtDriverName = (TextView) view.findViewById(R.id.txt_driver_name);
         rating = (RatingBar) view.findViewById(R.id.ratingBar);
+        LayerDrawable stars = (LayerDrawable) rating.getProgressDrawable();
+        stars.getDrawable(2).setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
+        stars.getDrawable(1).setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        stars.getDrawable(0).setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         edtReview = (EditText) view.findViewById(R.id.edt_review);
         txtDriverName.setText(driverName);
     }

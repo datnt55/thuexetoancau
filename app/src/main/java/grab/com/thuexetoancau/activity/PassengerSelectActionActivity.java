@@ -605,11 +605,37 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 startActivityForResult(intentEdit, Defines.CONFIGURE_CODE);
                 break;
             case R.id.layout_fix_gps:
+                layoutFixGPS.setClickable(false);
                 gpsTracker = new GPSTracker(this);
                 if (gpsTracker.handlePermissionsAndGetLocation()) {
                     if (!gpsTracker.canGetLocation()) {
                         DialogUtils.settingRequestTurnOnLocation(PassengerSelectActionActivity.this);
                     } else {
+                        // get car around
+                        for (Marker marker : aroundList)
+                            marker.remove();
+                        mApi.getCarAround(gpsTracker, new ApiUtilities.AroundCarListener() {
+                            @Override
+                            public void onSuccess(ArrayList<AroundCar> aroundCars) {
+                                for (AroundCar car : aroundCars) {
+                                    DecimalFormat df = new DecimalFormat("#.#");
+                                    String gap;
+                                    if ((int) car.getDistance() == 0) {
+                                        String meter = df.format(car.getDistance() * 1000);
+                                        gap = mContext.getResources().getString(R.string.distance_meter, meter);
+                                    } else {
+                                        String kilometer = df.format(car.getDistance());
+                                        gap = mContext.getResources().getString(R.string.distance_kilo_meter, kilometer);
+                                    }
+                                    LatLng aroundLatLon = new LatLng(car.getLatitude(), car.getLongitude());
+                                    Marker marker = mMap.addMarker(new MarkerOptions().position(aroundLatLon).title(mContext.getResources().getString(R.string.distance_car, gap)));
+                                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.car));
+                                    aroundList.add(marker);
+                                    layoutFixGPS.setClickable(true);
+                                }
+                            }
+                        });
+
                         for (Marker marker : markerList)
                             if (marker.getTitle().equals("Vị trí của bạn")) {
                                 CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -631,6 +657,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                                 .tilt(45)                   // Sets the tilt of the camera to 0 degrees
                                 .build();                   // Creates a CameraPosition from the builder
                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
                     }
                 }
                 break;
@@ -793,6 +820,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         hideLayoutDirection();
         layoutSearch.setShowLastSearch(true);
         layoutSearch.requestForcus();
+        layoutSearch.setHint(position);
         showLastSearchFragment(true, position);
     }
 
@@ -804,6 +832,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         AnimUtils.slideDown(layoutSearch, 0);
         hideLayoutDirection();
         layoutSearch.setShowLastSearch(true);
+        layoutSearch.setHint();
         layoutSearch.requestForcus();
         showLastSearchFragment(false, 0);
     }
@@ -971,6 +1000,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         AnimUtils.slideDown(layoutSearch, 0);
         hideLayoutDirection();
         layoutSearch.setShowLastSearch(true);
+        layoutSearch.setHint();
         layoutSearch.requestForcus();
         showLastSearchFragment(true, 1);
     }

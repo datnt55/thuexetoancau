@@ -88,6 +88,17 @@ public class SearchBarLayout extends LinearLayout implements View.OnClickListene
         mCallback.getLayoutSearchHeight(measureView(this));
     }
 
+    public void setHint(int position){
+        if (position != 0)
+            edtSearch.setHint("Nhập vào điểm đến");
+        else
+            edtSearch.setHint("Nhập vào điểm đi");
+    }
+
+    public void setHint(){
+        edtSearch.setHint("Nhập vào điểm đến");
+    }
+
     public void setShowLastSearch(boolean status){
         if (!status)
             imgMenu.setImageResource(R.drawable.ic_menu_black_24dp);

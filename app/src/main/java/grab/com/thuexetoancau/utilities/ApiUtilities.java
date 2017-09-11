@@ -1019,6 +1019,7 @@ public class ApiUtilities {
         params.put("lat", location.getLatitude());
         params.put("lon", location.getLongitude());
         Log.e("TAG",params.toString());
+        final ArrayList<AroundCar> aroundCars = new ArrayList<AroundCar>();
         BaseService.getHttpClient().post(Defines.URL_GET_CAR_AROUND, params, new AsyncHttpResponseHandler() {
 
             @Override
@@ -1030,7 +1031,7 @@ public class ApiUtilities {
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
                 // called when response HTTP status is "200 OK"
                 Log.i("JSON", new String(responseBody));
-                ArrayList<AroundCar> aroundCars = new ArrayList<AroundCar>();
+
                 try {
                     JSONArray data = new JSONArray(new String(responseBody));
                     for (int i = 0; i < data.length(); i++) {
@@ -1049,6 +1050,8 @@ public class ApiUtilities {
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 // called when response HTTP status is "4XX" (eg. 401, 403, 404)
                 //Toast.makeText(getContext(), getResources().getString(R.string.check_network), Toast.LENGTH_SHORT).show();
+                if (listener != null)
+                    listener.onSuccess(aroundCars);
             }
 
             @Override
