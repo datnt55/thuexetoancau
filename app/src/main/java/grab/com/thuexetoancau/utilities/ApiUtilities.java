@@ -345,6 +345,7 @@ public class ApiUtilities {
                 Position position = new Position(arrEndPointName[i],new LatLng(lat,lon));
                 listStopPoint.add(position);
             }
+            int status = booking.getInt("status_booking");
             trip = new Trip(id,useId,listStopPoint,carSize,isOneWay,distance,price,startTime,backTime,isMineTrip,customerName,customerPhone,guestName,guestPhone,note);
             trip.setBookingDateId(bookDateId);
             trip.setBookingTime(bookingTime);
@@ -358,6 +359,7 @@ public class ApiUtilities {
             trip.setDriverName(driverName);
             trip.setDriverPhone(driverPhone);
             trip.setDriverCarNumber(driverCarNumber);
+            trip.setStatus(status);
         } catch (JSONException e) {
             e.printStackTrace();
         }

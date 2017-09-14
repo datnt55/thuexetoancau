@@ -36,6 +36,8 @@ public class Trip implements Serializable{
     private String driverPhone;
     private String driverCarNumber;
     private boolean isCar;
+    private int status;
+
     public Trip() {
     }
 
@@ -290,5 +292,13 @@ public class Trip implements Serializable{
 
     public void setCar(boolean car) {
         isCar = car;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

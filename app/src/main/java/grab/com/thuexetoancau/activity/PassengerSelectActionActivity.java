@@ -172,6 +172,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 @Override
                 public void onSuccess(Trip trip, User mUser) {
                     user = mUser;
+                    lastTrip = trip;
                     initComponents();
                     getIntentFromFirebase();
                 }
@@ -187,6 +188,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         LocalBroadcastManager.getInstance(this).registerReceiver(tripCancel, new IntentFilter(Defines.BROADCAST_CANCEL_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
         LocalBroadcastManager.getInstance(this).registerReceiver(confirmTrip, new IntentFilter(Defines.BROADCAST_CONFFIRM_TRIP));
+        LocalBroadcastManager.getInstance(this).registerReceiver(catchTrip, new IntentFilter(Defines.BROADCAST_CATCH_TRIP));
     }
 
     private void getIntentFromFirebase() {
@@ -207,6 +209,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID, 0);
             String driverName = getIntent().getStringExtra(Defines.BUNDLE_DRIVER_NAME);
             showRatingDialog(bookingId, driverName);
+        }
+
+        // Check trip status
+        if (getIntent().hasExtra(Defines.BUNDLE_CATCH_TRIP)) {
+            toolbar.setTitle(getString(R.string.in_trip));
+            lastTrip.setStatus(Defines.BOOKING_IN_PROGRESS);
+            hideLayoutDirection();
         }
 
        /* // Check customer found driver
@@ -276,7 +285,10 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
 
     private void showCurrentTripAction() {
         toolbar.setVisibility(View.VISIBLE);
-        toolbar.setTitle(getString(R.string.in_trip));
+        if (lastTrip.getStatus() == Defines.BOOKING_IN_PROGRESS)
+            toolbar.setTitle(getString(R.string.in_trip));
+        else if (lastTrip.getStatus() == Defines.BOOKING_WELCOME_CUSTOMER)
+            toolbar.setTitle(getString(R.string.in_wait_driver));
         hideLayoutDirection();
         layoutDriveInfo = new DriverInformationLayout(this, new User(lastTrip.getDriverName(), lastTrip.getDriverPhone(), lastTrip.getDriverCarNumber()));
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -708,6 +720,15 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             }
         } else
             Global.isOnTrip = false;
+
+        // Check trip status
+        if (getIntent().hasExtra(Defines.BUNDLE_CATCH_TRIP)) {
+            Global.isOnTrip = true;
+            showCurrentTripAction();
+            listStopPoint = lastTrip.getListStopPoints();
+            sendRequestFindDirection();
+        }
+
         if (getIntent().hasExtra(Defines.BUNDLE_FOUND_DRIVER)) {
             Global.isOnTrip = true;
             final int bookingId = getIntent().getIntExtra(Defines.BUNDLE_TRIP_ID, 0);
@@ -1103,7 +1124,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             layoutRoot.removeView(layoutSeachingCar);
         }
         toolbar.setVisibility(View.VISIBLE);
-        toolbar.setTitle(getString(R.string.in_trip));
+        toolbar.setTitle(getString(R.string.wait_driver));
         hideLayoutDirection();
         layoutDriveInfo = new DriverInformationLayout(mContext, user);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -1134,6 +1155,17 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 bookingId = intent.getIntExtra(Defines.BUNDLE_TRIP, 0);
                 AnimUtils.slideDown(layoutSeachingCar, Global.APP_SCREEN_HEIGHT);
                 Toast.makeText(mContext, "Rất tiếc, Không có tài xế nào quanh bạn", Toast.LENGTH_LONG).show();
+            } catch (IllegalStateException e) {
+            }
+        }
+    };
+
+    BroadcastReceiver catchTrip = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                toolbar.setTitle(getString(R.string.in_trip));
+
             } catch (IllegalStateException e) {
             }
         }

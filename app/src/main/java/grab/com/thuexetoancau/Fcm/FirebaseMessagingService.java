@@ -110,6 +110,22 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                         confrimTrip(Integer.valueOf(bookingId),driverName);
                 }
             }
+        }else if (function.equals(Defines.DRIVER_CATCH_TRIP)) {
+            String receiveCase = remoteMessage.getData().get("case");
+            if (receiveCase.equals(Defines.SUCCESS)) {
+                String bookingId = remoteMessage.getData().get("id_booking");
+                final Intent intent = new Intent(Defines.BROADCAST_CATCH_TRIP);
+                final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+                //intent.putExtra(Defines.BUNDLE_TRIP, Integer.valueOf(bookingId));
+                //intent.putExtra(Defines.BUNDLE_DRIVER_NAME, driverName);
+                broadcastManager.sendBroadcast(intent);
+                if (!isAppInForeground(this)) {
+                    catchTrip(Integer.valueOf(bookingId));
+                }else {
+                    if (!isScreenOn())
+                        catchTrip(Integer.valueOf(bookingId));
+                }
+            }
         }
     }
 
@@ -147,7 +163,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(pendingIntent)
-                .setVibrate(new long[]{1, 1, 1});
+                .setVibrate(new long[]{0, 100, 200, 300 });
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         manager.notify(Defines.NOTIFY_TAG, bookingId, builder.build());
@@ -190,6 +206,25 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 .setAutoCancel(true)
                 .setContentTitle("Thuê xe toàn cầu")
                 .setContentText(message)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setVibrate(new long[]{1, 1, 1});
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.notify(Defines.NOTIFY_TAG, bookingId, builder.build());
+    }
+
+    private void catchTrip(int bookingId){
+        turnOnScreen();
+        Intent intent = new Intent(this, PassengerSelectActionActivity.class);
+        intent.putExtra(Defines.BUNDLE_CATCH_TRIP, true);
+        intent.putExtra(Defines.BUNDLE_TRIP_ID, bookingId);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setAutoCancel(true)
+                .setContentTitle("Thuê xe toàn cầu")
+                .setContentText("Tài xế đã đón bạn. Chuyến đã sẵn sàng để bắt đầu")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))

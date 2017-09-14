@@ -84,20 +84,28 @@ public class Defines {
     public static final String BUNDLE_CONFIRM_TRIP = "bundle confirm trip";
     public static final String BUNDLE_FOUND_DRIVER = "bundle found driver";
     public static final String BUNDLE_NOT_FOUND_DRIVER = "bundle not found driver";
+    public static final String BUNDLE_CATCH_TRIP = "bundle catch trip";
 
+    public static final String DRIVER_CATCH_TRIP = "CatchTrip";
     public static final String DRIVER_CANCEL_TRIP = "driverCancelTrip";
-    public static final String SUCCESS= "success";
     public static final String BOOKING_GRAB= "bookingGrab";
     public static final String NOT_FOUND_DRIVER= "notfounddriver";
     public static final String RECEIVED_TRIP= "receivedTrip";
     public static final String CONFIRM_TRIP= "confirmTrip";
     public static final String RATE_TRIP= "rate";
+
+    public static final String SUCCESS= "success";
+
     public static final String BROADCAST_RECEIVED_TRIP= "broadcast received Trip";
     public static final String BROADCAST_NOT_FOUND_DRIVER = "broadcast not found driver";
     public static final String BROADCAST_CANCEL_TRIP= "broadcast cancel Trip";
     public static final String BROADCAST_CONFFIRM_TRIP = "confirm trip";
+    public static final String BROADCAST_CATCH_TRIP = "broascast catch trip";
 
     // Notification tag
     public static final String NOTIFY_TAG = "notify tag";
+
+    public static final int BOOKING_IN_PROGRESS = 99 ;
+    public static final int BOOKING_WELCOME_CUSTOMER = 1 ;
 
 }
