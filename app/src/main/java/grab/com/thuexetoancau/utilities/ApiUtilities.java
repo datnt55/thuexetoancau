@@ -671,7 +671,7 @@ public class ApiUtilities {
                         if (listener != null)
                             listener.onSuccess(serverTime);
                     }else{
-                        Toast.makeText(mContext, mContext.getResources().getString(R.string.log_out_error), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, mContext.getResources().getString(R.string.error_network), Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

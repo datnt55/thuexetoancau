@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -101,6 +102,7 @@ import grab.com.thuexetoancau.utilities.DialogUtils;
 import grab.com.thuexetoancau.utilities.Global;
 import grab.com.thuexetoancau.utilities.Defines;
 import grab.com.thuexetoancau.utilities.GPSTracker;
+import grab.com.thuexetoancau.utilities.MarkerAnimation;
 import grab.com.thuexetoancau.utilities.SharePreference;
 import grab.com.thuexetoancau.widget.ConfirmDialogFragment;
 import grab.com.thuexetoancau.widget.DirectionLayout;
@@ -189,6 +191,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         LocalBroadcastManager.getInstance(this).registerReceiver(notFoundDriver, new IntentFilter(Defines.BROADCAST_NOT_FOUND_DRIVER));
         LocalBroadcastManager.getInstance(this).registerReceiver(confirmTrip, new IntentFilter(Defines.BROADCAST_CONFFIRM_TRIP));
         LocalBroadcastManager.getInstance(this).registerReceiver(catchTrip, new IntentFilter(Defines.BROADCAST_CATCH_TRIP));
+        LocalBroadcastManager.getInstance(this).registerReceiver(autoPostGPS, new IntentFilter(Defines.BROADCAST_AUTO_GPS));
     }
 
     private void getIntentFromFirebase() {
@@ -1166,6 +1169,21 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             try {
                 toolbar.setTitle(getString(R.string.in_trip));
 
+            } catch (IllegalStateException e) {
+            }
+        }
+    };
+
+    BroadcastReceiver autoPostGPS = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            try {
+                double lat = intent.getDoubleExtra(Defines.BUNDLE_LAT, 0);
+                double lon = intent.getDoubleExtra(Defines.BUNDLE_LON, 0);
+                Location lastLocation = new Location("last locate");
+                lastLocation.setLatitude(lat);
+                lastLocation.setLongitude(lon);
+                MarkerAnimation.animateMarker(lastLocation,currentLocation);
             } catch (IllegalStateException e) {
             }
         }

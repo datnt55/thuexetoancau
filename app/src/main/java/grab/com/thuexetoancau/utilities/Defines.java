@@ -78,6 +78,8 @@ public class Defines {
     public static final String BUNDLE_DRIVER= "bundle driver";
     public static final String BUNDLE_DRIVER_NAME= "bundle driver name";
     public static final String BUNDLE_PRICE= "bundle price";
+    public static final String BUNDLE_LAT = "bundle lat";
+    public static final String BUNDLE_LON = "bundle lon";
 
     // Main Screen Dimension, will be set when app startup
 
@@ -87,6 +89,7 @@ public class Defines {
     public static final String BUNDLE_CATCH_TRIP = "bundle catch trip";
 
     public static final String DRIVER_CATCH_TRIP = "CatchTrip";
+    public static final String DRIVER_AUTO_POST_GPS = "autoPostGpsToCustomerAndDriver";
     public static final String DRIVER_CANCEL_TRIP = "driverCancelTrip";
     public static final String BOOKING_GRAB= "bookingGrab";
     public static final String NOT_FOUND_DRIVER= "notfounddriver";
@@ -94,13 +97,15 @@ public class Defines {
     public static final String CONFIRM_TRIP= "confirmTrip";
     public static final String RATE_TRIP= "rate";
 
-    public static final String SUCCESS= "success";
+    public static final String SUCCESS = "success";
+    public static final String TO_CUSTOMER = "toCustomer";
 
     public static final String BROADCAST_RECEIVED_TRIP= "broadcast received Trip";
     public static final String BROADCAST_NOT_FOUND_DRIVER = "broadcast not found driver";
     public static final String BROADCAST_CANCEL_TRIP= "broadcast cancel Trip";
     public static final String BROADCAST_CONFFIRM_TRIP = "confirm trip";
     public static final String BROADCAST_CATCH_TRIP = "broascast catch trip";
+    public static final String BROADCAST_AUTO_GPS = "broascast auto gps";
 
     // Notification tag
     public static final String NOTIFY_TAG = "notify tag";

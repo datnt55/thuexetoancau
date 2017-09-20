@@ -126,6 +126,18 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                         catchTrip(Integer.valueOf(bookingId));
                 }
             }
+        }else if (function.equals(Defines.DRIVER_AUTO_POST_GPS)) {
+            String receiveCase = remoteMessage.getData().get("case");
+            if (receiveCase.equals(Defines.TO_CUSTOMER)) {
+                String driverLat = remoteMessage.getData().get("driver_lat");
+                String driverLon = remoteMessage.getData().get("driver_lon");
+
+                final Intent intent = new Intent(Defines.BROADCAST_AUTO_GPS);
+                final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(this);
+                intent.putExtra(Defines.BUNDLE_LAT, Double.valueOf(driverLat));
+                intent.putExtra(Defines.BUNDLE_LON, Double.valueOf(driverLon));
+                broadcastManager.sendBroadcast(intent);
+            }
         }
     }
 
