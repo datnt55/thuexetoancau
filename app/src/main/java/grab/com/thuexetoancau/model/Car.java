@@ -1,10 +1,12 @@
 package grab.com.thuexetoancau.model;
 
+import java.io.Serializable;
+
 /**
  * Created by DatNT on 7/20/2017.
  */
 
-public class Car {
+public class Car implements Serializable {
     private int size;
     private String  name;
     private boolean isCar;

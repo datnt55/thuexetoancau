@@ -54,6 +54,7 @@ public class Defines {
 
 
     public static  final String DIALOG_CONFIRM_TRIP              = "trip";
+    public static  final String DIALOG_UNIT_PRICE                = "unit price";
     public static int MAX_DISTANCE                              = 50000;
     public static int MIN_CURRENT_DISTANCE                      = 20;
     public static final int REQUEST_CODE_PICKER                 = 100;

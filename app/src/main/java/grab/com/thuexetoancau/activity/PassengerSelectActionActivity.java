@@ -996,6 +996,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         dialogConfirm.setOnCallBack(this);
         Bundle bundle = new Bundle();
         bundle.putSerializable(Defines.DIALOG_CONFIRM_TRIP, trip);
+        bundle.putSerializable(Defines.DIALOG_UNIT_PRICE, carSelectd);
         dialogConfirm.setArguments(bundle);
         dialogConfirm.setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialog);
         dialogConfirm.setCancelable(false);

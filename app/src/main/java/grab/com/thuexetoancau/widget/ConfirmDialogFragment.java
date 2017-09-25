@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import grab.com.thuexetoancau.R;
+import grab.com.thuexetoancau.model.Car;
 import grab.com.thuexetoancau.model.Trip;
 import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
@@ -61,7 +62,9 @@ public class ConfirmDialogFragment extends DialogFragment {
     private RadioButton rOwne, rFriend;
     private Button btnConfirm;
     private int totalDistance;
+    private long price;
     private ConfirmDialogListener callback;
+    private Car carPrice;
     private DateTime startTime, endTime;
     public interface ConfirmDialogListener {
         void onConfirmed(Trip mTrip);
@@ -84,7 +87,7 @@ public class ConfirmDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState) {
         Bundle bundle = getArguments();
         mTrip = (Trip) bundle.getSerializable(Defines.DIALOG_CONFIRM_TRIP);
-
+        carPrice = (Car) bundle.getSerializable(Defines.DIALOG_UNIT_PRICE);
         View view = inflater.inflate(R.layout.dialog_booking, container);
         //---set the title for the dialog
         getDialog().setTitle(title);
@@ -124,7 +127,7 @@ public class ConfirmDialogFragment extends DialogFragment {
         txtDistance.setText(CommonUtilities.convertToKilometer(totalDistance));
         txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
         mTrip.setCustomerType(1);
-
+        price = mTrip.getPrice();
 
         if (totalDistance < Defines.MAX_DISTANCE) {
             layoutStart.setVisibility(View.GONE);
@@ -216,8 +219,15 @@ public class ConfirmDialogFragment extends DialogFragment {
                             DateTime endTime = dtf.parseDateTime(txtBackTime.getText().toString());
                             mTrip.setEndTime(dtfTrip.print(endTime));
                             int days = Days.daysBetween(endTime.toLocalDate(), startTime.toLocalDate()).getDays();
-                            if (days > 2)
+                            if (days > 2) {
+                                if (mTrip.getTripType() == 1){
+                                    int unit = carPrice.getPrice01way();
+
+                                }else{
+
+                                }
                                 mTrip.setPrice(mTrip.getPrice() * days);
+                            }
                         }
                     }
                 }
@@ -241,6 +251,12 @@ public class ConfirmDialogFragment extends DialogFragment {
             txtCaution.setVisibility(View.GONE);
             txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
         }
+        if (mTrip.getCarSize() != 5 && mTrip.getCarSize() != 8) {
+            txtPrice.setText(CommonUtilities.convertCurrency(200*days*)+ " vnđ");
+        }else {
+            txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
+        }
+
     }
     private void showDateTimeDialog(final TextView txtDate){
         final View dialogView = View.inflate(getActivity(), R.layout.date_time_picker, null);
