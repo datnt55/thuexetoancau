@@ -125,9 +125,20 @@ public class ConfirmDialogFragment extends DialogFragment {
         txtTypeTrip.setText(CommonUtilities.getTripType(mTrip.getTripType()));
         totalDistance = mTrip.getDistance();
         txtDistance.setText(CommonUtilities.convertToKilometer(totalDistance));
-        txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
         mTrip.setCustomerType(1);
-        price = mTrip.getPrice();
+        if (mTrip.getCarSize() != 5 && mTrip.getCarSize() != 8) {
+            if( totalDistance > Defines.MAX_DISTANCE)
+                if (mTrip.getTripType() == Defines.ONE_WAY)
+                    price = 200 * 1 * carPrice.getPrice01way();
+                else
+                    price = 200 * 1 * carPrice.getPrice02way();
+            else
+                price = 200 * 1 * carPrice.getPrice11way();
+            txtPrice.setText(CommonUtilities.convertCurrency(price)+ " vnđ");
+        }else {
+            price = mTrip.getPrice();
+            txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
+        }
 
         if (totalDistance < Defines.MAX_DISTANCE) {
             layoutStart.setVisibility(View.GONE);
@@ -219,15 +230,7 @@ public class ConfirmDialogFragment extends DialogFragment {
                             DateTime endTime = dtf.parseDateTime(txtBackTime.getText().toString());
                             mTrip.setEndTime(dtfTrip.print(endTime));
                             int days = Days.daysBetween(endTime.toLocalDate(), startTime.toLocalDate()).getDays();
-                            if (days > 2) {
-                                if (mTrip.getTripType() == 1){
-                                    int unit = carPrice.getPrice01way();
-
-                                }else{
-
-                                }
-                                mTrip.setPrice(mTrip.getPrice() * days);
-                            }
+                            mTrip.setPrice(price);
                         }
                     }
                 }
@@ -252,8 +255,16 @@ public class ConfirmDialogFragment extends DialogFragment {
             txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
         }
         if (mTrip.getCarSize() != 5 && mTrip.getCarSize() != 8) {
-            txtPrice.setText(CommonUtilities.convertCurrency(200*days*)+ " vnđ");
+            if( totalDistance > Defines.MAX_DISTANCE)
+                if (mTrip.getTripType() == Defines.ONE_WAY)
+                    price = 200 * days * carPrice.getPrice01way();
+                else
+                    price = 200 * days * carPrice.getPrice02way();
+            else
+                price = 200 * days * carPrice.getPrice11way();
+            txtPrice.setText(CommonUtilities.convertCurrency(price)+ " vnđ");
         }else {
+            price = mTrip.getPrice();
             txtPrice.setText(CommonUtilities.convertCurrency(mTrip.getPrice())+ " vnđ");
         }
 

@@ -14,6 +14,7 @@ import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -147,7 +148,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private ArrayList<Position> listStopPoint = new ArrayList<>();
     private ArrayList<Marker> markerList = new ArrayList<>();
     private ArrayList<Marker> aroundList = new ArrayList<>();
-    private Marker currentLocation;
+    private Marker currentLocation, driverLocation;
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ArrayList<Car> listCar = new ArrayList<>();
     private Position mFrom, mEnd;
@@ -161,7 +162,6 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     private TextView txtName, txtEmail;
     private ProgressDialog dialogDirection;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1174,7 +1174,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
             }
         }
     };
-
+    private double distanceDriver;
     BroadcastReceiver autoPostGPS = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1184,7 +1184,19 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 Location lastLocation = new Location("last locate");
                 lastLocation.setLatitude(lat);
                 lastLocation.setLongitude(lon);
-                MarkerAnimation.animateMarker(lastLocation,currentLocation);
+                if (driverLocation == null) {
+                    driverLocation = mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lon)).title("Vị trí của tài xế").icon(BitmapDescriptorFactory.fromResource(R.drawable.car)));
+                    driverLocation.showInfoWindow();
+                    markerList.add(driverLocation);
+                    distanceDriver = CommonUtilities.distanceInMeter(new LatLng(lat,lon), currentLocation.getPosition());
+                }else {
+                    double distance = CommonUtilities.distanceInMeter(new LatLng(lat,lon), driverLocation.getPosition());
+                    double velocity = distance/3;
+                    double timeRemain = (distanceDriver/ velocity)/60;
+                    driverLocation.setTitle(timeRemain+" phút");
+                    driverLocation.setPosition(new LatLng(lat,lon));
+                    MarkerAnimation.animateMarker(lastLocation, driverLocation);
+                }
             } catch (IllegalStateException e) {
             }
         }
@@ -1329,11 +1341,25 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                 break;
 
             case R.id.nav_invite:
-                Toast.makeText(mContext, "Chức năng đang được cập nhật", Toast.LENGTH_SHORT).show();
+                final String app = getPackageName(); // getPackageName() from Context or Activity object
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "market://details?id=" + app);
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
                 break;
 
             case R.id.nav_support:
                 Toast.makeText(mContext, "Chức năng đang được cập nhật", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.nav_driver:
+                final String appPackageName = "grab.com.thuexetoancau.driver"; // getPackageName() from Context or Activity object
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                }
                 break;
 
         }

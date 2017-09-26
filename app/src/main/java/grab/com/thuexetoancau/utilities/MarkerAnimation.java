@@ -33,12 +33,12 @@ public class MarkerAnimation {
                         LatLng newPosition = latLngInterpolator.interpolate(v, startPosition, endPosition);
                         marker.setPosition(newPosition);
                         float angle = computeRotation(v, startRotation, destination.getBearing());
-                        if (angle > 180){
+                     /*   if (angle > 180){
                             marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.car));
                             marker.setRotation(angle-180);
                         }else if (angle <= 180 && angle >= 160) {
                             marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.car));
-                        }else
+                        }else*/
                             marker.setRotation(angle);
                     } catch (Exception ex) {
                         // I don't care atm..

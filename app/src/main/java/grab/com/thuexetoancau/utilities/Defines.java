@@ -114,4 +114,7 @@ public class Defines {
     public static final int BOOKING_IN_PROGRESS = 99 ;
     public static final int BOOKING_WELCOME_CUSTOMER = 1 ;
 
+    public static final int ONE_WAY = 1 ;
+    public static final int ROUND_TRIP = 0 ;
+
 }

@@ -18,6 +18,7 @@ import grab.com.thuexetoancau.activity.PassengerSelectActionActivity;
 import grab.com.thuexetoancau.adapter.TransportationAdapter;
 import grab.com.thuexetoancau.listener.ChangeTripInfo;
 import grab.com.thuexetoancau.model.Car;
+import grab.com.thuexetoancau.utilities.CommonUtilities;
 import grab.com.thuexetoancau.utilities.Defines;
 
 /**
@@ -124,14 +125,30 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
     }
 
     private void setCarPrice(int distance) {
-        for (Car car : transports)
-            if (totalDistance < Defines.MAX_DISTANCE)
-                car.setTotalPrice(car.getPrice11way()*(distance/1000));
-            else if (tripType == 1)
-                car.setTotalPrice(car.getPrice01way()*(distance/1000));
-            else {
-                car.setTotalPrice((car.getPrice02way()+car.getPrice02way()) * (distance/ 1000));
+        for (Car car : transports) {
+            if (distance ==0) {
+                car.setTotalPrice(0);
+                continue;
             }
+            if (car.getSize() != 5 && car.getSize() != 8) {
+                if (totalDistance > Defines.MAX_DISTANCE)
+                    if (tripType == Defines.ONE_WAY)
+                        car.setTotalPrice(car.getPrice01way() * 200);
+                    else
+                        car.setTotalPrice(car.getPrice02way() * 200);
+                else
+                    car.setTotalPrice(car.getPrice11way() * 200);
+            } else {
+                if (totalDistance < Defines.MAX_DISTANCE)
+                    car.setTotalPrice(car.getPrice11way() * (distance / 1000));
+                else if (tripType == Defines.ONE_WAY)
+                    car.setTotalPrice(car.getPrice01way() * (distance / 1000));
+                else {
+                    car.setTotalPrice((car.getPrice02way() + car.getPrice02way()) * (distance / 1000));
+                }
+            }
+        }
+
     }
 
     @Override

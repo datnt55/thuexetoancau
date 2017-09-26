@@ -27,6 +27,10 @@
         android:icon="@drawable/ic_mail_outline_black_24dp"
         android:title="Hỗ trợ" />
     <item
+        android:id="@+id/nav_driver"
+        android:icon="@drawable/driver_icon"
+        android:title="Làm tài xế" />
+    <item
         android:id="@+id/nav_log_out"
         android:icon="@drawable/ic_exit_to_app_black_24dp"
         android:title="Đăng xuất" />
