@@ -162,11 +162,13 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     private TextView txtName, txtEmail;
     private ProgressDialog dialogDirection;
+    private MarkerAnimation animation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passenger_select_action);
         mApi = new ApiUtilities(this);
+        animation = new MarkerAnimation(this);
         if (getIntent().hasExtra(Defines.BUNDLE_LOGIN_USER))
             user = (User) getIntent().getSerializableExtra(Defines.BUNDLE_LOGIN_USER);
         if (user == null) {
@@ -1197,7 +1199,7 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
                     double timeRemain = (distanceDriver/ velocity)/60;
                     driverLocation.setTitle(timeRemain+" phút");
                     driverLocation.setPosition(new LatLng(lat,lon));
-                    MarkerAnimation.animateMarker(lastLocation, driverLocation);
+                    animation.animateMarker(lastLocation, driverLocation);
                 }
             } catch (IllegalStateException e) {
             }
