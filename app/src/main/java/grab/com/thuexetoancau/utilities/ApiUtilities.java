@@ -176,6 +176,9 @@ public class ApiUtilities {
                             trip = parseBookingData(booking);
                         }
                         User user = new User(useId, customerName,customerPhone,customerEmail,null);
+                        if (data.has("driver_car_model")){
+                            user.setCarModel(data.getString("driver_car_model"));
+                        }
                         if (listener != null)
                             listener.onSuccess(trip, user);
                     }else
@@ -246,7 +249,11 @@ public class ApiUtilities {
                             JSONObject booking = data.getJSONObject("booking_data");
                             trip = parseBookingData(booking);
                         }
+
                         User user = new User(useId, customerName,customerPhone,customerEmail,null);
+                        if (data.has("driver_car_model")){
+                            user.setCarModel(data.getString("driver_car_model"));
+                        }
                         if (listener != null)
                             listener.onSuccess(trip, user);
                     }else {

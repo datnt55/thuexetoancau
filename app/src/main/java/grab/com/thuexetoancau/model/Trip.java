@@ -35,6 +35,7 @@ public class Trip implements Serializable{
     private String driverName;
     private String driverPhone;
     private String driverCarNumber;
+    private String carModel;
     private boolean isCar;
     private int status;
 
@@ -300,5 +301,13 @@ public class Trip implements Serializable{
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getCarModel() {
+        return carModel;
+    }
+
+    public void setCarModel(String carModel) {
+        this.carModel = carModel;
     }
 }

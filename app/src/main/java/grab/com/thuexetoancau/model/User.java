@@ -13,6 +13,7 @@ public class User implements Serializable{
     private String email;
     private String url;
     private String license;
+    private String carModel;
     public User() {
     }
 
@@ -76,5 +77,13 @@ public class User implements Serializable{
 
     public void setLicense(String license) {
         this.license = license;
+    }
+
+    public String getCarModel() {
+        return carModel;
+    }
+
+    public void setCarModel(String carModel) {
+        this.carModel = carModel;
     }
 }

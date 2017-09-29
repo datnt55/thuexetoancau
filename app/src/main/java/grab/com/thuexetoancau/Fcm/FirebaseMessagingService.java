@@ -71,9 +71,10 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 String bookingId = remoteMessage.getData().get("id_booking");
                 String carType = remoteMessage.getData().get("car_type");
                 String carNumber = remoteMessage.getData().get("driver_car_number");
-
+                String carModel = remoteMessage.getData().get("driver_car_model");
                 User user = new User(0, dName, dPhone, "", "");
                 user.setLicense(carNumber);
+                user.setCarModel(carModel);
                 if (Integer.valueOf(carType) == 0) {
                     foundDriver(user, Integer.valueOf(bookingId), Integer.valueOf(carType), "Tài xế " + dName + " đã chấp nhận chuyến đi của bạn");
                 }else {

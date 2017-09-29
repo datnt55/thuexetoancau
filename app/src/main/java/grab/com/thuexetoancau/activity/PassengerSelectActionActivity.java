@@ -293,7 +293,9 @@ public class PassengerSelectActionActivity extends AppCompatActivity implements
         else if (lastTrip.getStatus() == Defines.BOOKING_WELCOME_CUSTOMER)
             toolbar.setTitle(getString(R.string.in_wait_driver));
         hideLayoutDirection();
-        layoutDriveInfo = new DriverInformationLayout(this, new User(lastTrip.getDriverName(), lastTrip.getDriverPhone(), lastTrip.getDriverCarNumber()));
+        User driver = new User(lastTrip.getDriverName(), lastTrip.getDriverPhone(), lastTrip.getDriverCarNumber());
+        driver.setCarModel(user.getCarModel());
+        layoutDriveInfo = new DriverInformationLayout(this, driver);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         layoutDriveInfo.setLayoutParams(params);
