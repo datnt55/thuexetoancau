@@ -126,33 +126,28 @@ public class TransportationLayout extends LinearLayout implements View.OnClickLi
 
     private void setCarPrice(int distance) {
         for (Car car : transports) {
-            if (distance ==0) {
+            if (distance == 0) {
                 car.setTotalPrice(0);
                 continue;
             }
-            long day = Math.round(totalDistance/1000/200 + 0.5 );
+            long day = Math.round(totalDistance / 1000 / 200 + 0.5);
             if (car.getSize() != 5 && car.getSize() != 8) {
-                if (totalDistance > Defines.MAX_DISTANCE)
-                    if (tripType == Defines.ONE_WAY)
-                        car.setTotalPrice(car.getPrice01way() * 200*day*130/100);
-                    else
-                        car.setTotalPrice(car.getPrice02way() * 200*day*130/100);
+                if (tripType == Defines.ONE_WAY)
+                    car.setTotalPrice(car.getPrice01way() * 200 * day);
                 else
-                    car.setTotalPrice(car.getPrice11way() * 200*day*130/100);
+                    car.setTotalPrice(car.getPrice02way() * 200 * day * 130 / 100);
             } else {
-                if (totalDistance < Defines.MAX_DISTANCE)
+                if (totalDistance < Defines.MAX_DISTANCE) {
+                    car.setTotalPrice(car.getPrice11way() * (distance / 1000) * day);
+                } else {
                     if (tripType == Defines.ONE_WAY)
-                        car.setTotalPrice(car.getPrice11way() * (distance / 1000)*day*130/100);
-                    else
-                        car.setTotalPrice((car.getPrice02way()) * (distance / 1000)*day*130/100);
-                else if (tripType == Defines.ONE_WAY)
-                    car.setTotalPrice(car.getPrice01way() * (distance / 1000)*day*130/100);
-                else {
-                    car.setTotalPrice((car.getPrice02way()) * (distance / 1000)*day*130/100);
+                        car.setTotalPrice(car.getPrice01way() * (distance / 1000) * day);
+                    else {
+                        car.setTotalPrice((car.getPrice02way()) * (distance / 1000) * day * 130 / 100);
+                    }
                 }
             }
         }
-
     }
 
     @Override
